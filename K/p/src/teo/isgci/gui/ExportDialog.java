@@ -63,7 +63,7 @@ public class ExportDialog extends JDialog implements ActionListener {
         Container content = getContentPane();
         JPanel buttonPanel = new JPanel();
         Box buttonBox = new Box(BoxLayout.X_AXIS);
-
+        
         cardPanel = new JPanel();
         cardPanel.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10))); 
 

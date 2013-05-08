@@ -52,6 +52,7 @@ public class ISGCIGraphCanvas extends
     public static final Color COLOR_NPC = Color.red;
     public static final Color COLOR_INTERMEDIATE = SColor.brighter(Color.red);
     public static final Color COLOR_UNKNOWN = Color.white;
+    private ISGCIMainFrame myPar;
 
 
     public ISGCIGraphCanvas(ISGCIMainFrame parent) {
@@ -63,6 +64,7 @@ public class ISGCIGraphCanvas extends
         edgePopup = new EdgePopup(parent);
         add(nodePopup);
         add(edgePopup);
+        myPar = parent;
     }
 
 
@@ -91,6 +93,9 @@ public class ISGCIGraphCanvas extends
                 GAlg.split(graph, DefaultEdge.class);
         //System.err.println(list);
         drawGraphs(list);
+        if (myPar.export()) {
+        	myPar.loadInitialGraph();
+        }
     }
     
     
@@ -166,6 +171,9 @@ public class ISGCIGraphCanvas extends
             problem = p;
             setComplexityColors();
             repaint();
+            if (myPar.export()) {
+            	myPar.loadInitialGraph();
+            }
         }
     }
 
@@ -212,6 +220,9 @@ public class ISGCIGraphCanvas extends
         setPreferedNames();
         updateBounds();
         repaint();
+        if (myPar.export()) {
+        	myPar.loadInitialGraph();
+        }
     }
 
     public Algo.NamePref getNamingPref() {

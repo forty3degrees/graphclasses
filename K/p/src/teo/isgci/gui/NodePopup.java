@@ -44,6 +44,7 @@ public class NodePopup extends JPopupMenu implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == infoItem) {
+        	System.out.println(view.getFullName());
             JDialog d = new GraphClassInformationDialog(
                     parent, DataSet.getClass(view.getFullName()));
             d.setLocation(50, 50);

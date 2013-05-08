@@ -178,6 +178,7 @@ public class Generate {
             List<Problem> problems,
             List<AbstractRelation> relations)
             throws java.net.MalformedURLException {
+    	System.out.println(file);
         Loader loader = new Loader("file:"+System.getProperty("user.dir")+"/",
                 true);
         ISGCIReader gcr = new ISGCIReader(graph, problems);

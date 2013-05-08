@@ -1,2 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<qualifiedTypeNameHistroy/>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="teo.isg.Graph"/>
+<fullyQualifiedTypeName name="y.base.Graph"/>
+<fullyQualifiedTypeName name="teo.isgci.db.Algo.NamePref"/>
+<fullyQualifiedTypeName name="java.io.File"/>
+<fullyQualifiedTypeName name="java.net.URL"/>
+<fullyQualifiedTypeName name="javax.swing.Action"/>
+<fullyQualifiedTypeName name="javax.swing.ImageIcon"/>
+<fullyQualifiedTypeName name="com.sun.org.apache.xerces.internal.util.URI"/>
+<fullyQualifiedTypeName name="javax.swing.filechooser.FileFilter"/>
+<fullyQualifiedTypeName name="java.net.URI"/>
+<fullyQualifiedTypeName name="java.util.regex.Pattern"/>
+<fullyQualifiedTypeName name="y.base.Node"/>
+<fullyQualifiedTypeName name="y.view.GenericNodeRealizer.Factory"/>
+<fullyQualifiedTypeName name="java.awt.color.ICC_ProfileRGB"/>
+</qualifiedTypeNameHistroy>

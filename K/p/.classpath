@@ -8,8 +8,9 @@
 	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/Mouse.jar"/>
 	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/saxon8.jar"/>
 	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/xml-writer.jar"/>
-	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/jgrapht.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/K/p/src/stuff/Isgci/lib/jgrapht.jar"/>
 	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/saxon.jar"/>
 	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/xalan.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/K/p/src/stuff/Isgci/lib/y.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -2,8 +2,8 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="257" key="DIALOG_WIDTH"/>
-		<item value="122" key="DIALOG_Y_ORIGIN"/>
-		<item value="817" key="DIALOG_X_ORIGIN"/>
+		<item value="528" key="DIALOG_Y_ORIGIN"/>
+		<item value="815" key="DIALOG_X_ORIGIN"/>
 		<item value="372" key="DIALOG_HEIGHT"/>
 		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
 	</section>
@@ -13,18 +13,19 @@
 		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="xsl" key="selection"/>
+		<item value="infoItem" key="selection"/>
 		<list key="findhistory">
-			<item value="xsl"/>
-			<item value="masterdata"/>
-			<item value="masterda"/>
-			<item value="smallgraphs.x"/>
-			<item value="smallgraph"/>
-			<item value="rm&quot;"/>
-			<item value="rm "/>
-			<item value="rm"/>
+			<item value="infoItem"/>
+			<item value="boolean check = "/>
+			<item value="check = "/>
+			<item value="check"/>
+			<item value="chk"/>
+			<item value="infoitem"/>
+			<item value=".add(miGraphClassI"/>
+			<item value=".add(mi"/>
 		</list>
 		<list key="replacehistory">
+			<item value=""/>
 		</list>
 	</section>
 </section>
