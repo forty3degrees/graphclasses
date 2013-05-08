@@ -8,6 +8,7 @@
 *.gz
 *.xz
 *.tar
+*.jar
 *.zip
 *.nbm
 *.orig
