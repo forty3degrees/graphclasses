@@ -1400,7 +1400,6 @@ public class ISGCIMainFrame extends JFrame
         if (object == miDrawUnproper) {
             graphCanvas.setDrawUnproper(
                     ((JCheckBoxMenuItem) object).getState());
-            export();
             loadInitialGraph();
         }
     }
