@@ -12,11 +12,15 @@ package teo.isgci.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -25,6 +29,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.print.PageFormat;
@@ -124,8 +130,10 @@ import y.view.Graph2DViewRepaintManager;
 import y.view.HitInfo;
 import y.view.LineType;
 import y.view.MovePortMode;
+import y.view.NavigationComponent;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
+import y.view.Overview;
 import y.view.PopupMode;
 import y.view.ProxyShapeNodeRealizer;
 import y.view.ShapeNodeRealizer;
@@ -195,6 +203,7 @@ public class ISGCIMainFrame extends JFrame
     protected JMenuItem miSmallgraphs, miHelp, miAbout;
     
     private static boolean check = false;
+    private static boolean oldStyle = false;
 
     // This is where the drawing goes.
     protected JScrollPane drawingPane;
@@ -352,6 +361,8 @@ public class ISGCIMainFrame extends JFrame
     public ISGCIMainFrame(teo.Loader loader) {
         super(APPLICATIONNAME);
         
+        
+        
         layouter = new IncrementalHierarchicLayouter();
         layouter.setOrthogonallyRouted(true);
         layouter.setRecursiveGroupLayeringEnabled(false);
@@ -367,6 +378,8 @@ public class ISGCIMainFrame extends JFrame
         
         applyRealizerDefaults(view.getGraph2D(), true, true);
 
+        addGlassPaneComponents();
+        
         loader.register();
         this.loader = loader;
         tracker = this;
@@ -441,6 +454,111 @@ public class ISGCIMainFrame extends JFrame
         view.fitContent();
     }
     
+    
+    /* Test */
+    
+    private Overview createOverview(Graph2DView view) {
+        Overview ov = new Overview(view);
+        /* customize the overview */
+        //animates the scrolling
+        ov.putClientProperty("Overview.AnimateScrollTo", Boolean.TRUE);
+        //blurs the part of the graph which can currently not be seen
+        ov.putClientProperty("Overview.PaintStyle", "Funky");
+        //allows zooming from within the overview
+        ov.putClientProperty("Overview.AllowZooming", Boolean.TRUE);
+        //provides functionality for navigation via keybord (zoom in (+), zoom out (-), navigation with arrow keys)
+        ov.putClientProperty("Overview.AllowKeyboardNavigation", Boolean.TRUE);
+        //determines how to differ between the part of the graph that can currently be seen, and the rest
+        ov.putClientProperty("Overview.Inverse", Boolean.TRUE);
+        ov.setPreferredSize(new Dimension(150, 150));
+        ov.setMinimumSize(new Dimension(150, 150));
+
+        ov.setBorder(BorderFactory.createEtchedBorder());
+        return ov;
+      }
+    
+    private JComponent overview, navigationComponent;
+    
+    private void addGlassPaneComponents() {
+        //get the glass pane
+        JPanel glassPane = view.getGlassPane();
+        //set an according layout manager
+        glassPane.setLayout(new BorderLayout());
+
+        JPanel toolsPanel = new JPanel(new GridBagLayout());
+        toolsPanel.setOpaque(false);
+        toolsPanel.setBackground(null);
+        toolsPanel.setBorder(BorderFactory.createEmptyBorder(16, 16, 0, 0));
+
+        //create and add the overview to the tools panel
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.insets = new Insets(0, 0, 16, 0);
+        overview = createOverview(view);
+        toolsPanel.add(overview, gbc);
+
+        //create and add the navigation component to the tools panel
+        navigationComponent = createNavigationComponent(view, 20, 30);
+        toolsPanel.add(navigationComponent, gbc);
+
+        //add the toolspanel to the glass pane
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        JViewport viewport = new JViewport();
+        viewport.add(toolsPanel);
+        viewport.setOpaque(false);
+        viewport.setBackground(null);
+        JPanel westPanel = new JPanel(new BorderLayout());
+        westPanel.setOpaque(false);
+        westPanel.setBackground(null);
+        westPanel.add(viewport, BorderLayout.NORTH);
+        glassPane.add(westPanel, BorderLayout.WEST);
+      }
+
+      private NavigationComponent createNavigationComponent(Graph2DView view, double scrollStepSize, int scrollTimerDelay) {
+        //create the NavigationComponent itself
+        final NavigationComponent navigation = new NavigationComponent(view);
+        navigation.setScrollStepSize(scrollStepSize);
+        //set the duration between scroll ticks
+        navigation.putClientProperty("NavigationComponent.ScrollTimerDelay", new Integer(scrollTimerDelay));
+        //set the initial duration until the first scroll tick is triggered
+        navigation.putClientProperty("NavigationComponent.ScrollTimerInitialDelay", new Integer(scrollTimerDelay));
+        //set a flag so that the fit content button will adjust the viewports in an animated fashion
+        navigation.putClientProperty("NavigationComponent.AnimateFitContent", Boolean.TRUE);
+
+        //add a mouse listener that will make a semi transparent background, as soon as the mouse enters this component
+        navigation.setBackground(new Color(255, 255, 255, 0));
+        MouseAdapter navigationToolListener = new MouseAdapter() {
+          public void mouseEntered(MouseEvent e) {
+            super.mouseEntered(e);
+            Color background = navigation.getBackground();
+            //add some semi transparent background
+            navigation.setBackground(new Color(background.getRed(), background.getGreen(), background.getBlue(), 196));
+          }
+
+          public void mouseExited(MouseEvent e) {
+            super.mouseExited(e);
+            Color background = navigation.getBackground();
+            //make the background completely transparent
+            navigation.setBackground(new Color(background.getRed(), background.getGreen(), background.getBlue(), 0));
+          }
+        };
+        navigation.addMouseListener(navigationToolListener);
+
+        //add mouse listener to all sub components of the navigationComponent
+        for (int i = 0; i < navigation.getComponents().length; i++) {
+          Component component = navigation.getComponents()[i];
+          component.addMouseListener(navigationToolListener);
+        }
+
+        return navigation;
+      }
+    
+    ///
         
     
     protected HierarchyManager createHierarchyManager(Graph2D rootGraph) {
@@ -1130,7 +1248,27 @@ public class ISGCIMainFrame extends JFrame
         	}        	
         });
         chk.setVisible(true);
+        
+        JCheckBoxMenuItem style = new JCheckBoxMenuItem();
+        style.setText("old Canvas");
+        style.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent a) {
+        		oldStyle = !oldStyle;
+        		if (oldStyle) {
+        			mainPan.remove(view);
+        	        mainPan.add(drawingPane);
+        		} else {
+        			mainPan.remove(drawingPane);
+        	        mainPan.add(view);
+        		}
+        		mainPan.updateUI();
+        		
+        	}        	
+        });
+        style.setVisible(true);
+        
         toolBar.add(chk);
+        toolBar.add(style);
 
         
         return toolBar;

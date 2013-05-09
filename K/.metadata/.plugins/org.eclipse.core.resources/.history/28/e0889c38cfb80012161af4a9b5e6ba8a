@@ -104,6 +104,7 @@ import y.util.D;
 import y.util.DefaultMutableValue2D;
 import y.util.Maps;
 import y.util.Value2D;
+import y.view.AutoDragViewMode;
 import y.view.BridgeCalculator;
 import y.view.CreateEdgeMode;
 import y.view.DefaultGraph2DRenderer;
@@ -127,6 +128,7 @@ import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.PopupMode;
 import y.view.ProxyShapeNodeRealizer;
+import y.view.ShapeNodeRealizer;
 import y.view.ShinyPlateNodePainter;
 import y.view.SmartEdgeLabelModel;
 import y.view.SmartNodeLabelModel;
@@ -192,7 +194,8 @@ public class ISGCIMainFrame extends JFrame
     protected JMenu miOpenProblem, miColourProblem;
     protected JMenuItem miSmallgraphs, miHelp, miAbout;
     
-    private boolean check = true;
+    private static boolean check = false;
+    private static boolean oldStyle = false;
 
     // This is where the drawing goes.
     protected JScrollPane drawingPane;
@@ -397,6 +400,7 @@ public class ISGCIMainFrame extends JFrame
         
         getContentPane().add("Center", createMainPanel());
         getContentPane().add("Center", createCanvasPanel());
+        
         /*final JToolBar jtb = createToolBar();
         if (jtb != null) {
         	getContentPane().add(jtb, BorderLayout.NORTH);
@@ -584,9 +588,6 @@ public class ISGCIMainFrame extends JFrame
     	
         loadGraph("myGraph.graphml");
         
-        
-
-        /*
         for (NodeCursor nc = view.getGraph2D().nodes(); nc.ok(); nc.next())
         {
           Node n = nc.node();
@@ -594,14 +595,17 @@ public class ISGCIMainFrame extends JFrame
           ShapeNodeRealizer nr = (ShapeNodeRealizer)view.getGraph2D().getRealizer(n);
           nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
           
-          //nr.setLineColor(new Color(255, 153, 0, 255));
-          //nr.setFillColor(new Color(255, 153, 0, 255));
+          if (nr.getFillColor() == Color.WHITE) {
+        	  nr.setLineColor(new Color(255, 153, 0));
+        	  nr.setFillColor(new Color(255, 153, 0));
+          }
           nr.setSize(80, 50);
+          nr.getLabel().setFontSize(5);
           
           configureNodeLabel(nr.getLabel(), SmartNodeLabelModel.POSITION_CENTER);
           
           nr.repaint();
-        }*/
+        }
         preferredEdgeLengthMap = view.getGraph2D().createEdgeMap();
         dolayout();
      }
@@ -879,6 +883,7 @@ public class ISGCIMainFrame extends JFrame
 
         
         JMenu menu2 = new JMenu("Grouping");
+        
         populateGroupingMenu(menu2);
         mainMenuBar.add(menu2);
 
@@ -932,9 +937,15 @@ public class ISGCIMainFrame extends JFrame
         item.setText("Create Empty Folder");
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
         pm.add(item);
+        add(infoItem = new JMenuItem("Information"));
+        infoItem.addActionListener(this);       
         
-        pm.add(miGraphClassInformation);
+        
+        pm.add(infoItem);
       }
+    
+    
+    JMenuItem  infoItem;
 
     /**
      * Creates the drawing canvas with scrollbars at the bottom and at the
@@ -948,7 +959,7 @@ public class ISGCIMainFrame extends JFrame
         registerViewModes();
         registerViewActions();
 
-        mainPan.add(graphCanvas, BorderLayout.CENTER);
+        //mainPan.add(graphCanvas, BorderLayout.CENTER);
         mainPan.add(view, BorderLayout.CENTER);
         
         return mainPan;
@@ -1004,11 +1015,8 @@ public class ISGCIMainFrame extends JFrame
         }
     	
     	
-    	
-    	
-    	
-        //view.addViewMode(new AutoDragViewMode());
-        //view.addViewMode(rm);
+        view.addViewMode(new AutoDragViewMode());        
+        view.addViewMode(rm); 
 
         TooltipMode tooltipMode = createTooltipMode();
         if(tooltipMode != null) {
@@ -1111,19 +1119,38 @@ public class ISGCIMainFrame extends JFrame
         toolBar.add(new AssignLengthsAction());
         toolBar.addSeparator();
         JCheckBoxMenuItem chk = new JCheckBoxMenuItem();
-        chk.setText("Old Style");
+        chk.setText("Animation");
         chk.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent a) {
         		check = !check;
-        		view.setVisible(check);
+        		/*view.setVisible(check);
         		mainPan.setVisible(check);
         		drawingPane.setVisible(!check);
-        		graphCanvas.setVisible(!check);
+        		graphCanvas.setVisible(!check);*/
         		
         	}        	
         });
         chk.setVisible(true);
-        //toolBar.add(chk);
+        
+        JCheckBoxMenuItem style = new JCheckBoxMenuItem();
+        style.setText("Animation");
+        style.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent a) {
+        		oldStyle = !oldStyle;
+        		if (oldStyle) {
+        			getContentPane().remove(mainPan);
+        	        getContentPane().add("Center", drawingPane);
+        		} else {
+        			getContentPane().remove(drawingPane);
+        			getContentPane().add("Center", mainPan);
+        		}
+        		
+        	}        	
+        });
+        style.setVisible(true);
+        
+        toolBar.add(chk);
+        toolBar.add(style);
 
         
         return toolBar;
@@ -1170,7 +1197,32 @@ public class ISGCIMainFrame extends JFrame
     public void actionPerformed(ActionEvent event) {
         Object object = event.getSource();
 
-        if (object == miExit) {
+        Object source = event.getSource();
+        if (source == infoItem) {
+        	String sub = view.getGraph2D().selectedNodes().node().toString();
+        	JDialog d;
+        	if (sub.length() >= 0) {
+        		//ToDo: Catch unknown Sequences (\cap ... )
+        	sub = sub.substring(6, sub.indexOf("</html>"));
+        	if (sub.indexOf('?') >= 0) {
+        		String newSub = sub.substring(0, sub.indexOf(" "));
+        		newSub += "$\\cap$ ";
+        		newSub += sub.substring(sub.indexOf("?") + 1);
+        		sub = newSub;
+        		
+        	}
+        	System.out.println(sub);
+            d = new GraphClassInformationDialog(
+                    this, DataSet.getClass(sub));
+        	} else {
+        		d = new GraphClassInformationDialog(
+                        this, DataSet.getClass(view.getGraph2D().selectedNodes().current().toString()));
+        	}
+            d.setLocation(50, 50);
+            d.pack();
+            d.setSize(800, 600);
+            d.setVisible(true);
+        } else if (object == miExit) {
             closeWindow();
         } else if (object == miNew) {
             new ISGCIMainFrame(loader);
@@ -1190,6 +1242,7 @@ public class ISGCIMainFrame extends JFrame
             search.setLocation(50,50);
             search.setVisible(true);
         } else if (object == miGraphClassInformation) {
+        	System.out.println(this.getName());
             JDialog info = new GraphClassInformationDialog(this);
             info.setLocation(50, 50);
             info.pack();
@@ -1736,7 +1789,7 @@ public class ISGCIMainFrame extends JFrame
 
     	    /** Scale factor for the roll over effect animations */
     	    private static final Value2D SCALE_FACTOR =
-    	            DefaultMutableValue2D.create(3, 3);
+    	            DefaultMutableValue2D.create(2, 2);
 
 
     	    /** Stores the last node that was marked with the roll over effect */
@@ -1806,17 +1859,19 @@ public class ISGCIMainFrame extends JFrame
     	    protected void mark( final Node node ) {
     	      // only start a mark animation if no other animation is playing
     	      // for the given node
+    	    	if (check) {
     	      if (state.getInt(node) == NONE) {
     	        state.setInt(node, MARKED);
 
     	        final NodeRealizer nr = getGraph2D().getRealizer(node);
+    	        nr.getLabel().setFontSize(12);
     	        size.set(node, DefaultMutableValue2D.create(nr.getWidth(), nr.getHeight()));
     	        final AnimationObject ao = factory.scale(
     	                nr,
     	                SCALE_FACTOR,
     	                ViewAnimationFactory.APPLY_EFFECT,
     	                PREFERRED_DURATION);
-    	        player.animate(AnimationFactory.createEasedAnimation(ao));
+    	        player.animate(AnimationFactory.createEasedAnimation(ao));}
     	      }
     	    }
 
@@ -1831,11 +1886,13 @@ public class ISGCIMainFrame extends JFrame
 
     	      // only start an unmark animation if the node is currently marked
     	      // (or in the process of being marked)
+    	      
     	      if (state.getInt(node) == MARKED) {
     	        state.setInt(node, UNMARK);
 
     	        final Value2D oldSize = (Value2D) size.get(node);
     	        final NodeRealizer nr = getGraph2D().getRealizer(node);
+    	        nr.getLabel().setFontSize(5);
     	        final AnimationObject ao = factory.resize(
     	                nr,
     	                oldSize,
@@ -1887,7 +1944,7 @@ public class ISGCIMainFrame extends JFrame
     	      }
 
     	      public long preferredDuration() {
-    	        return ao.preferredDuration();
+    	        return ao.preferredDuration()/2;
     	      }
     	    }
     	  }
