@@ -16,4 +16,5 @@
 <fullyQualifiedTypeName name="java.awt.color.ICC_ProfileRGB"/>
 <fullyQualifiedTypeName name="java.awt.event.MouseEvent"/>
 <fullyQualifiedTypeName name="java.awt.Component"/>
+<fullyQualifiedTypeName name="y.view.Graph2DViewActions.CloseGroupsAction"/>
 </qualifiedTypeNameHistroy>

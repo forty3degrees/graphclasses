@@ -1,0 +1,149 @@
+package teo.isgci.gui;
+
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+
+import teo.isgci.gui.ISGCIMainFrame.CreateNewFolderNodeAction;
+import teo.isgci.gui.ISGCIMainFrame.CreateNewGroupNodeAction;
+
+import y.base.Node;
+import y.view.Graph2D;
+import y.view.Graph2DView;
+import y.view.Graph2DViewActions;
+import y.view.PopupMode;
+import y.view.hierarchy.HierarchyManager;
+
+class HierarchicPopupMode extends PopupMode {
+	
+	JMenuItem  infoItem;
+	
+	public HierarchicPopupMode(JMenuItem mI) {
+		infoItem = mI;
+	}
+	
+	 protected void populateGroupingMenu(JMenu hierarchyMenu) {
+	        // Predefined actions for open/close groups
+	        registerAction(hierarchyMenu, Graph2DViewActions.CLOSE_GROUPS, true);
+	        registerAction(hierarchyMenu, Graph2DViewActions.OPEN_FOLDERS, true);
+
+	        hierarchyMenu.addSeparator();
+
+	        // Predefined actions for group/fold/ungroup
+	        registerAction(hierarchyMenu, Graph2DViewActions.GROUP_SELECTION, true);
+	        registerAction(hierarchyMenu, Graph2DViewActions.UNGROUP_SELECTION, true);
+	        registerAction(hierarchyMenu, Graph2DViewActions.FOLD_SELECTION, true);
+	      }
+	
+    public JPopupMenu getPaperPopup(double x, double y) {
+      JPopupMenu pm = new JPopupMenu();
+      populateGroupingPopup(pm, x, y, null, false);
+      return pm;
+    }
+
+    public JPopupMenu getNodePopup(Node v) {
+      Graph2D graph = getGraph2D();
+      JPopupMenu pm = new JPopupMenu();
+      populateGroupingPopup(pm, graph.getCenterX(v), graph.getCenterY(v), v, true);
+      return pm;
+    }
+
+    public JPopupMenu getSelectionPopup(double x, double y) {
+      JPopupMenu pm = new JPopupMenu();
+      populateGroupingPopup(pm, x, y, null, getGraph2D().selectedNodes().ok());
+      return pm;
+    }
+    
+    protected HierarchyManager createHierarchyManager(Graph2D rootGraph) {
+        return new HierarchyManager(rootGraph);
+      }
+    
+    protected HierarchyManager getHierarchyManager() {
+        return view.getGraph2D().getHierarchyManager();
+      }
+    
+    protected void registerAction(final Object menu, final Object key, final boolean enabled) {
+        final ActionMap viewActions = view.getCanvasComponent().getActionMap();
+
+        final Action action = viewActions.get(key);
+        if (action != null) {
+          final JMenuItem item = new JMenuItem(action);
+          final String name = (String) actionNames.get(key);
+          if (name != null) {
+            item.setText(name);
+          }
+          item.setEnabled(enabled);
+
+          final InputMap imap = view.getCanvasComponent().getInputMap();
+          final KeyStroke[] keyStrokes = imap.allKeys();
+          if (keyStrokes != null) {
+            for (int i = 0; i < keyStrokes.length; ++i) {
+              if (imap.get(keyStrokes[i]) == key) {
+                item.setAccelerator(keyStrokes[i]);
+                break;
+              }
+            }
+          }
+
+          if (menu instanceof JMenu) {
+            ((JMenu) menu).add(item);
+          } else if (menu instanceof JPopupMenu) {
+            ((JPopupMenu) menu).add(item);
+          }
+        }
+      }
+    
+    
+    
+    protected void populateGroupingPopup(JPopupMenu pm, final double x, final double y, Node node, boolean selected) {
+        // Predefined actions for open/close groups
+        registerAction(
+            pm, Graph2DViewActions.CLOSE_GROUPS,
+            node != null && getHierarchyManager().isGroupNode(node));
+        	
+        registerAction(
+            pm, Graph2DViewActions.OPEN_FOLDERS,
+            node != null && getHierarchyManager().isFolderNode(node));
+        	
+        pm.addSeparator();
+
+        // Predefined actions for group/fold/ungroup
+        registerAction(pm, Graph2DViewActions.GROUP_SELECTION, selected);
+        registerAction(pm, Graph2DViewActions.UNGROUP_SELECTION, selected);
+        registerAction(pm, Graph2DViewActions.FOLD_SELECTION, selected);
+
+        pm.addSeparator();
+
+        //We customize both "Create..." actions so that the newly created node lies at the coordinates of the mouse click
+        //(for "Group Selection"/"Fold Selection", the location is determined by the content's location instead.
+        JMenuItem item = new JMenuItem(new CreateNewGroupNodeAction(view){
+          protected void setGroupNodeBounds(Graph2DView view, Graph2D graph, Node groupNode) {
+            graph.setLocation(groupNode, x, y);
+          }
+        });
+        item.setText("Create Empty Group");
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+        pm.add(item);
+
+        item = new JMenuItem(new CreateNewFolderNodeAction(view){
+          protected void setFolderNodeBounds(Graph2DView view, Graph2D graph, Node groupNode) {
+            graph.setLocation(groupNode, x, y);
+          }
+        });
+        item.setText("Create Empty Folder");
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+        pm.add(item);
+        add(infoItem = new JMenuItem("Information"));
+        infoItem.addActionListener(this);       
+        
+        
+        pm.add(infoItem);
+      }
+  }

@@ -1,0 +1,17 @@
+package teo.Actions;
+
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+
+import teo.isgci.gui.ISGCIMainFrame.OptionSupport;
+
+class OptionAction extends AbstractAction {
+    OptionAction() {
+      super("Settings...");
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      OptionSupport.showDialog(module, view.getGraph2D(), false, view.getFrame());
+    }
+  }

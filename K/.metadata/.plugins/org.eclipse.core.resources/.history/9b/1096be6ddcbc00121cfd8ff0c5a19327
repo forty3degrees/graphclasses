@@ -1,0 +1,6 @@
+package teo.Actions;
+
+public class OpenFoldersAndLayoutAction extends Graph2DViewActions.OpenFoldersAction {
+
+   
+  }

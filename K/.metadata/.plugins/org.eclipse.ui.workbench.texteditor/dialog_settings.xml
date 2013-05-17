@@ -13,16 +13,16 @@
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="oldStyle" key="selection"/>
+		<item value="Overview" key="selection"/>
 		<list key="findhistory">
-			<item value="oldStyle"/>
-			<item value="mainFrame"/>
-			<item value="remove("/>
-			<item value="style."/>
+			<item value="overview"/>
+			<item value="createOverview"/>
+			<item value="glass"/>
 			<item value="oldstyle"/>
-			<item value="&quot;center&quot;"/>
-			<item value="add(main"/>
-			<item value="chk"/>
+			<item value="&quot;old Canvas&quot;"/>
+			<item value="old Canvas"/>
+			<item value="oldCanvas"/>
+			<item value="registerView"/>
 		</list>
 		<list key="replacehistory">
 			<item value=""/>

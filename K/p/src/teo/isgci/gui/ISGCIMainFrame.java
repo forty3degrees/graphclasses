@@ -33,17 +33,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.print.PageFormat;
-import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -57,9 +51,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -69,11 +61,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
-import javax.swing.filechooser.FileFilter;
 
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
+import teo.Actions.CreateNewFolderNodeAction;
+import teo.Actions.CreateNewGroupNodeAction;
+import teo.Actions.DeleteSelection;
+import teo.Actions.ExitAction;
+import teo.Actions.LayoutAction;
+import teo.Actions.LoadAction;
+import teo.Actions.PrintAction;
+import teo.Actions.SaveAction;
+import teo.ViewModes.AnimationMode;
 import teo.isgci.db.DataSet;
 import teo.isgci.gc.ForbiddenClass;
 import teo.isgci.gc.GraphClass;
@@ -81,19 +81,11 @@ import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Problem;
 import teo.isgci.xml.GraphMLWriter;
-import y.anim.AnimationFactory;
-import y.anim.AnimationObject;
-import y.anim.AnimationPlayer;
 import y.base.DataMap;
-import y.base.Edge;
 import y.base.EdgeCursor;
-import y.base.EdgeMap;
 import y.base.Node;
 import y.base.NodeCursor;
-import y.base.NodeMap;
 import y.geom.OrientedRectangle;
-import y.io.GraphMLIOHandler;
-import y.io.IOHandler;
 import y.layout.hierarchic.IncrementalHierarchicLayouter;
 import y.layout.hierarchic.incremental.IncrementalHintsFactory;
 import y.layout.organic.OrganicLayouter;
@@ -106,10 +98,7 @@ import y.option.EditorFactory;
 import y.option.GuiFactory;
 import y.option.OptionHandler;
 import y.option.OptionItem;
-import y.util.D;
-import y.util.DefaultMutableValue2D;
 import y.util.Maps;
-import y.util.Value2D;
 import y.view.AutoDragViewMode;
 import y.view.BridgeCalculator;
 import y.view.CreateEdgeMode;
@@ -122,12 +111,9 @@ import y.view.GenericNodeRealizer;
 import y.view.GenericNodeRealizer.Factory;
 import y.view.Graph2D;
 import y.view.Graph2DLayoutExecutor;
-import y.view.Graph2DPrinter;
 import y.view.Graph2DView;
 import y.view.Graph2DViewActions;
 import y.view.Graph2DViewMouseWheelZoomListener;
-import y.view.Graph2DViewRepaintManager;
-import y.view.HitInfo;
 import y.view.LineType;
 import y.view.MovePortMode;
 import y.view.NavigationComponent;
@@ -135,19 +121,18 @@ import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.Overview;
 import y.view.PopupMode;
-import y.view.ProxyShapeNodeRealizer;
 import y.view.ShapeNodeRealizer;
 import y.view.ShinyPlateNodePainter;
 import y.view.SmartEdgeLabelModel;
 import y.view.SmartNodeLabelModel;
 import y.view.TooltipMode;
-import y.view.ViewAnimationFactory;
 import y.view.ViewMode;
 import y.view.YLabel;
 import y.view.hierarchy.DefaultGenericAutoBoundsFeature;
 import y.view.hierarchy.DefaultHierarchyGraphFactory;
 import y.view.hierarchy.GenericGroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
+import y.base.NodeList;
 
 /*import teo.isgci.gc.GraphClass;
 import java.util.ArrayList;*/
@@ -163,8 +148,8 @@ public class ISGCIMainFrame extends JFrame
 	private static final Color LABEL_LINE_COLOR = new Color(153, 204, 255, 255);
 	  private static final Color LABEL_BACKGROUND_COLOR = Color.WHITE;
 	  private static final String AUTO_FLIPPING_CONFIG = "AutoFlipConfig";
-	  EdgeMap preferredEdgeLengthMap;
-	  YModule module;
+	  
+	  public YModule module;
 	protected static final Map actionNames;
 	  static {
 	    actionNames = new HashMap();
@@ -183,8 +168,8 @@ public class ISGCIMainFrame extends JFrame
 
     public static final String APPLICATIONNAME = "ISGCI";
     public static final String CONFIGURATION_GROUP = "GroupingDemo";
-    private IncrementalHierarchicLayouter layouter;
-    private OptionHandler groupLayoutOptions;
+    public IncrementalHierarchicLayouter layouter;
+    public OptionHandler groupLayoutOptions;
 
     public static ISGCIMainFrame tracker; // Needed for MediaTracker (hack)
     public static LatexGraphics latex;
@@ -202,14 +187,17 @@ public class ISGCIMainFrame extends JFrame
     protected JMenu miOpenProblem, miColourProblem;
     protected JMenuItem miSmallgraphs, miHelp, miAbout;
     
-    private static boolean check = false;
-    private static boolean oldStyle = false;
+    public static boolean check = false;
+    public static boolean oldStyle = false;
+    public static boolean overView = false;
 
     // This is where the drawing goes.
-    protected JScrollPane drawingPane;
+    public JScrollPane drawingPane;
     public ISGCIGraphCanvas graphCanvas;
-    private JPanel mainPan;
-    protected Graph2DView view;
+    public JPanel mainPan;
+    public Graph2DView view;
+    private static LoadAction gLoader;
+    public static LayoutAction lA; 
 
 
     protected void populateGroupingMenu(JMenu hierarchyMenu) {
@@ -280,15 +268,11 @@ public class ISGCIMainFrame extends JFrame
         return res;
     }
 
-
-    
-
     /**
      * Export to GraphML.
      */
     protected void exportGML(FileOutputStream f) throws Exception {
         Exception res = null;
-        String outstr;
         Writer out = null;
         
         try {
@@ -308,6 +292,7 @@ public class ISGCIMainFrame extends JFrame
         if (res != null)
             throw res;
     }
+    
     protected Graph2DView createGraphView() {
         Graph2DView view = new Graph2DView();
         view.setFitContentOnResize(true);
@@ -361,16 +346,17 @@ public class ISGCIMainFrame extends JFrame
     public ISGCIMainFrame(teo.Loader loader) {
         super(APPLICATIONNAME);
         
-        
-        
+        gLoader = new LoadAction(this);
+        lA = new LayoutAction(this);
         layouter = new IncrementalHierarchicLayouter();
         layouter.setOrthogonallyRouted(true);
         layouter.setRecursiveGroupLayeringEnabled(false);
+       
         view = createGraphView();
         
-        preferredEdgeLengthMap = view.getGraph2D().createEdgeMap();
-        view.getGraph2D().addDataProvider(OrganicLayouter.PREFERRED_EDGE_LENGTH_DATA, preferredEdgeLengthMap);
+        view.getGraph2D().addDataProvider(OrganicLayouter.PREFERRED_EDGE_LENGTH_DATA, view.getGraph2D().createEdgeMap());
         module = new SmartOrganicLayoutModule();
+        ISGCIToolBar tool = new ISGCIToolBar(this);
         
         
         
@@ -379,6 +365,7 @@ public class ISGCIMainFrame extends JFrame
         applyRealizerDefaults(view.getGraph2D(), true, true);
 
         addGlassPaneComponents();
+        view.getGlassPane().hide();
         
         loader.register();
         this.loader = loader;
@@ -421,7 +408,7 @@ public class ISGCIMainFrame extends JFrame
         registerListeners();
         setLocation(20, 20);
         pack();
-        final JToolBar jtb = createToolBar();
+        final JToolBar jtb = tool.createToolBar();
         if (jtb != null) {
           mainPan.add(jtb, BorderLayout.NORTH);
         }
@@ -479,7 +466,7 @@ public class ISGCIMainFrame extends JFrame
     
     private JComponent overview, navigationComponent;
     
-    private void addGlassPaneComponents() {
+    public void addGlassPaneComponents() {
         //get the glass pane
         JPanel glassPane = view.getGlassPane();
         //set an according layout manager
@@ -569,26 +556,7 @@ public class ISGCIMainFrame extends JFrame
         return view.getGraph2D().getHierarchyManager();
       }
     
-    void configureGroupLayout() {
-        Object gsi = groupLayoutOptions.get("Group Layering Strategy");
-        if ("Recursive Layering".equals(gsi)) {
-          layouter.setRecursiveGroupLayeringEnabled(true);
-        } else if ("Global Layering".equals(gsi)) {
-          layouter.setRecursiveGroupLayeringEnabled(false);
-        }
-
-        layouter.setGroupCompactionEnabled(groupLayoutOptions.getBool("Enable Compact Layering"));
-
-        Object gai = groupLayoutOptions.get("Group Alignment");
-        if ("Top".equals(gai)) {
-          layouter.setGroupAlignmentPolicy(IncrementalHierarchicLayouter.POLICY_ALIGN_GROUPS_TOP);
-        } else if ("Center".equals(gai)) {
-          layouter.setGroupAlignmentPolicy(IncrementalHierarchicLayouter.POLICY_ALIGN_GROUPS_CENTER);
-        }
-        if ("Bottom".equals(gai)) {
-          layouter.setGroupAlignmentPolicy(IncrementalHierarchicLayouter.POLICY_ALIGN_GROUPS_BOTTOM);
-        }
-      }
+    
     
     protected EditMode createEditMode() {
     	
@@ -703,7 +671,7 @@ public class ISGCIMainFrame extends JFrame
     		
     	}
     	
-        loadGraph("myGraph.graphml");
+    	gLoader.loadGraph("myGraph.graphml");
         
         for (NodeCursor nc = view.getGraph2D().nodes(); nc.ok(); nc.next())
         {
@@ -723,7 +691,8 @@ public class ISGCIMainFrame extends JFrame
           
           nr.repaint();
         }
-        preferredEdgeLengthMap = view.getGraph2D().createEdgeMap();
+        
+        lA.preferredEdgeLengthMap = view.getGraph2D().createEdgeMap();
         dolayout();
      }
     
@@ -740,30 +709,8 @@ public class ISGCIMainFrame extends JFrame
         layoutExecutor.doLayout(view, layouter);
       }
     
-    protected void loadGraph(Class aClass, String resourceString) {
-        try {
-    	URL resource = new URL("File:///D:/" + resourceString);
-        if (resource == null) {
-          String message = "Resource \"" + resourceString + "\" not found in classpath of " + aClass;
-          D.showError(message);
-          
-          throw new RuntimeException(message);
-        }
-        loadGraph(resource);
-        } catch (Exception e) {
-        	
-        }
-      }
-    
-    protected void loadGraph(String resourceString) {
-        loadGraph(getClass(), resourceString);
-      }
-    protected GraphMLIOHandler createGraphMLIOHandler() {
-        return new GraphMLIOHandler();
-      }
-
-    
-    void layoutIncrementally() {
+     
+    public void layoutIncrementally() {
         Graph2D graph = view.getGraph2D();
 
         layouter.setLayoutMode(IncrementalHierarchicLayouter.LAYOUT_MODE_INCREMENTAL);
@@ -790,39 +737,7 @@ public class ISGCIMainFrame extends JFrame
         }
       }
     
-    public static JComponent createActionControl(final Action action) {
-        return createActionControl(action, true);
-      }
     
-    public static JComponent createActionControl(final Action action, final boolean showActionText) {
-        final JButton jb = new JButton();
-        if (action.getValue(Action.SMALL_ICON) != null) {
-          jb.putClientProperty("hideActionText", Boolean.valueOf(!showActionText));
-        }
-        jb.setAction(action);
-        return jb;
-      }
-    protected void loadGraph(URL resource) {
-        if (resource == null) {
-          String message = "Resource \"" + resource + "\" not found in classpath";
-          D.showError(message);
-          throw new RuntimeException(message);
-        }
-
-        try {
-          IOHandler ioh = null;
-          ioh = createGraphMLIOHandler();
-          view.getGraph2D().clear();
-          ioh.read(view.getGraph2D(), resource);
-        } catch (IOException e) {
-          String message = "Unexpected error while loading resource \"" + resource + "\" due to " + e.getMessage();
-          D.bug(message);
-          throw new RuntimeException(message, e);
-        }
-        view.getGraph2D().setURL(resource);
-        view.fitContent();
-        view.updateView();
-      }
 
     /**
      * Write the entire database in GraphML to isgcifull.graphml.
@@ -882,11 +797,11 @@ public class ISGCIMainFrame extends JFrame
     }
 
     protected Action createLoadAction() {
-        return new LoadAction();
+        return new LoadAction(this);
       }
 
       protected Action createSaveAction() {
-        return new SaveAction();
+        return new SaveAction(this);
       }
 
       protected Action createDeleteSelectionAction() {
@@ -906,7 +821,7 @@ public class ISGCIMainFrame extends JFrame
           menu.add(action);
         }
         menu.addSeparator();
-        menu.add(new PrintAction());
+        menu.add(new PrintAction(this));
         menu.addSeparator();
         menu.add(new ExitAction());
         menuBar.add(menu);
@@ -936,7 +851,7 @@ public class ISGCIMainFrame extends JFrame
           final String[] path = PATH_SEPARATOR_PATTERN.split(filename);
           menu.add(new AbstractAction(path[path.length - 1]) {
             public void actionPerformed(ActionEvent e) {
-              loadGraph(filename);
+            	gLoader.loadGraph(filename);
             }
           });
         }
@@ -1022,10 +937,12 @@ public class ISGCIMainFrame extends JFrame
         registerAction(
             pm, Graph2DViewActions.CLOSE_GROUPS,
             node != null && getHierarchyManager().isGroupNode(node));
+        	
         registerAction(
             pm, Graph2DViewActions.OPEN_FOLDERS,
             node != null && getHierarchyManager().isFolderNode(node));
-
+        	
+        
         pm.addSeparator();
 
         // Predefined actions for group/fold/ungroup
@@ -1103,6 +1020,8 @@ public class ISGCIMainFrame extends JFrame
         actionMap.put(Graph2DViewActions.DELETE_SELECTION, createDeleteSelectionActionImpl());
         actionMap.put("CREATE_NEW_GROUP_NODE_ACTION", new CreateNewGroupNodeAction());
         actionMap.put("CREATE_NEW_FOLDER_NODE_ACTION", new CreateNewFolderNodeAction());
+        view.getCanvasComponent().getActionMap().put(Graph2DViewActions.CLOSE_GROUPS, new CloseGroupsAndLayoutAction());
+        view.getCanvasComponent().getActionMap().put(Graph2DViewActions.OPEN_FOLDERS, new OpenFoldersAndLayoutAction());
       }
     
     private Action createDeleteSelectionActionImpl() {
@@ -1121,7 +1040,7 @@ public class ISGCIMainFrame extends JFrame
    
     protected void registerViewModes() {
     	
-    	RollOverViewMode rm = new RollOverViewMode();
+    	AnimationMode rm = new AnimationMode(this);
     	
         EditMode editMode = createEditMode();
         editMode.allowNodeCreation(false);
@@ -1224,90 +1143,8 @@ public class ISGCIMainFrame extends JFrame
     public void windowDeactivated(WindowEvent e) {}
     public void windowActivated(WindowEvent e) {}
 
-    protected JToolBar createToolBar() {
-    	JToolBar toolBar = new JToolBar();
-        
-        addLayoutActions(toolBar);    
-        
-        toolBar.addSeparator();
-        toolBar.add(createActionControl(new oLayoutAction()));
-        toolBar.add(createActionControl(new OptionAction()));
-        toolBar.addSeparator();
-        toolBar.add(new AssignLengthsAction());
-        toolBar.addSeparator();
-        JCheckBoxMenuItem chk = new JCheckBoxMenuItem();
-        chk.setText("Animation");
-        chk.addActionListener(new ActionListener(){
-        	public void actionPerformed(ActionEvent a) {
-        		check = !check;
-        		/*view.setVisible(check);
-        		mainPan.setVisible(check);
-        		drawingPane.setVisible(!check);
-        		graphCanvas.setVisible(!check);*/
-        		
-        	}        	
-        });
-        chk.setVisible(true);
-        
-        JCheckBoxMenuItem style = new JCheckBoxMenuItem();
-        style.setText("old Canvas");
-        style.addActionListener(new ActionListener(){
-        	public void actionPerformed(ActionEvent a) {
-        		oldStyle = !oldStyle;
-        		if (oldStyle) {
-        			mainPan.remove(view);
-        	        mainPan.add(drawingPane);
-        		} else {
-        			mainPan.remove(drawingPane);
-        	        mainPan.add(view);
-        		}
-        		mainPan.updateUI();
-        		
-        	}        	
-        });
-        style.setVisible(true);
-        
-        toolBar.add(chk);
-        toolBar.add(style);
-
-        
-        return toolBar;
-      }
     
-    protected void addLayoutActions(JToolBar toolBar) {
-        final Action incrementalLayoutAction = new AbstractAction(
-                "Incremental") {
-          public void actionPerformed(ActionEvent e) {
-            layoutIncrementally();
-          }
-        };
-
-        final Action layoutAction = new AbstractAction(
-                "Complete") {
-          public void actionPerformed(ActionEvent e) {
-            dolayout();
-          }
-        };
-
-        final Action propertiesAction = new AbstractAction(
-                "Settings...") {
-          public void actionPerformed(ActionEvent e) {
-            final ActionListener layoutListener = new ActionListener() {
-              public void actionPerformed(ActionEvent e) {
-                dolayout();
-              }
-            };
-            OptionSupport.showDialog(groupLayoutOptions, layoutListener, false, view.getFrame());
-            configureGroupLayout();
-          }
-        };
-
-        toolBar.addSeparator();
-        toolBar.add(new JLabel("Layout: "));
-        toolBar.add(createActionControl(incrementalLayoutAction));
-        toolBar.add(createActionControl(layoutAction));
-        toolBar.add(createActionControl(propertiesAction));
-      }
+    
     
     /**
      * Eventhandler for menu selections
@@ -1404,8 +1241,7 @@ public class ISGCIMainFrame extends JFrame
             loadInitialGraph();
         }
     }
-    
-    
+        
     public static class OptionSupport {
     private final EditorFactory editorFactory;
 
@@ -1572,308 +1408,7 @@ public class ISGCIMainFrame extends JFrame
     }
   }
     
-    
-    public class SaveAction extends AbstractAction {
-        JFileChooser chooser;
-
-        public SaveAction() {
-          super("Save...");
-          chooser = null;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-          if (chooser == null) {
-            chooser = new JFileChooser();
-            chooser.setAcceptAllFileFilterUsed(false);
-            chooser.addChoosableFileFilter(new FileFilter() {
-              public boolean accept(File f) {
-                return f.isDirectory() || f.getName().endsWith(".graphml");
-              }
-
-              public String getDescription() {
-                return "GraphML Format (.graphml)";
-              }
-            });
-          }
-
-          URL url = view.getGraph2D().getURL();
-          if (url != null && "file".equals(url.getProtocol())) {
-            try {
-              chooser.setSelectedFile(new File(new URI(url.toString())));
-            } catch (URISyntaxException e1) {
-              // ignore
-            }
-          }
-
-          if (chooser.showSaveDialog(mainPan) == JFileChooser.APPROVE_OPTION) {
-            String name = chooser.getSelectedFile().toString();
-            if(!name.endsWith(".graphml")) {
-              name += ".graphml";
-            }
-            IOHandler ioh = createGraphMLIOHandler();
-
-            try {
-              ioh.write(view.getGraph2D(), name);
-            } catch (IOException ioe) {
-              D.show(ioe);
-            }
-          }
-        }
-      }
-
-      /**
-       * Action that loads the current graph from a file in GraphML format.
-       */
-      public class LoadAction extends AbstractAction {
-        JFileChooser chooser;
-
-        public LoadAction() {
-          super("Load...");
-          chooser = null;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-          if (chooser == null) {
-            chooser = new JFileChooser();
-            chooser.setAcceptAllFileFilterUsed(false);
-            chooser.addChoosableFileFilter(new FileFilter() {
-              public boolean accept(File f) {
-                return f.isDirectory() || f.getName().endsWith(".graphml");
-              }
-
-              public String getDescription() {
-                return "GraphML Format (.graphml)";
-              }
-            });
-          }
-          if (chooser.showOpenDialog(mainPan) == JFileChooser.APPROVE_OPTION) {
-            URL resource = null;
-            try {
-              resource = chooser.getSelectedFile().toURI().toURL();
-            } catch (MalformedURLException urlex) {
-              urlex.printStackTrace();
-            }
-            loadGraph(resource);
-          }
-        }
-      }
-
-      /**
-       * Action that deletes the selected parts of the graph.
-       */
-      public static class DeleteSelection extends AbstractAction {
-        private final Graph2DView view;
-
-        public DeleteSelection(final Graph2DView view) {
-          super("Delete Selection");
-          this.view = view;
-          this.putValue(Action.SHORT_DESCRIPTION, "Delete Selection");
-        }
-
-        public void actionPerformed(ActionEvent e) {
-          view.getGraph2D().removeSelection();
-          view.getGraph2D().updateViews();
-        }
-      }
-      public static class ExitAction extends AbstractAction {
-    	    public ExitAction() {
-    	      super("Exit");
-    	    }
-
-    	    public void actionPerformed(ActionEvent e) {
-    	      System.exit(0);
-    	    }
-    	  }
-      
-      public class PrintAction extends AbstractAction {
-    	    PageFormat pageFormat;
-
-    	    OptionHandler printOptions;
-
-    	    public PrintAction() {
-    	      super("Print");
-
-    	      // setup option handler
-    	      printOptions = new OptionHandler("Print Options");
-    	      printOptions.addInt("Poster Rows", 1);
-    	      printOptions.addInt("Poster Columns", 1);
-    	      printOptions.addBool("Add Poster Coords", false);
-    	      final String[] area = {"View", "Graph"};
-    	      printOptions.addEnum("Clip Area", area, 1);
-    	    }
-
-    	    public void actionPerformed(ActionEvent e) {
-    	      Graph2DPrinter gprinter = new Graph2DPrinter(view);
-
-    	      // show custom print dialog and adopt values
-    	      if (!printOptions.showEditor(view.getFrame())) {
-    	        return;
-    	      }
-    	      gprinter.setPosterRows(printOptions.getInt("Poster Rows"));
-    	      gprinter.setPosterColumns(printOptions.getInt("Poster Columns"));
-    	      gprinter.setPrintPosterCoords(printOptions.getBool("Add Poster Coords"));
-    	      if ("Graph".equals(printOptions.get("Clip Area"))) {
-    	        gprinter.setClipType(Graph2DPrinter.CLIP_GRAPH);
-    	      } else {
-    	        gprinter.setClipType(Graph2DPrinter.CLIP_VIEW);
-    	      }
-
-    	      // show default print dialogs
-    	      PrinterJob printJob = PrinterJob.getPrinterJob();
-    	      if (pageFormat == null) {
-    	        pageFormat = printJob.defaultPage();
-    	      }
-    	      PageFormat pf = printJob.pageDialog(pageFormat);
-    	      if (pf == pageFormat) {
-    	        return;
-    	      } else {
-    	        pageFormat = pf;
-    	      }
-
-    	      // setup print job.
-    	      // Graph2DPrinter is of type Printable
-    	      printJob.setPrintable(gprinter, pageFormat);
-
-    	      if (printJob.printDialog()) {
-    	        try {
-    	          printJob.print();
-    	        } catch (Exception ex) {
-    	          ex.printStackTrace();
-    	        }
-    	      }
-    	    }
-    	  }
-      
-      public static class CreateNewFolderNodeAction extends Graph2DViewActions.AbstractGroupingAction {
-
-    	    public CreateNewFolderNodeAction() {
-    	      this(null);
-    	    }
-
-    	    public CreateNewFolderNodeAction(final Graph2DView view) {
-    	      super("CREATE_NEW_FOLDER_NODE", view);
-    	    }
-
-    	    public void actionPerformed(ActionEvent e) {
-    	      final Graph2DView graph2DView = getView(e);
-    	      if (graph2DView != null) {
-    	        createFolderNode(graph2DView);
-    	        graph2DView.getGraph2D().updateViews();
-    	      }
-    	    }
-
-    	    /**
-    	     * Create an empty folder node, assigns a name and sets the node bounds.
-    	     */
-    	    protected Node createFolderNode(Graph2DView view) {
-    	      final Graph2D graph = view.getGraph2D();
-    	      graph.firePreEvent();
-    	      Node groupNode;
-    	      try {
-    	        groupNode = createFolderNodeImpl(graph);
-    	        assignFolderName(groupNode, view);
-    	        setFolderNodeBounds(view, graph, groupNode);
-    	      } finally {
-    	        graph.firePostEvent();
-    	      }
-    	      return groupNode;
-    	    }
-
-    	    protected Node createFolderNodeImpl(Graph2D graph) {
-    	      return getHierarchyManager(graph).createFolderNode(graph);
-    	    }
-
-    	    protected void setFolderNodeBounds(Graph2DView view, Graph2D graph, Node folderNode) {
-    	      double x = view.getCenter().getX();
-    	      double y = view.getCenter().getY();
-    	      graph.setCenter(folderNode, x, y);
-    	    }
-
-    	    protected void assignFolderName(Node groupNode, Graph2DView view) {
-    	      NodeRealizer nr = view.getGraph2D().getRealizer(groupNode);
-    	      if (nr instanceof ProxyShapeNodeRealizer) {
-    	        ProxyShapeNodeRealizer pnr = (ProxyShapeNodeRealizer) nr;
-    	        pnr.getRealizer(0).setLabelText(createGroupName(groupNode, view));
-    	        pnr.getRealizer(1).setLabelText(createFolderName(groupNode, view));
-    	      } else {
-    	        nr.setLabelText(createGroupName(groupNode, view));
-    	      }
-    	    }
-
-    	    protected String createFolderName(Node folderNode, Graph2DView view) {
-    	      return "Folder";
-    	    }
-
-    	    protected String createGroupName(Node groupNode, Graph2DView view) {
-    	      return "Group";
-    	    }
-    	  }
-      
-      public static class CreateNewGroupNodeAction extends Graph2DViewActions.AbstractGroupingAction {
-
-    	    public CreateNewGroupNodeAction() {
-    	      this(null);
-    	    }
-
-    	    public CreateNewGroupNodeAction(final Graph2DView view) {
-    	      super("CREATE_NEW_GROUP_NODE", view);
-    	    }
-
-    	    public void actionPerformed(ActionEvent e) {
-    	      final Graph2DView graph2DView = getView(e);
-    	      if (graph2DView != null) {
-    	        createGroupNode(graph2DView);
-    	        graph2DView.getGraph2D().updateViews();
-    	      }
-    	    }
-
-    	    /**
-    	     * Create an empty group node, assigns a name and sets the node bounds.
-    	     */
-    	    protected Node createGroupNode(Graph2DView view) {
-    	      final Graph2D graph = view.getGraph2D();
-    	      graph.firePreEvent();
-    	      Node groupNode;
-    	      try {
-    	        groupNode = createGroupNodeImpl(graph);
-    	        assignGroupName(groupNode, view);
-    	        setGroupNodeBounds(view, graph, groupNode);
-    	      } finally {
-    	        graph.firePostEvent();
-    	      }
-    	      return groupNode;
-    	    }
-
-    	    protected Node createGroupNodeImpl(Graph2D graph) {
-    	      return getHierarchyManager(graph).createGroupNode(graph);
-    	    }
-
-    	    protected void setGroupNodeBounds(Graph2DView view, Graph2D graph, Node groupNode) {
-    	      double x = view.getCenter().getX();
-    	      double y = view.getCenter().getY();
-    	      graph.setCenter(groupNode, x, y);
-    	    }
-
-    	    protected void assignGroupName(Node groupNode, Graph2DView view) {
-    	      NodeRealizer nr = view.getGraph2D().getRealizer(groupNode);
-    	      if (nr instanceof ProxyShapeNodeRealizer) {
-    	        ProxyShapeNodeRealizer pnr = (ProxyShapeNodeRealizer) nr;
-    	        pnr.getRealizer(0).setLabelText(createGroupName(groupNode, view));
-    	        pnr.getRealizer(1).setLabelText(createFolderName(groupNode, view));
-    	      } else {
-    	        nr.setLabelText(createGroupName(groupNode, view));
-    	      }
-    	    }
-
-    	    protected String createFolderName(Node folderNode, Graph2DView view) {
-    	      return "Folder";
-    	    }
-
-    	    protected String createGroupName(Node groupNode, Graph2DView view) {
-    	      return "Group";
-    	    }
-    	  }
-      
+        
       class HierarchicPopupMode extends PopupMode {
     	    public JPopupMenu getPaperPopup(double x, double y) {
     	      JPopupMenu pm = new JPopupMenu();
@@ -1895,254 +1430,58 @@ public class ISGCIMainFrame extends JFrame
     	    }
     	  }
       
-      private static final class RollOverViewMode extends ViewMode {
-    	    /** Animation state constant */
-    	    private static final int NONE = 0;
-    	    /** Animation state constant */
-    	    private static final int MARKED = 1;
-    	    /** Animation state constant */
-    	    private static final int UNMARK = 2;
+      
+      
+      
+      class OpenFoldersAndLayoutAction extends Graph2DViewActions.OpenFoldersAction {
 
-
-    	    /** Preferred duration for roll over effect animations */
-    	    private static final int PREFERRED_DURATION = 350;
-
-    	    /** Scale factor for the roll over effect animations */
-    	    private static final Value2D SCALE_FACTOR =
-    	            DefaultMutableValue2D.create(2, 2);
-
-
-    	    /** Stores the last node that was marked with the roll over effect */
-    	    private Node lastHitNode;
-    	    /** Stores the original size of nodes */
-    	    private NodeMap size;
-    	    /** Stores the animation state of nodes */
-    	    private NodeMap state;
-
-    	    private ViewAnimationFactory factory;
-    	    private AnimationPlayer player;
-
-    	    /**
-    	     * Triggers a rollover effect for the first node at the specified location.
-    	     */
-    	    public void mouseMoved( final double x, final double y ) {
-    	      final HitInfo hi = getHitInfo(x, y);
-    	      if (hi.hasHitNodes()) {
-    	        final Node node = (Node) hi.hitNodes().current();
-    	        if (node != lastHitNode) {
-    	          unmark(lastHitNode);
-    	        }
-    	        if (state.getInt(node) == NONE) {
-    	          mark(node);
-    	          lastHitNode = node;
-    	        }
-    	      } else {
-    	        unmark(lastHitNode);
-    	        lastHitNode = null;
-    	      }
+    	    OpenFoldersAndLayoutAction() {
+    	      super(ISGCIMainFrame.this.view);
     	    }
 
-    	    /**
-    	     * Overwritten to initialize/dispose this <code>ViewMode</code>'s
-    	     * helper data.
-    	     */
-    	    public void activate( final boolean b ) {
-    	      if (b) {
-    	        factory = new ViewAnimationFactory(new Graph2DViewRepaintManager(view));
-    	        player = factory.createConfiguredPlayer();
-    	        size = view.getGraph2D().createNodeMap();
-    	        state = view.getGraph2D().createNodeMap();
-    	      } else {
-    	        view.getGraph2D().disposeNodeMap(state);
-    	        view.getGraph2D().disposeNodeMap(size);
-    	        state = null;
-    	        size = null;
-    	        player = null;
-    	        factory = null;
-    	      }
-    	      super.activate(b);
-    	    }
-
-    	    /**
-    	     * Overwritten to take only nodes into account for hit testing.
-    	     */
-    	    protected HitInfo getHitInfo( final double x, final double y ) {
-    	      final HitInfo hi = new HitInfo(view, x, y, true, HitInfo.NODE);
-    	      setLastHitInfo(hi);
-    	      return hi;
-    	    }
-
-    	    /**
-    	     * Triggers a <em>mark</em> animation for the specified node.
-    	     * Sets the animation state of the given node to <em>MARKED</em>.
-    	     */
-    	    protected void mark( final Node node ) {
-    	      // only start a mark animation if no other animation is playing
-    	      // for the given node
-    	    	if (check) {
-    	      if (state.getInt(node) == NONE) {
-    	        state.setInt(node, MARKED);
-
-    	        final NodeRealizer nr = getGraph2D().getRealizer(node);
-    	        nr.getLabel().setFontSize(12);
-    	        size.set(node, DefaultMutableValue2D.create(nr.getWidth(), nr.getHeight()));
-    	        final AnimationObject ao = factory.scale(
-    	                nr,
-    	                SCALE_FACTOR,
-    	                ViewAnimationFactory.APPLY_EFFECT,
-    	                PREFERRED_DURATION);
-    	        player.animate(AnimationFactory.createEasedAnimation(ao));}
-    	      }
-    	    }
-
-    	    /**
-    	     * Triggers an <em>unmark</em> animation for the specified node.
-    	     * Sets the animation state of the given node to <em>UNMARKED</em>.
-    	     */
-    	    protected void unmark( final Node node ) {
-    	      if (node == null) {
-    	        return;
+    	    public void openFolder(Node folderNode, Graph2D graph) {
+    	      NodeList children = new NodeList(graph.getHierarchyManager().getInnerGraph(folderNode).nodes());
+    	      super.openFolder(folderNode, graph);
+    	      graph.unselectAll();
+    	      graph.setSelected(folderNode, true);
+    	      for (NodeCursor nc = children.nodes(); nc.ok(); nc.next()) {
+    	        graph.setSelected(nc.node(), true);
     	      }
 
-    	      // only start an unmark animation if the node is currently marked
-    	      // (or in the process of being marked)
-    	      
-    	      if (state.getInt(node) == MARKED) {
-    	        state.setInt(node, UNMARK);
+    	      layoutIncrementally();
 
-    	        final Value2D oldSize = (Value2D) size.get(node);
-    	        final NodeRealizer nr = getGraph2D().getRealizer(node);
-    	        nr.getLabel().setFontSize(5);
-    	        final AnimationObject ao = factory.resize(
-    	                nr,
-    	                oldSize,
-    	                ViewAnimationFactory.APPLY_EFFECT,
-    	                PREFERRED_DURATION);
-    	        final AnimationObject eao = AnimationFactory.createEasedAnimation(ao);
-    	        player.animate(new Reset(eao, node, nr, oldSize));
-    	      }
-    	    }
-
-    	    /**
-    	     * Custom animation object that resets node size and state upon disposal.
-    	     */
-    	    private final class Reset implements AnimationObject {
-    	      private AnimationObject ao;
-    	      private final Node node;
-    	      private final NodeRealizer nr;
-    	      private final Value2D oldSize;
-
-    	      Reset(
-    	              final AnimationObject ao,
-    	              final Node node,
-    	              final NodeRealizer nr,
-    	              final Value2D size
-    	      ) {
-    	        this.ao = ao;
-    	        this.node = node;
-    	        this.nr = nr;
-    	        this.oldSize = size;
-    	      }
-
-    	      public void initAnimation() {
-    	        ao.initAnimation();
-    	      }
-
-    	      public void calcFrame( final double time ) {
-    	        ao.calcFrame(time);
-    	      }
-
-    	      /**
-    	       * Resets the target node to its original size and its animation state
-    	       * to <em>NONE</em>.
-    	       */
-    	      public void disposeAnimation() {
-    	        ao.disposeAnimation();
-    	        nr.setSize(oldSize.getX(), oldSize.getY());
-    	        size.set(node, null);
-    	        state.setInt(node, NONE);
-    	      }
-
-    	      public long preferredDuration() {
-    	        return ao.preferredDuration()/2;
-    	      }
+    	      graph.unselectAll();
+    	      graph.setSelected(folderNode, true);
+    	      graph.updateViews();
+    	     
     	    }
     	  }
-    
-      class EditLabel extends AbstractAction {
-    	    Edge e;
 
-    	    EditLabel(Edge e) {
-    	      super("Edit Preferred Length");
-    	      this.e = e;
+    	  /**
+    	   * Collapse a group node. After collapsing the group node, an incremental layout is automatically triggered.
+    	   * For this, the collapsed node is treated as an incremental element.
+    	   */
+    	  class CloseGroupsAndLayoutAction extends Graph2DViewActions.CloseGroupsAction {
+
+    	    CloseGroupsAndLayoutAction() {
+    	      super(ISGCIMainFrame.this.view);
     	    }
 
-    	    public void actionPerformed(ActionEvent ev) {
+    	    public void closeGroup(Node groupNode, Graph2D graph) {
+    	      super.closeGroup(groupNode, graph);
+    	      graph.unselectAll();
+    	      graph.setSelected(groupNode, true);
+    	      for (EdgeCursor ec = groupNode.edges(); ec.ok(); ec.next()) {
+    	        graph.setSelected(ec.edge(), true);
+    	      }
 
-    	      final EdgeRealizer r = view.getGraph2D().getRealizer(e);
-    	      final YLabel label = r.getLabel();
+    	      layoutIncrementally();
+    	      graph.unselectAll();
 
-    	      view.openLabelEditor(label,
-    	          label.getBox().getX(),
-    	          label.getBox().getY(),
-    	          null, true);
+    	      graph.updateViews();      
     	    }
     	  }
       
-      class oLayoutAction extends AbstractAction {
-    	    oLayoutAction() {
-    	      super("Layout");
-    	    }
-
-    	    public void actionPerformed(ActionEvent e) {
-    	      //update preferredEdgeLengthData before launching the module
-    	      Graph2D graph = view.getGraph2D();
-    	      for (EdgeCursor ec = graph.edges(); ec.ok(); ec.next()) {
-    	        Edge edge = ec.edge();
-    	        String eLabel = graph.getLabelText(edge);
-    	        preferredEdgeLengthMap.set(edge, null);
-    	        try {
-    	          preferredEdgeLengthMap.setInt(edge, (int) Double.parseDouble(eLabel));
-    	        }
-    	        catch (Exception ex) {
-    	        }
-    	      }
-
-    	      //start the module
-    	      module.start(view.getGraph2D());
-    	    }
-    	  }
-      
-      class AssignLengthsAction extends AbstractAction {
-    	    AssignLengthsAction() {
-    	      super("Assign Preferred Length");
-    	      putValue(Action.SHORT_DESCRIPTION, "Set the preferred length of each edge to its current geometric length");
-    	    }
-
-    	    public void actionPerformed(ActionEvent e) {
-    	      Graph2D g = view.getGraph2D();
-    	      for (EdgeCursor ec = g.edges(); ec.ok(); ec.next()) {
-    	        NodeRealizer snr = g.getRealizer(ec.edge().source());
-    	        NodeRealizer tnr = g.getRealizer(ec.edge().target());
-    	        double deltaX = snr.getCenterX() - tnr.getCenterX();
-    	        double deltaY = snr.getCenterY() - tnr.getCenterY();
-    	        double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    	        EdgeRealizer er = g.getRealizer(ec.edge());
-    	        er.getLabel().setText(Integer.toString((int) dist));
-    	      }
-    	      g.updateViews();
-    	    }
-    	  }
-      
-      class OptionAction extends AbstractAction {
-    	    OptionAction() {
-    	      super("Settings...");
-    	    }
-
-    	    public void actionPerformed(ActionEvent e) {
-    	      OptionSupport.showDialog(module, view.getGraph2D(), false, view.getFrame());
-    	    }
-    	  }
 }
 
 
