@@ -29,6 +29,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
@@ -38,6 +39,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -82,9 +84,11 @@ import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Problem;
 import teo.isgci.xml.GraphMLWriter;
 import y.base.DataMap;
+import y.base.Edge;
 import y.base.EdgeCursor;
 import y.base.Node;
 import y.base.NodeCursor;
+import y.base.NodeList;
 import y.geom.OrientedRectangle;
 import y.layout.hierarchic.IncrementalHierarchicLayouter;
 import y.layout.hierarchic.incremental.IncrementalHintsFactory;
@@ -132,7 +136,6 @@ import y.view.hierarchy.DefaultGenericAutoBoundsFeature;
 import y.view.hierarchy.DefaultHierarchyGraphFactory;
 import y.view.hierarchy.GenericGroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
-import y.base.NodeList;
 
 /*import teo.isgci.gc.GraphClass;
 import java.util.ArrayList;*/
@@ -439,6 +442,22 @@ public class ISGCIMainFrame extends JFrame
         ((DefaultGraph2DRenderer) view.getGraph2DRenderer()).setBridgeCalculator(bridgeCalculator);
         
         view.fitContent();
+        view.getRootPane().getInputMap(mainPan.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "highlight");
+        view.getRootPane().getInputMap(mainPan.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0), "select");
+        view.getRootPane().getActionMap().put("highlight", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	highlightNeighbors();
+            }
+        });
+        view.getRootPane().getActionMap().put("select", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectNeighbors();
+            }
+        });
     }
     
     
@@ -681,10 +700,10 @@ public class ISGCIMainFrame extends JFrame
           nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
           
           if (nr.getFillColor() == Color.WHITE) {
-        	  nr.setLineColor(new Color(255, 153, 0));
-        	  nr.setFillColor(new Color(255, 153, 0));
+        	  //nr.setLineColor(new Color(255, 153, 0));
+        	  //nr.setFillColor(new Color(255, 153, 0));
           }
-          nr.setSize(80, 50);
+          nr.setSize(80, 20);
           nr.getLabel().setFontSize(5);
           
           configureNodeLabel(nr.getLabel(), SmartNodeLabelModel.POSITION_CENTER);
@@ -963,6 +982,28 @@ public class ISGCIMainFrame extends JFrame
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
         pm.add(item);
 
+        pm.addSeparator();
+        
+        item = new JMenuItem(new CreateNewFolderNodeAction(view){
+            protected void setFolderNodeBounds(Graph2DView view, Graph2D graph, Node groupNode) {
+              graph.setLocation(groupNode, x, y);
+            }
+          });
+          item.setText("Create Empty Folder");
+          item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+          pm.add(item);
+          
+          
+          add(selectItem = new JMenuItem("Select Neighbors"));
+          selectItem.addActionListener(this);
+          add(highlightItem = new JMenuItem("Highlight Neighbors"));
+          highlightItem.addActionListener(this);
+          
+          add(infoItem = new JMenuItem("Information"));
+          infoItem.addActionListener(this);  
+        
+          
+          
         item = new JMenuItem(new CreateNewFolderNodeAction(view){
           protected void setFolderNodeBounds(Graph2DView view, Graph2D graph, Node groupNode) {
             graph.setLocation(groupNode, x, y);
@@ -974,12 +1015,15 @@ public class ISGCIMainFrame extends JFrame
         add(infoItem = new JMenuItem("Information"));
         infoItem.addActionListener(this);       
         
-        
+        pm.add(selectItem);
+        pm.add(highlightItem);
         pm.add(infoItem);
       }
     
     
     JMenuItem  infoItem;
+    JMenuItem  selectItem;
+    JMenuItem  highlightItem;
 
     /**
      * Creates the drawing canvas with scrollbars at the bottom and at the
@@ -1144,7 +1188,41 @@ public class ISGCIMainFrame extends JFrame
     public void windowActivated(WindowEvent e) {}
 
     
+    public void selectNeighbors() {
+    	Graph2D g = view.getGraph2D();
+    	NodeCursor n = g.selectedNodes();
+    	ArrayList<Node> l = new ArrayList<Node>();
+    	
+    	for (int i = 0; i < n.size(); ++i) {
+    		NodeCursor neigh =  n.node().neighbors(); 
+    		for (int j = 0; j < neigh.size(); ++j) {
+    			l.add(neigh.node());
+    			neigh.next();
+    		}
+    		n.next();
+    	}
+    	for (Node no: l) {
+    		view.getGraph2D().setSelected(no, true);
+    	}
+    	view.updateView();
+    }
     
+    public void highlightNeighbors() {  	
+    	
+    	for (NodeCursor nc = view.getGraph2D().selectedNodes(); nc.ok(); nc.next())
+        {
+          Node n = nc.node();
+          for (EdgeCursor cur = n.edges(); cur.ok(); cur.next())
+          {
+        	  Edge e = cur.edge();
+        	  view.getGraph2D().setSelected(e, true);
+          }
+          
+        }
+    	view.updateView();
+    	
+    	
+    }
     
     /**
      * Eventhandler for menu selections
@@ -1179,6 +1257,10 @@ public class ISGCIMainFrame extends JFrame
             d.setVisible(true);
         } else if (object == miExit) {
             closeWindow();
+        } else if (object == selectItem) {
+            selectNeighbors();
+        } else if (object == highlightItem) {
+            highlightNeighbors();
         } else if (object == miNew) {
             new ISGCIMainFrame(loader);
         } else if (object == miExport) {

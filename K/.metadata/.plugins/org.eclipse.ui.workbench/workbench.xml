@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workbench progressCount="17" version="2.0">
+<workbench progressCount="18" version="2.0">
 <workbenchAdvisor/>
 <window height="768" maximized="true" width="1326" x="289" y="323">
 <fastViewData fastViewLocation="1024"/>
@@ -20,7 +20,7 @@
 <coolItem id="group.nav" itemType="typeGroupMarker"/>
 <coolItem id="org.eclipse.ui.workbench.navigate" itemType="typeToolBarContribution" x="190" y="22"/>
 <coolItem id="group.editor" itemType="typeGroupMarker"/>
-<coolItem id="org.eclipse.jdt.ui.ClassFileEditor" itemType="typeToolBarContribution" x="-1" y="-1"/>
+<coolItem id="org.eclipse.jdt.ui.ClassFileEditor" itemType="typePlaceholder" x="-1" y="-1"/>
 <coolItem id="org.eclipse.ant.ui.internal.editor.AntEditor" itemType="typeToolBarContribution" x="-1" y="-1"/>
 <coolItem id="org.eclipse.jdt.ui.CompilationUnitEditor" itemType="typeToolBarContribution" x="-1" y="-1"/>
 <coolItem id="group.help" itemType="typeGroupMarker"/>
@@ -79,7 +79,7 @@
 </editor>
 <editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ISGCIMainFrame.java" partName="ISGCIMainFrame.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/gui/ISGCIMainFrame.java" title="ISGCIMainFrame.java" tooltip="p/src/teo/isgci/gui/ISGCIMainFrame.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/gui/ISGCIMainFrame.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="12785" selectionTopPixel="6003"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="27162" selectionTopPixel="11686"/>
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ISGCIGraphCanvas.java" partName="ISGCIGraphCanvas.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/gui/ISGCIGraphCanvas.java" title="ISGCIGraphCanvas.java" tooltip="p/src/teo/isgci/gui/ISGCIGraphCanvas.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/gui/ISGCIGraphCanvas.java"/>
@@ -257,7 +257,7 @@
 <viewState/>
 </view>
 </views>
-<perspectives activePart="org.eclipse.ui.console.ConsoleView" activePerspective="org.eclipse.jdt.ui.JavaPerspective">
+<perspectives activePart="org.eclipse.jdt.ui.PackageExplorer" activePerspective="org.eclipse.jdt.ui.JavaPerspective">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.eclipse.jdt.internal.ui.JavaPerspectiveFactory" id="org.eclipse.jdt.ui.JavaPerspective" label="Java"/>
 <alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
@@ -482,103 +482,11 @@
 <editors>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/gui/ISGCIMainFrame.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/gui/ISGCIToolBar.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/Actions/LayoutAction.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/Actions/EditLabel.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/Actions/OptionAction.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/Actions/LoadAction.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/Actions/OpenFoldersAndLayoutAction.java"/>
 <editor factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" org.eclipse.jdt.ui.ClassFileIdentifier="=p/D:\/KN\/eclipse_knime_2.7.2\/jre\/lib\/rt.jar&lt;javax.swing(JFrame.class"/>
+<editor factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" org.eclipse.jdt.ui.ClassFileIdentifier="=p/D:\/K\/p\/src\/stuff\/Isgci\/lib\/jgrapht.jar&lt;y.view(ShapeNodeRealizer.class"/>
 </editors>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="6760" y="20"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="6866" y="0"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="30303" y="0"/>
-</item>
-<item historyLabel="LayoutAction.java" index="2">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="EditLabel.java" index="3">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="OptionAction.java" index="4">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="LoadAction.java" index="5">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="30303" y="0"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="12256" y="0"/>
-</item>
-<item historyLabel="LoadAction.java" index="5">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="ISGCIToolBar.java" index="1">
-<position info="not_deleted" x="3317" y="16"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="12301" y="0"/>
-</item>
-<item historyLabel="ISGCIToolBar.java" index="1">
-<position info="not_deleted" x="3317" y="16"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="7496" y="38"/>
-</item>
-<item historyLabel="LayoutAction.java" index="2">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="ISGCIToolBar.java" index="1">
-<position info="not_deleted" x="3317" y="16"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="7496" y="38"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="37488" y="0"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="39099" y="0"/>
-</item>
-<item historyLabel="OpenFoldersAndLayoutAction.java" index="6">
-<position info="not_deleted" x="117" y="0"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="39099" y="0"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="53830" y="0"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="10789" y="0"/>
-</item>
-<item historyLabel="ISGCIToolBar.java" index="1">
-<position info="not_deleted" x="2700" y="0"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="6481" y="0"/>
-</item>
-<item historyLabel="ISGCIToolBar.java" index="1">
-<position/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="6481" y="0"/>
-</item>
-<item historyLabel="ISGCIMainFrame.java" index="0">
-<position info="not_deleted" x="12736" y="0"/>
-</item>
 <item historyLabel="ISGCIMainFrame.java" index="0">
 <position info="not_deleted" x="16775" y="22"/>
 </item>
@@ -612,10 +520,10 @@
 <item historyLabel="ISGCIToolBar.java" index="1">
 <position info="not_deleted" x="2783" y="0"/>
 </item>
-<item historyLabel="LoadAction.java" index="5">
+<item historyLabel="LoadAction.java" index="3">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="OptionAction.java" index="4">
+<item historyLabel="OptionAction.java" index="2">
 <position info="not_deleted" x="0" y="0"/>
 </item>
 <item historyLabel="ISGCIToolBar.java" index="1">
@@ -630,14 +538,104 @@
 <item historyLabel="ISGCIMainFrame.java" index="0">
 <position info="not_deleted" x="16775" y="22"/>
 </item>
-<item historyLabel="JFrame.class" index="7">
+<item historyLabel="JFrame.class" index="4">
 <position info="not_deleted" x="0" y="0"/>
 </item>
 <item historyLabel="ISGCIToolBar.java" index="1">
 <position info="not_deleted" x="2879" y="0"/>
 </item>
-<item active="true" historyLabel="ISGCIMainFrame.java" index="0">
+<item historyLabel="ISGCIMainFrame.java" index="0">
 <position info="not_deleted" x="16775" y="22"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="38121" y="1"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="37073" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="46513" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="48250" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="26513" y="16"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="48961" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="26822" y="383"/>
+</item>
+<item historyLabel="ShapeNodeRealizer.class" index="5">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="26822" y="383"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="48962" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="26513" y="16"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="45154" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="46593" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="46650" y="9"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="12063" y="14"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="13858" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="39105" y="17"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="16026" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="16376" y="0"/>
+</item>
+<item active="true" historyLabel="ISGCIMainFrame.java" index="0">
+<position info="not_deleted" x="44346" y="15"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -656,6 +654,9 @@
 </trimLayout>
 </window>
 <mruList>
+<file factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" name="ShapeNodeRealizer.class" tooltip="y.view.ShapeNodeRealizer">
+<persistable org.eclipse.jdt.ui.ClassFileIdentifier="=p/D:\/K\/p\/src\/stuff\/Isgci\/lib\/jgrapht.jar&lt;y.view(ShapeNodeRealizer.class"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="OpenFoldersAndLayoutAction.java" tooltip="p/src/teo/Actions/OpenFoldersAndLayoutAction.java">
 <persistable path="/p/src/teo/Actions/OpenFoldersAndLayoutAction.java"/>
 </file>
@@ -697,9 +698,6 @@
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="GraphClassInformationDialog.java" tooltip="p/src/teo/isgci/gui/GraphClassInformationDialog.java">
 <persistable path="/p/src/teo/isgci/gui/GraphClassInformationDialog.java"/>
-</file>
-<file factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" name="ViewMode.class" tooltip="y.view.ViewMode">
-<persistable org.eclipse.jdt.ui.ClassFileIdentifier="=p/D:\/K\/p\/src\/stuff\/Isgci\/lib\/jgrapht.jar&lt;y.view(ViewMode.class"/>
 </file>
 </mruList>
 </workbench>
