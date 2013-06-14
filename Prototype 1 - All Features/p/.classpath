@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.7.0_21"/>
+	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/getopt.jar"/>
+	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/gnu.getopt.jar"/>
+	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/Mouse.jar"/>
+	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/saxon8.jar"/>
+	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/xml-writer.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/K/p/src/stuff/Isgci/lib/jgrapht.jar"/>
+	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/saxon.jar"/>
+	<classpathentry kind="lib" path="D:/K/p/src/stuff/Isgci/lib/xalan.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/K/p/src/stuff/Isgci/lib/y.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

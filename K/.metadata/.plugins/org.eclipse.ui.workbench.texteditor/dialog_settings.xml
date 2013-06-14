@@ -13,16 +13,16 @@
 		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="loadInit" key="selection"/>
+		<item value="jgrapht" key="selection"/>
 		<list key="findhistory">
-			<item value="loadinit"/>
-			<item value="addkeylis"/>
-			<item value="ISGCIMain"/>
-			<item value="highlightnei"/>
-			<item value="selectneigh"/>
-			<item value="highlightsele"/>
-			<item value="selectNei"/>
-			<item value="selectItem"/>
+			<item value="jgrapht"/>
+			<item value="jgrapht.jar"/>
+			<item value="y.jar"/>
+			<item value="exportsvg"/>
+			<item value="exportGRAPHICS"/>
+			<item value="GRAPHICS"/>
+			<item value="dolay"/>
+			<item value="check "/>
 		</list>
 		<list key="replacehistory">
 			<item value=""/>

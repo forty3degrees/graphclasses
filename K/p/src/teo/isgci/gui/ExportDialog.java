@@ -10,21 +10,40 @@
 
 package teo.isgci.gui;
 
-import java.io.*;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Component;
-import java.awt.CardLayout;
-import java.awt.BorderLayout;
 import java.awt.Insets;
-import java.awt.Container;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import teo.isgci.grapht.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
+import javax.swing.JTextArea;
+import javax.swing.border.EmptyBorder;
+
 import teo.isgci.xml.GraphMLWriter;
+import y.io.IOHandler;
+import yext.svg.io.SVGIOHandler;
 
 public class ExportDialog extends JDialog implements ActionListener {
 
@@ -370,7 +389,8 @@ public class ExportDialog extends JDialog implements ActionListener {
                     fittopage.isSelected(), keepsideratio.isSelected(),
                     rotate.isSelected(), color.isSelected());
 
-            parent.graphCanvas.forcePaint(g);
+            parent.exportGRAPHICS(g);
+            
             outstr = g.getContent();
             g.dispose();
             out.writeBytes(outstr);
@@ -423,16 +443,21 @@ public class ExportDialog extends JDialog implements ActionListener {
         Writer out = null;
         
         try {
-            out = new OutputStreamWriter(f, "UTF-8");
+        	//f.close();
+        	IOHandler ioh = new SVGIOHandler();  
+    	    double tmpPDT = parent.view.getPaintDetailThreshold();  
+    	    parent.view.setPaintDetailThreshold(0.0);  
+    	    ioh.write(parent.view.getGraph2D(),file.getSelectedFile().toString());  
+    	    parent.view.setPaintDetailThreshold(tmpPDT);
+        	/*
+        	out = new OutputStreamWriter(f, "UTF-8");
             SVGGraphics g = new SVGGraphics();
-            parent.graphCanvas.forcePaint(g);
+            parent.exportSGRAPHICS(g);
             outstr = g.getContent();
             g.dispose();
-            out.write(outstr, 0, outstr.length());
+            out.write(outstr, 0, outstr.length());*/
         } catch (IOException ex)  {
             res = ex;
-        } finally {
-            out.close();
         }
         
         if (res != null)

@@ -44,61 +44,7 @@ public class ISGCIToolBar {
         
         addLayoutActions(toolBar);    
         
-        toolBar.addSeparator();
-        toolBar.add(createActionControl(parent.lA));
-        toolBar.add(createActionControl(new OptionAction(parent)));
-        toolBar.addSeparator();
-        toolBar.add(new AssignLengthsAction(parent));
-        toolBar.addSeparator();
-        JCheckBoxMenuItem chk = new JCheckBoxMenuItem();
-        chk.setText("Animation");
-        chk.addActionListener(new ActionListener(){
-        	public void actionPerformed(ActionEvent a) {
-        		parent.check = !parent.check;
-        		
-        	}        	
-        });
-        chk.setVisible(true);
-        
-        JCheckBoxMenuItem style = new JCheckBoxMenuItem();
-        style.setText("old Canvas");
-        style.addActionListener(new ActionListener(){
-        	public void actionPerformed(ActionEvent a) {
-        		parent.oldStyle = !parent.oldStyle;
-        		if (parent.oldStyle) {
-        			parent.mainPan.remove(parent.view);
-        			parent.mainPan.add(parent.drawingPane);
-        		} else {
-        			parent.mainPan.remove(parent.drawingPane);
-        			parent.mainPan.add(parent.view);
-        		}
-        		parent.mainPan.updateUI();
-        		
-        	}        	
-        });
-        style.setVisible(true);
-        
-        JCheckBoxMenuItem overview = new JCheckBoxMenuItem();
-        overview.setText("Overview");
-        overview.addActionListener(new ActionListener(){
-        	public void actionPerformed(ActionEvent a) {
-        		parent.overView = !parent.overView;
-        		if (parent.overView) {
-        			parent.view.getGlassPane().show();
-        		} else {
-        			parent.view.getGlassPane().hide();
-        		}
-        		parent.mainPan.updateUI();        		
-        	}        	
-        });
-        overview.setVisible(true);
-        
-        
-        toolBar.add(chk);
-        toolBar.add(style);
-        toolBar.add(overview);
-
-        
+               
         return toolBar;
       }
 	

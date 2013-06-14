@@ -68,11 +68,13 @@
 	<property name="jarlib.dir" location="stuff/Isgci/lib" />
 	<property name="jgrapht.jar" location="${jarlib.dir}/jgrapht.jar"/>
 	<property name="y.jar" location="${jarlib.dir}/y.jar"/>
+	<property name="ysvg.jar" location="${jarlib.dir}/ysvg.jar"/>
 
 	<path id="compile.classpath">
 	   <pathelement location="${jarlib.dir}/getopt.jar"/>
 	   <pathelement location="${jarlib.dir}/mouse.jar"/>
 	   <pathelement location="${y.jar}"/>
+	   <pathelement location="${ysvg.jar}"/>
 	   <pathelement location="${jgrapht.jar}"/>
 	</path>
 
@@ -80,6 +82,7 @@
 	   <path refid="compile.classpath"/>
 	   <pathelement location="${jarlib.dir}/saxon.jar"/>
 	   <pathelement location="${jarlib.dir}/y.jar"/>
+	   <pathelement location="${jarlib.dir}/ysvg.jar"/>
 	   <pathelement location="${build.classes.dir}"/>
 	</path>
 
