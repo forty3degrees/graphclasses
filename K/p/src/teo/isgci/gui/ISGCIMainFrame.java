@@ -137,11 +137,9 @@ public class ISGCIMainFrame extends JFrame
 	private static final Pattern PATH_SEPARATOR_PATTERN = Pattern.compile("/");
 	
 	private static final Color LABEL_LINE_COLOR = new Color(153, 204, 255, 255);
-	  private static final Color LABEL_BACKGROUND_COLOR = Color.WHITE;
-	  private static final String AUTO_FLIPPING_CONFIG = "AutoFlipConfig";
+	private static final Color LABEL_BACKGROUND_COLOR = Color.WHITE;
+	private static final String AUTO_FLIPPING_CONFIG = "AutoFlipConfig";
 	  
-	  public YModule module;
-
     public static final String APPLICATIONNAME = "ISGCI";
     public IncrementalHierarchicLayouter layouter;
     public OptionHandler groupLayoutOptions;
@@ -170,7 +168,37 @@ public class ISGCIMainFrame extends JFrame
     private static LoadAction gLoader;
 
 
-    
+    public void loadInitialGraph() {
+    	view.getGraph2D().clear();
+    	try {
+    	
+    	} catch (Exception ex) {
+    		
+    	}
+    	
+    	gLoader.loadGraph("myGraph.graphml");
+        
+        for (NodeCursor nc = view.getGraph2D().nodes(); nc.ok(); nc.next())
+        {
+          Node n = nc.node();
+          
+          ShapeNodeRealizer nr = (ShapeNodeRealizer)view.getGraph2D().getRealizer(n);
+          nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
+          
+          if (nr.getFillColor() == Color.WHITE) {
+        	  //nr.setLineColor(new Color(255, 153, 0));
+        	  //nr.setFillColor(new Color(255, 153, 0));
+          }
+          nr.setSize(80, 20);
+          nr.getLabel().setFontSize(5);
+          
+          configureNodeLabel(nr.getLabel(), SmartNodeLabelModel.POSITION_CENTER);
+          
+          nr.repaint();
+        }
+        
+        dolayout();
+     }
        
     public boolean export() {
         boolean res = true;
@@ -281,13 +309,7 @@ public class ISGCIMainFrame extends JFrame
        
         view = createGraphView();
         
-        view.getGraph2D().addDataProvider(OrganicLayouter.PREFERRED_EDGE_LENGTH_DATA, view.getGraph2D().createEdgeMap());
-        module = new SmartOrganicLayoutModule();
         ISGCIToolBar tool = new ISGCIToolBar(this);
-        
-        
-        
-        //loadGraph("resource/organic.graphml");
         
         applyRealizerDefaults(view.getGraph2D(), true, true);
 
@@ -326,11 +348,7 @@ public class ISGCIMainFrame extends JFrame
         getContentPane().add("Center", createMainPanel());
         getContentPane().add("Center", createCanvasPanel());
         
-        /*final JToolBar jtb = createToolBar();
-        if (jtb != null) {
-        	getContentPane().add(jtb, BorderLayout.NORTH);
-        }*/
-        registerViewListeners();
+
         registerListeners();
         setLocation(20, 20);
         pack();
@@ -375,12 +393,8 @@ public class ISGCIMainFrame extends JFrame
         });
     }
     
-    
-    /* Test */
-    
     private Overview createOverview(Graph2DView view) {
         Overview ov = new Overview(view);
-        /* customize the overview */
         //animates the scrolling
         ov.putClientProperty("Overview.AnimateScrollTo", Boolean.TRUE);
         //blurs the part of the graph which can currently not be seen
@@ -440,7 +454,7 @@ public class ISGCIMainFrame extends JFrame
         glassPane.add(westPanel, BorderLayout.WEST);
       }
 
-      private NavigationComponent createNavigationComponent(Graph2DView view, double scrollStepSize, int scrollTimerDelay) {
+    private NavigationComponent createNavigationComponent(Graph2DView view, double scrollStepSize, int scrollTimerDelay) {
         //create the NavigationComponent itself
         final NavigationComponent navigation = new NavigationComponent(view);
         navigation.setScrollStepSize(scrollStepSize);
@@ -479,23 +493,15 @@ public class ISGCIMainFrame extends JFrame
         return navigation;
       }
     
-    ///
-        
-    
     protected HierarchyManager createHierarchyManager(Graph2D rootGraph) {
         return new HierarchyManager(rootGraph);
-      }
+    }
     
     protected HierarchyManager getHierarchyManager() {
         return view.getGraph2D().getHierarchyManager();
-      }
-    
-    
+    }
     
     protected EditMode createEditMode() {
-    	
-    	
-    	
     	EditMode editMode = new EditMode();
         // show the highlighting which is turned off by default
         if (editMode.getCreateEdgeMode() instanceof CreateEdgeMode) {
@@ -554,52 +560,15 @@ public class ISGCIMainFrame extends JFrame
       }
     
     
-    
-    protected void registerViewListeners() {
-        Graph2DViewMouseWheelZoomListener wheelZoomListener = new Graph2DViewMouseWheelZoomListener();
-        //zoom in/out at mouse pointer location 
-        wheelZoomListener.setCenterZooming(false);
-        view.getCanvasComponent().addMouseWheelListener(wheelZoomListener);
-      }
-    
-    public void loadInitialGraph() {
-    	view.getGraph2D().clear();
-    	try {
-    	
-    	} catch (Exception ex) {
-    		
-    	}
-    	
-    	gLoader.loadGraph("myGraph.graphml");
-        
-        for (NodeCursor nc = view.getGraph2D().nodes(); nc.ok(); nc.next())
-        {
-          Node n = nc.node();
-          
-          ShapeNodeRealizer nr = (ShapeNodeRealizer)view.getGraph2D().getRealizer(n);
-          nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
-          
-          if (nr.getFillColor() == Color.WHITE) {
-        	  //nr.setLineColor(new Color(255, 153, 0));
-        	  //nr.setFillColor(new Color(255, 153, 0));
-          }
-          nr.setSize(80, 20);
-          nr.getLabel().setFontSize(5);
-          
-          configureNodeLabel(nr.getLabel(), SmartNodeLabelModel.POSITION_CENTER);
-          
-          nr.repaint();
-        }
-        
-        dolayout();
-     }
-    
     private void configureNodeLabel(NodeLabel label, int position) {
         SmartNodeLabelModel model = new SmartNodeLabelModel();
         label.setLabelModel(model);
         label.setModelParameter(model.createDiscreteModelParameter(position));
       }
     
+    /**
+     * Layout all included graphs.
+     */
     public void dolayout() {
         layouter.setLayoutMode(IncrementalHierarchicLayouter.LAYOUT_MODE_FROM_SCRATCH);
         final Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
@@ -635,8 +604,6 @@ public class ISGCIMainFrame extends JFrame
         }
       }
     
-    
-
     /**
      * Write the entire database in GraphML to isgcifull.graphml.
      */
@@ -692,6 +659,11 @@ public class ISGCIMainFrame extends JFrame
         miSmallgraphs.addActionListener(this);
         miHelp.addActionListener(this);
         miAbout.addActionListener(this);
+        
+        Graph2DViewMouseWheelZoomListener wheelZoomListener = new Graph2DViewMouseWheelZoomListener();
+        //zoom in/out at mouse pointer location 
+        wheelZoomListener.setCenterZooming(false);
+        view.getCanvasComponent().addMouseWheelListener(wheelZoomListener);
     }
 
     protected Action createLoadAction() {
@@ -822,9 +794,6 @@ public class ISGCIMainFrame extends JFrame
     }
     
     protected void populateGroupingPopup(JPopupMenu pm, final double x, final double y, Node node, boolean selected) {
-        
-        
-
         
           add(selectItem = new JMenuItem("Show Neighbors"));
           selectItem.addActionListener(this);
@@ -1013,81 +982,6 @@ public class ISGCIMainFrame extends JFrame
     		view.getGraph2D().setSelected(no, true);
     	}
     	view.updateView();
-    }
-    
-    public void boldNeighbors() {
-    	Graph2D g = view.getGraph2D();
-    	NodeCursor n = g.selectedNodes();
-    	ArrayList<Node> l = new ArrayList<Node>();
-    	
-    	for (int i = 0; i < n.size(); ++i) {
-    		NodeCursor neigh =  n.node().neighbors(); 
-    		for (int j = 0; j < neigh.size(); ++j) {
-    			l.add(neigh.node());
-    			neigh.next();
-    		}
-    		n.next();
-    	}
-    	    	
-    	for (Node no: l)
-        {
-          ShapeNodeRealizer nr = (ShapeNodeRealizer)view.getGraph2D().getRealizer(no);
-                    
-          	
-        	 nr.setDropShadowColor(Color.black);
-        	 Byte b;
-        	 b = Byte.parseByte("5");
-        	 
-        	 nr.setDropShadowOffsetX(b);
-        	 nr.setDropShadowOffsetY(b);
-          
-                    
-          configureNodeLabel(nr.getLabel(), SmartNodeLabelModel.POSITION_CENTER);
-          
-          nr.repaint();
-        }
-    	
-    	
-    	view.updateView();
-    }
-    
-    public void highlightNeighbors() {  	
-    	
-    	
-    	if (!view.getGraph2D().selectedEdges().ok()) {
-	    	for (NodeCursor nc = view.getGraph2D().selectedNodes(); nc.ok(); nc.next())
-	        {
-	          Node n = nc.node();
-	          for (EdgeCursor cur = n.edges(); cur.ok(); cur.next())
-	          {
-	        	  Edge e = cur.edge();
-	        	  view.getGraph2D().setSelected(e, true);
-	          }
-	          
-	        }
-	    	view.updateView();
-    	} else {
-    		for (EdgeCursor ec = view.getGraph2D().selectedEdges(); ec.ok(); ec.next())
-	        {
-	          Edge n = ec.edge();
-	          Node n1 = n.source();
-	          Node n2 = n.target();
-	        	
-	          for (EdgeCursor cur = n1.edges(); cur.ok(); cur.next())
-	          {
-	        	  Edge e = cur.edge();
-	        	  view.getGraph2D().setSelected(e, true);
-	          }
-	          
-	          for (EdgeCursor cur = n2.edges(); cur.ok(); cur.next())
-	          {
-	        	  Edge e = cur.edge();
-	        	  view.getGraph2D().setSelected(e, true);
-	          }
-	          
-	        }
-    		view.updateView();
-    	}
     }
     
     /**

@@ -1,7 +1,5 @@
 package teo.isgci.gui;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
@@ -11,13 +9,10 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
-import teo.Actions.AssignLengthsAction;
-import teo.Actions.OptionAction;
 import y.layout.hierarchic.IncrementalHierarchicLayouter;
 
 public class ISGCIToolBar {

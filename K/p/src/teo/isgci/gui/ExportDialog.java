@@ -43,6 +43,7 @@ import javax.swing.border.EmptyBorder;
 
 import teo.isgci.xml.GraphMLWriter;
 import y.io.IOHandler;
+import yext.export.io.EPSOutputHandler;
 import yext.svg.io.SVGIOHandler;
 
 public class ExportDialog extends JDialog implements ActionListener {
@@ -384,6 +385,14 @@ public class ExportDialog extends JDialog implements ActionListener {
         DataOutputStream out = null;
         
         try {
+        	
+        	IOHandler ioh = new EPSOutputHandler();  
+    	    double tmpPDT = parent.view.getPaintDetailThreshold();  
+    	    parent.view.setPaintDetailThreshold(0.0);
+    	    ioh.write(parent.view.getGraph2D(),file.getSelectedFile().toString());  
+    	    parent.view.setPaintDetailThreshold(tmpPDT);
+        	
+        	/*
             out = new DataOutputStream(f);
             PSGraphics g = new PSGraphics((String) papersize.getSelectedItem(),
                     fittopage.isSelected(), keepsideratio.isSelected(),
@@ -393,11 +402,11 @@ public class ExportDialog extends JDialog implements ActionListener {
             
             outstr = g.getContent();
             g.dispose();
-            out.writeBytes(outstr);
+            out.writeBytes(outstr);*/
         } catch (IOException ex)  {
             res = ex;
         } finally {
-            out.close();
+            //out.close();
         }
         
         if (res != null)
