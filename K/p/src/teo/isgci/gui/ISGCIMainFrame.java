@@ -205,7 +205,7 @@ public class ISGCIMainFrame extends JFrame
         FileOutputStream f;
         try {
         	
-        	File  myFile = new File("D:/myGraph.graphml");
+        	File  myFile = new File("C:/myGraph.graphml");
             f = new FileOutputStream(myFile);
         } catch (Exception e) {
             e.printStackTrace();
