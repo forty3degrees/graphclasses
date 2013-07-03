@@ -205,7 +205,7 @@ public class ISGCIMainFrame extends JFrame
         FileOutputStream f;
         try {
         	
-        	File  myFile = new File("C:/myGraph.graphml");
+        	File  myFile = new File("D:/myGraph.graphml");
             f = new FileOutputStream(myFile);
         } catch (Exception e) {
             e.printStackTrace();
@@ -385,10 +385,30 @@ public class ISGCIMainFrame extends JFrame
         view.getRootPane().getInputMap(mainPan.WHEN_IN_FOCUSED_WINDOW)
         .put(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0), "select");
         
+        view.getRootPane().getInputMap(mainPan.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "selectUp");
+        
+        view.getRootPane().getInputMap(mainPan.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0), "selectDown");
+        
         view.getRootPane().getActionMap().put("select", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 selectNeighbors();
+            }
+        });
+        
+        view.getRootPane().getActionMap().put("selectUp", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectSuperClasses();
+            }
+        });
+        
+        view.getRootPane().getActionMap().put("selectDown", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectSubClasses();
             }
         });
     }
@@ -795,8 +815,14 @@ public class ISGCIMainFrame extends JFrame
     
     protected void populateGroupingPopup(JPopupMenu pm, final double x, final double y, Node node, boolean selected) {
         
-          add(selectItem = new JMenuItem("Show Neighbors"));
-          selectItem.addActionListener(this);
+    	add(selectItem = new JMenuItem("Show Neighbors"));
+        selectItem.addActionListener(this);
+        
+        add(selectItemUp = new JMenuItem("Show SuperClasses"));
+        selectItemUp.addActionListener(this);
+        
+        add(selectItemDown = new JMenuItem("Show Subclasses"));
+        selectItemDown.addActionListener(this);
           
           add(infoItem = new JMenuItem("Information"));
           infoItem.addActionListener(this);  
@@ -807,7 +833,8 @@ public class ISGCIMainFrame extends JFrame
         infoItem.addActionListener(this);       
         
         pm.add(selectItem);
-        
+        pm.add(selectItemUp);
+        pm.add(selectItemDown);
 
         pm.addSeparator();
         
@@ -817,6 +844,8 @@ public class ISGCIMainFrame extends JFrame
     
     JMenuItem  infoItem;
     JMenuItem  selectItem;
+    JMenuItem  selectItemUp;
+    JMenuItem  selectItemDown;
     
     /**
      * Creates the drawing canvas with scrollbars at the bottom and at the
@@ -984,6 +1013,44 @@ public class ISGCIMainFrame extends JFrame
     	view.updateView();
     }
     
+    public void selectSuperClasses() {
+    	Graph2D g = view.getGraph2D();
+    	NodeCursor n = g.selectedNodes();
+    	ArrayList<Node> l = new ArrayList<Node>();
+    	
+    	for (int i = 0; i < n.size(); ++i) {
+    		NodeCursor neigh =  n.node().successors(); 
+    		for (int j = 0; j < neigh.size(); ++j) {
+    			l.add(neigh.node());
+    			neigh.next();
+    		}
+    		n.next();
+    	}
+    	for (Node no: l) {
+    		view.getGraph2D().setSelected(no, true);
+    	}
+    	view.updateView();
+    }
+    
+    public void selectSubClasses() {
+    	Graph2D g = view.getGraph2D();
+    	NodeCursor n = g.selectedNodes();
+    	ArrayList<Node> l = new ArrayList<Node>();
+    	
+    	for (int i = 0; i < n.size(); ++i) {
+    		NodeCursor neigh =  n.node().predecessors(); 
+    		for (int j = 0; j < neigh.size(); ++j) {
+    			l.add(neigh.node());
+    			neigh.next();
+    		}
+    		n.next();
+    	}
+    	for (Node no: l) {
+    		view.getGraph2D().setSelected(no, true);
+    	}
+    	view.updateView();
+    }
+    
     /**
      * Eventhandler for menu selections
      */
@@ -1019,6 +1086,10 @@ public class ISGCIMainFrame extends JFrame
             closeWindow();
         } else if (object == selectItem) {
             selectNeighbors();
+        }else if (object == selectItemUp) {
+            selectSuperClasses();
+        }else if (object == selectItemDown) {
+            selectSubClasses();
         } else if (object == miNew) {
             new ISGCIMainFrame(loader);
         } else if (object == miExport) {
