@@ -72,14 +72,14 @@ public class SearchDialog extends JDialog implements ActionListener {
         cancelButton.addActionListener(this);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     
-        List<GraphClass> names = parent.graphCanvas.getClasses();
-        if (!names.isEmpty()) {
-            Collections.sort(names, new LessLatex());
-            classesList.setListData(names);
-        }
-        pack();
-        setSize(300, 350);
-    
+//        List<GraphClass> names = parent.graphCanvas.getClasses();
+//        if (!names.isEmpty()) {
+//            Collections.sort(names, new LessLatex());
+//            classesList.setListData(names);
+//        }
+//        pack();
+//        setSize(300, 350);
+//    
     }
 
 
@@ -95,8 +95,7 @@ public class SearchDialog extends JDialog implements ActionListener {
         } else if (source == searchButton) {
             NodeView view = parent.graphCanvas.findNode(
                             classesList.getSelectedNode());
-            parent.graphCanvas.markOnly(view);
-            parent.graphCanvas.centerNode(view);
+            //parent.graphCanvas.markOnly(view);
             closeDialog();
         }
     }

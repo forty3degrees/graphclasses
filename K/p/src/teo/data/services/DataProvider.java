@@ -191,10 +191,10 @@ public abstract class DataProvider implements IDataProvider {
         for (GraphClass graph : graphs) {
             result.add(graph);
             if (doSuper) {
-                result.addAll(ISGCIMainFrame.DataProvider.getSuperClasses(graph, true));
+                result.addAll(this.getSuperClasses(graph, true));
             }
             if (doSub) {
-                result.addAll(ISGCIMainFrame.DataProvider.getSubClasses(graph, true));
+                result.addAll(this.getSubClasses(graph, true));
             }
         }
 

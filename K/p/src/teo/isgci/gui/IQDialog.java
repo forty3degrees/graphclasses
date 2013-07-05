@@ -164,7 +164,6 @@ public class IQDialog extends JDialog
                 if (v != null)
                     v.setNameAndLabel(gc.toString());
             }
-            parent.graphCanvas.updateBounds();
             
             setCursor(oldcursor);
             closeDialog();

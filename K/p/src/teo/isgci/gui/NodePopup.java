@@ -54,7 +54,6 @@ public class NodePopup extends JPopupMenu implements ActionListener {
             String fullname = event.getActionCommand().substring(
                     CHANGENAME.length());
             view.setNameAndLabel(fullname);
-            parent.graphCanvas.updateBounds();
             parent.graphCanvas.repaint();
         }
     }

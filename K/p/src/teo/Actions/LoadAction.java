@@ -117,7 +117,7 @@ public class LoadAction extends AbstractAction {
   
   protected void loadGraph(Class aClass, String resourceString) {
       try {
-  	URL resource = new URL("File:///D:/" + resourceString);
+  	URL resource = new URL("File:///U:/" + resourceString);
       if (resource == null) {
         String message = "Resource \"" + resourceString + "\" not found in classpath of " + aClass;
         D.showError(message);

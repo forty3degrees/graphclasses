@@ -209,7 +209,7 @@ public class ISGCIMainFrame extends JFrame
         FileOutputStream f;
         try {
         	
-        	File  myFile = new File("D:/myGraph.graphml");
+        	File  myFile = new File("U:/myGraph.graphml");
             f = new FileOutputStream(myFile);
         } catch (Exception e) {
             e.printStackTrace();
@@ -343,11 +343,11 @@ public class ISGCIMainFrame extends JFrame
             createMaps = System.getProperty("org.isgci.mappath") != null;
         } catch (Exception e) {}
 
-        if (createMaps) {       // Create maps and terminate
-            createCanvasPanel();
-            new teo.isgci.util.LandMark(this).createMaps();
-            closeWindow();
-        }
+//        if (createMaps) {       // Create maps and terminate
+//            createCanvasPanel();
+//            new teo.isgci.util.LandMark(this).createMaps();
+//            closeWindow();
+//        }
         
         final JMenuBar jmb = createMenuBar();
         if (jmb != null) {

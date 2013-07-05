@@ -17,6 +17,10 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.*;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
 import javax.swing.*;
 import java.util.Collection;
 import java.util.Set;
@@ -59,7 +63,6 @@ public class ISGCIGraphCanvas extends
         super(parent, parent.latex, new ISGCIVertexFactory(), null);
         problem = null;
         namingPref = Algo.NamePref.BASIC;
-        setWidthFunc(new NodeWidthFunc());
         nodePopup = new NodePopup(parent);
         edgePopup = new EdgePopup(parent);
         add(nodePopup);
@@ -75,7 +78,7 @@ public class ISGCIGraphCanvas extends
             SimpleDirectedGraph<Set<GraphClass>,DefaultEdge> g) {
         GraphView<Set<GraphClass>,DefaultEdge> gv = super.addGraph(g);
         for (NodeView<Set<GraphClass>,DefaultEdge> nv : gv.getNodeViews()) {
-            nv.setColor(complexityColor(nv.getNode()));
+            //nv.setColor(complexityColor(nv.getNode()));
             nv.setNameAndLabel(Algo.getName(nv.getNode(), namingPref)); 
         }
         return gv;
@@ -92,6 +95,28 @@ public class ISGCIGraphCanvas extends
         List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
                 GAlg.split(graph, DefaultEdge.class);
         //System.err.println(list);
+//        Exception res = null;
+//        Writer out = null;
+//        
+//        try {
+//            out = new OutputStreamWriter(f, "UTF-8");
+//            GraphMLWriter w = new GraphMLWriter(out,GraphMLWriter.MODE_YED,
+//                    graphCanvas.getDrawUnproper(),true);
+//
+//            w.startDocument();
+//            
+//            for(SimpleDirectedGraph<Set<GraphClass>,DefaultEdge> item : list) {
+//            	for(Set<GraphClass> set : item.vertexSet()) {
+//	            	w.writeNode(Integer.toString(item.vertexSet().indexOf(this)),
+//	                        getLabel(), getColor());
+//            	}
+//            }
+//            w.endDocument();
+//        } finally {
+//            out.close();
+//        }
+        
+        
         drawGraphs(list);
         if (myPar.export()) {
         	myPar.loadInitialGraph();
@@ -99,33 +124,6 @@ public class ISGCIGraphCanvas extends
     }
     
     
-    /**
-     * Returns all classes on the canvas (unsorted).
-     */
-    public List<GraphClass> getClasses() {
-        List<GraphClass> result = new ArrayList<GraphClass>();
-        for (GraphView<Set<GraphClass>,DefaultEdge> gv : graphs) {
-            for (NodeView<Set<GraphClass>,DefaultEdge> nv : gv.getNodeViews())
-                for (GraphClass gc : nv.getNode())
-                    result.add(gc);
-        }
-        return result;
-    }
-    
-    
-    /**
-     * Returns all names of all nodes.
-     */
-    public List<String> getNames() {
-        List<String> result = new ArrayList<String>();
-        for (GraphView<Set<GraphClass>,DefaultEdge> gv : graphs) {
-            for (NodeView<Set<GraphClass>,DefaultEdge> nv : gv.getNodeViews())
-                for (GraphClass gc : nv.getNode())
-                    result.add(gc.toString());
-        }
-        return result;
-    }
-
 
     /**
      * Set all nodes to their prefered names.
@@ -172,7 +170,6 @@ public class ISGCIGraphCanvas extends
         if (problem != p) {
             problem = p;
             setComplexityColors();
-            repaint();
             if (myPar.export()) {
             	myPar.loadInitialGraph();
             }
@@ -220,8 +217,6 @@ public class ISGCIGraphCanvas extends
     public void setNamingPref(Algo.NamePref pref) {
         namingPref = pref;
         setPreferedNames();
-        updateBounds();
-        repaint();
         if (myPar.export()) {
         	myPar.loadInitialGraph();
         }
@@ -232,54 +227,6 @@ public class ISGCIGraphCanvas extends
     }
 
 
-
-    /**
-     * Center the canvas on the given NodeView.
-     */
-    public void centerNode(NodeView<Set<GraphClass>, DefaultEdge> v) {
-        Point p = null;
-
-        for (GraphView<Set<GraphClass>,DefaultEdge> gv : graphs) {
-            if ((p = gv.getNodeCenter(v)) != null) {
-                ((ISGCIMainFrame) parent).centerCanvas(p);
-                return;
-            }
-        }
-    }
-
-
-    //----------------------- MouseListener stuff --------------------------
-
-    protected boolean mousePopup(MouseEvent event) {
-        if (!event.isPopupTrigger())
-            return false;
-
-        event.consume();
-        
-        View v = getViewAt(event.getPoint());
-        if (v == null)
-            return true;
-        if (v instanceof NodeView) {
-            nodePopup.setNode((NodeView) v);
-            nodePopup.show(this, event.getX(), event.getY());
-        }
-        if (v instanceof EdgeView) {
-            edgePopup.setEdge((EdgeView) v);
-            edgePopup.show(this, event.getX(), event.getY());
-        }
-        return true;
-    }
-
-
-    //----------------------- Width calculator --------------------------
-    class NodeWidthFunc implements IntFunction<Set<GraphClass> > {
-        /** Return the width of node */
-        public int execute(Set<GraphClass> node) {
-            NodeView<Set<GraphClass>, DefaultEdge> view = getView(node);
-            view.updateSize();
-            return view.getSize().width;
-        }
-    }
 }
 
 /* EOF */

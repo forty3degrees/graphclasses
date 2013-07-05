@@ -69,6 +69,10 @@
 		<item value="false" key="create_main"/>
 		<item value="true" key="create_unimplemented"/>
 	</section>
+	<section name="RenameInformationPopup">
+	</section>
+	<section name="org.eclipse.ltk.ui.refactoring.settings">
+	</section>
 	<section name="CallHierarchySearchScope">
 	</section>
 </section>
