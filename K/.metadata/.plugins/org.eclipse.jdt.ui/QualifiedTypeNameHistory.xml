@@ -20,4 +20,19 @@
 <fullyQualifiedTypeName name="java.awt.Color"/>
 <fullyQualifiedTypeName name="java.lang.System"/>
 <fullyQualifiedTypeName name="java.io.InputStream"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="teo.isgci.gc.GraphClass"/>
+<fullyQualifiedTypeName name="teo.Loader"/>
+<fullyQualifiedTypeName name="teo.isgci.problem.Problem"/>
+<fullyQualifiedTypeName name="java.util.LinkedList"/>
+<fullyQualifiedTypeName name="teo.isgci.grapht.Inclusion"/>
+<fullyQualifiedTypeName name="java.util.Map"/>
+<fullyQualifiedTypeName name="teo.isgci.problem.Complexity"/>
+<fullyQualifiedTypeName name="java.util.Collection"/>
+<fullyQualifiedTypeName name="teo.isgci.grapht.BFSWalker"/>
+<fullyQualifiedTypeName name="teo.isgci.xml.ISGCIReader"/>
+<fullyQualifiedTypeName name="teo.isgci.xml.XMLParser"/>
+<fullyQualifiedTypeName name="teo.isgci.xml.NoteFilter"/>
+<fullyQualifiedTypeName name="teo.isgci.db.AbstractRelation"/>
+<fullyQualifiedTypeName name="teo.data.services.IDataService"/>
 </qualifiedTypeNameHistroy>

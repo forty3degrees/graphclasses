@@ -1,0 +1,74 @@
+package teo.data.services;
+
+import java.util.Collection;
+import java.util.Map;
+
+import teo.isgci.db.AbstractRelation;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.problem.Complexity;
+import teo.isgci.problem.Problem;
+
+public abstract class DataProvider implements IDataService {
+
+	@Override
+	public void loadData(String path) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public AbstractRelation findRelation(GraphClass x, GraphClass y) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GraphClass[] getGraphClasses() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Problem[] getProblems() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<GraphClass> getSubClasses(GraphClass graph,
+			Boolean recursive) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<GraphClass> getSuperClasses(GraphClass graph,
+			Boolean recursive) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Problem, Complexity> getComplexityMap(GraphClass graph) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<GraphClass, Complexity> getComplexityMap(Problem problem) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+    public static String getDate() {
+        return date;
+    }        
+    
+    public static String getNodeCount() {
+        return nodecount;
+    }    
+    
+    public static String getEdgeCount() {
+        return edgecount;
+    }    
+}

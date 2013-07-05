@@ -11,7 +11,6 @@
 package teo.isgci.gui;
 
 import teo.isgci.db.Algo;
-import teo.isgci.db.DataSet;
 import teo.isgci.problem.Problem;
 import teo.isgci.problem.Complexity;
 import teo.isgci.xml.GraphMLWriter;

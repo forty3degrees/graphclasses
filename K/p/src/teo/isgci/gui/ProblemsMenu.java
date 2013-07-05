@@ -30,8 +30,9 @@ public class ProblemsMenu extends JMenu implements ActionListener {
 
         addRadio("None", true);
 
-        for (int i = 0; i < DataSet.problems.size(); i++)
-            addRadio(((Problem)DataSet.problems.elementAt(i)).getName(),false);
+        Problem[] problems = ISGCIMainFrame.DataProvider.getProblems();
+        for (int i = 0; i < problems.length; i++)
+            addRadio((problems[i]).getName(),false);
     }
 
     /**
@@ -49,7 +50,7 @@ public class ProblemsMenu extends JMenu implements ActionListener {
 
     public void actionPerformed(ActionEvent event) {
         parent.graphCanvas.setProblem(
-                DataSet.getProblem(event.getActionCommand()));
+        		ISGCIMainFrame.DataProvider.getProblem(event.getActionCommand()));
     }
 }
 

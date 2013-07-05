@@ -1,0 +1,23 @@
+package teo.data.services;
+
+import java.util.Collection;
+import java.util.Map;
+
+import teo.isgci.db.AbstractRelation;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.problem.Complexity;
+import teo.isgci.problem.Problem;
+
+public interface IDataService {
+	void loadData(String path) throws Exception;
+	AbstractRelation findRelation(GraphClass x, GraphClass y);
+	GraphClass[] getGraphClasses();
+	Problem[] getProblems();
+	Collection<GraphClass> getSubClasses(GraphClass graph, Boolean recursive);
+	Collection<GraphClass> getSuperClasses(GraphClass graph, Boolean recursive);
+	Map<Problem, Complexity> getComplexityMap(GraphClass graph);
+	Map<GraphClass, Complexity> getComplexityMap(Problem problem);
+	String getDate();    
+    int getNodeCount();
+    int getEdgeCount();
+}

@@ -12,7 +12,6 @@
 package teo.isgci.gui;
 
 import teo.isgci.gc.GraphClass;
-import teo.isgci.db.DataSet;
 import teo.isgci.grapht.*;
 import teo.isgci.util.LatexGlyph;
 import java.io.IOException;
@@ -127,7 +126,7 @@ public class IQDialog extends JDialog
         addListeners();
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        classesList.setListData(DataSet.getClasses());
+        classesList.setListData(ISGCIMainFrame.DataProvider.getGraphClasses());
         pack();
         setSize(500, 400);
     }

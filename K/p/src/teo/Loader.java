@@ -188,6 +188,7 @@ public class Loader {
         }
 
         try {
+        	//args[opts.getOptind()]
             final Loader loader = new Loader(args[0]);
             synchronized (loader.finished) {
                 new Thread(new Runnable() {

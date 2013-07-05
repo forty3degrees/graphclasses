@@ -12,7 +12,6 @@
 package teo.isgci.gui;
 
 import teo.isgci.gc.GraphClass;
-import teo.isgci.db.DataSet;
 import teo.isgci.grapht.*;
 import java.io.IOException;
 import java.awt.Cursor;
@@ -115,7 +114,7 @@ public class GraphClassSelectionDialog extends JDialog
         addListeners();
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        classesList.setListData(DataSet.getClasses());
+        classesList.setListData(ISGCIMainFrame.DataProvider.getGraphClasses());
         pack();
         setSize(500, 400);
     }
@@ -176,29 +175,11 @@ public class GraphClassSelectionDialog extends JDialog
                 doSub = subCheck.isSelected();
        
         for (Object o : classesList.getSelectedValues()) {
-            GraphClass gc = (GraphClass) o;
-            result.add(gc);
-            if (doSuper) {
-                new RevBFSWalker<GraphClass,Inclusion>( DataSet.inclGraph,
-                        gc, null, GraphWalker.InitCode.DYNAMIC) {
-                    public void visit(GraphClass v) {
-                        result.add(v);
-                        super.visit(v);
-                    }
-                }.run();
-            }
-            if (doSub) {
-                new BFSWalker<GraphClass,Inclusion>(DataSet.inclGraph,
-                        gc, null, GraphWalker.InitCode.DYNAMIC) {
-                    public void visit(GraphClass v) {
-                        result.add(v);
-                        super.visit(v);
-                    }
-                }.run();
-            }
+            GraphClass graph = (GraphClass) o;
+            result.add(graph);
         }
 
-        return result;
+        return ISGCIMainFrame.DataProvider.getNodes(result, doSuper, doSub);
     }    
 }
 

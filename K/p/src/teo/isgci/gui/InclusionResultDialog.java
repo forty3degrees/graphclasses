@@ -19,6 +19,10 @@ import java.awt.Container;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.Collections;
@@ -272,12 +276,14 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
      */
     private JComponent makeNoRelationPanel(GraphClass node1, GraphClass node2){
         //---- First check the stored non-inclusion relations
-        for (AbstractRelation r : DataSet.relations) {
+    	SimpleDirectedGraph<GraphClass, Inclusion> inclusionGraph = 
+    						ISGCIMainFrame.DataProvider.getInclusionGraph();
+        for (AbstractRelation r : ISGCIMainFrame.DataProvider.getRelations()) {
             if (r instanceof Disjointness) {
-                if (    GAlg.getPath(DataSet.inclGraph,r.get1(),node1)!=null &&
-                        GAlg.getPath(DataSet.inclGraph,r.get2(),node2)!=null ||
-                        GAlg.getPath(DataSet.inclGraph,r.get1(),node2)!=null &&
-                        GAlg.getPath(DataSet.inclGraph,r.get2(),node1)!=null )
+                if (    GAlg.getPath(inclusionGraph,r.get1(),node1)!=null &&
+                        GAlg.getPath(inclusionGraph,r.get2(),node2)!=null ||
+                        GAlg.getPath(inclusionGraph,r.get1(),node2)!=null &&
+                        GAlg.getPath(inclusionGraph,r.get2(),node1)!=null )
                     return makeNoRelationPanel(node1, node2, r);
             } else if (r instanceof Incomparability) {
                 if (r.get1() == node1  &&  r.get2() == node2  ||
@@ -292,7 +298,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         if (node1 instanceof ForbiddenClass) {
             g1 = (ForbiddenClass) node1;
         } else {
-            for (GraphClass g : DataSet.getEquivalentClasses(node1))
+            for (GraphClass g : ISGCIMainFrame.DataProvider.getEquivalentClasses(node1))
                 if (g instanceof ForbiddenClass) {
                     g1 = (ForbiddenClass) g;
                     break;
@@ -302,7 +308,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         if (node2 instanceof ForbiddenClass) {
             g2 = (ForbiddenClass) node2;
         } else {
-            for (GraphClass g : DataSet.getEquivalentClasses(node2))
+            for (GraphClass g : ISGCIMainFrame.DataProvider.getEquivalentClasses(node2))
                 if (g instanceof ForbiddenClass) {
                     g2 = (ForbiddenClass) g;
                     break;
@@ -403,7 +409,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         //---- Find forbidden equivalent to lower
         ForbiddenClass forbLower = null;
         for (GraphClass gc :
-                DataSet.getEquivalentClasses(lower.iterator().next())) {
+        	ISGCIMainFrame.DataProvider.getEquivalentClasses(lower.iterator().next())) {
             if (gc instanceof ForbiddenClass) {
                 forbLower = (ForbiddenClass) gc;
                 break;
@@ -503,7 +509,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
 
             LatexLabel subset;
             if (details  &&
-                        DataSet.getEquivalentClasses(sup).contains(sub))
+            		ISGCIMainFrame.DataProvider.getEquivalentClasses(sup).contains(sub))
                 subset = new LatexLabel(parent.latex, "   $\\equiv$");
             else if (details  &&  e.isProper())
                 subset = new LatexLabel(parent.latex, "   $\\subset$");
@@ -554,9 +560,9 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             parent.graphCanvas.drawHierarchy(Algo.nodesBetween(upper, lower));
 
             NodeView node1 = parent.graphCanvas.findNode(
-                    DataSet.getClass(nodeName1));
+                    ISGCIMainFrame.DataProvider.getClass(nodeName1));
             NodeView node2 = parent.graphCanvas.findNode(
-                    DataSet.getClass(nodeName2));
+            		ISGCIMainFrame.DataProvider.getClass(nodeName2));
             if (node1 != null  && node2 != null) {
                 node1.setNameAndLabel(nodeName1);
                 node2.setNameAndLabel(nodeName2);
@@ -577,8 +583,11 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
      */
     public static InclusionResultDialog newInstance(ISGCIMainFrame parent,
             GraphClass v1, GraphClass v2) {
-        List<Inclusion> v12 = GAlg.getPath(DataSet.inclGraph, v1, v2),
-                        v21 = GAlg.getPath(DataSet.inclGraph, v2, v1);
+    	
+    	DirectedGraph<GraphClass, Inclusion> g = 
+    			ISGCIMainFrame.DataProvider.getInclusionGraph();
+        List<Inclusion> v12 = GAlg.getPath(g, v1, v2),
+                        v21 = GAlg.getPath(g, v2, v1);
         InclusionResultDialog dialog = null;
         
         nodeName1 = v1.toString();

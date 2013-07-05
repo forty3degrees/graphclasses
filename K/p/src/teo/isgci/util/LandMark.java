@@ -19,6 +19,8 @@ import javax.imageio.ImageIO;
 import org.xml.sax.InputSource;
 import gnu.getopt.Getopt;
 import org.jgrapht.graph.SimpleDirectedGraph;
+
+import teo.data.services.IDataProvider;
 import teo.isgci.grapht.*;
 import teo.isgci.gui.*;
 import teo.isgci.xml.*;
@@ -49,16 +51,17 @@ public class LandMark {
      * Fill the landmarks array with the proper nodes.
      */
     protected List<GraphClass> findLandmarks() {
+    	IDataProvider dataProvider = ISGCIMainFrame.DataProvider;
         List<GraphClass> landmarks = new ArrayList<GraphClass>();
         landmarks.add(null);
-        landmarks.add(DataSet.getClass("perfect"));
-        landmarks.add(DataSet.getClass("Meyniel"));
-        landmarks.add(DataSet.getClass("threshold"));
-        landmarks.add(DataSet.getClass("tree"));
-        landmarks.add(DataSet.getClass("cograph"));
-        landmarks.add(DataSet.getClass("clique"));
-        landmarks.add(DataSet.getClass("proper interval"));
-        landmarks.add(DataSet.getClass("even-hole--free"));
+        landmarks.add(dataProvider.getClass("perfect"));
+        landmarks.add(dataProvider.getClass("Meyniel"));
+        landmarks.add(dataProvider.getClass("threshold"));
+        landmarks.add(dataProvider.getClass("tree"));
+        landmarks.add(dataProvider.getClass("cograph"));
+        landmarks.add(dataProvider.getClass("clique"));
+        landmarks.add(dataProvider.getClass("proper interval"));
+        landmarks.add(dataProvider.getClass("even-hole--free"));
         return landmarks;
     }
 
@@ -101,7 +104,7 @@ public class LandMark {
     public void createMaps() {
         //createMap(DataSet.getNode("(2K_2,A,H)--free"));
 
-        for (GraphClass n : DataSet.getClasses()) {
+        for (GraphClass n : ISGCIMainFrame.DataProvider.getGraphClasses()) {
             try {
                 createMap(n);
             } catch (Exception e) {

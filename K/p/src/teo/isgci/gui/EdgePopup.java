@@ -14,7 +14,8 @@ import java.awt.event.*;
 import java.util.Set;
 import javax.swing.*;
 import org.jgrapht.graph.DefaultEdge;
-import teo.isgci.db.DataSet;
+
+import teo.data.services.IDataProvider;
 import teo.isgci.gc.GraphClass;
 
 
@@ -38,11 +39,12 @@ public class EdgePopup extends JPopupMenu implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == infoItem) {
+        	IDataProvider dataProvider = ISGCIMainFrame.DataProvider;
             JDialog d = InclusionResultDialog.newInstance(parent,
-                DataSet.getClass(
-                    parent.graphCanvas.getView(view.getFrom()).getFullName()),
-                DataSet.getClass(
-                    parent.graphCanvas.getView(view.getTo()).getFullName()));
+            		dataProvider.getClass(
+            				parent.graphCanvas.getView(view.getFrom()).getFullName()),
+                    dataProvider.getClass(
+                    		parent.graphCanvas.getView(view.getTo()).getFullName()));
             d.setLocation(50, 50);
             d.pack();
             d.setVisible(true);

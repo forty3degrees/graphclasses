@@ -1,0 +1,145 @@
+package teo.data.services;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.jgrapht.graph.DirectedMultigraph;
+
+import teo.Loader;
+import teo.Loader.Resolver;
+import teo.isgci.db.AbstractRelation;
+import teo.isgci.db.DataSet;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.BFSWalker;
+import teo.isgci.grapht.GraphWalker;
+import teo.isgci.grapht.Inclusion;
+import teo.isgci.grapht.RevBFSWalker;
+import teo.isgci.problem.Complexity;
+import teo.isgci.problem.Problem;
+import teo.isgci.xml.ISGCIReader;
+import teo.isgci.xml.NoteFilter;
+import teo.isgci.xml.XMLParser;
+
+/**
+ * Class to provide data to the application. Uses an XML file
+ * as the backing store for the data.
+ * 
+ * @author Calum McLellan
+ *
+ */
+public class XmlDataProvider implements IDataService {
+
+	private DirectedMultigraph<GraphClass,Inclusion> Graph;
+	private List<Problem> Problems;
+	private List<AbstractRelation> Relations;
+	
+	public XmlDataProvider()
+	{
+	}
+
+	/**
+	 * Loads the data from the specified file into memory.
+	 * 
+	 * @param	path	The path to the XML file containing the application data
+	 */
+	@Override
+	public void loadData(String path) throws Exception {
+		
+		/* Initialize the collections */
+        this.Graph = new DirectedMultigraph<GraphClass,Inclusion>(Inclusion.class);
+		this.Problems = new LinkedList<Problem>();
+		this.Relations = new LinkedList<AbstractRelation>();
+		
+		/* Parse the XML */
+		Loader loader = new Loader("file:"+System.getProperty("user.dir")+"/",
+                true);
+        ISGCIReader gcr = new ISGCIReader(this.Graph, this.Problems);
+        XMLParser xml = new XMLParser(loader.openInputSource(path),
+                gcr, loader.new Resolver(), new NoteFilter());
+        xml.parse();
+        this.Relations.addAll(gcr.getRelations());
+	}
+
+	@Override
+	public AbstractRelation findRelation(GraphClass x, GraphClass y) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GraphClass[] getGraphClasses() {
+		
+		/* Return a copy of the graphs in a new array. This avoids
+		 * giving external access to the list.
+		 */
+		GraphClass[] graphs = new GraphClass[this.Graph..size()];
+		return this.Graphs.toArray(graphs);
+	}
+
+	@Override
+	public Problem[] getProblems() {
+
+		/* Return a copy of the problems in a new array. This avoids
+		 * giving external access to the list.
+		 */
+		Problem[] problems = new Problem[this.Problems.size()];
+		return this.Problems.toArray(problems);
+	}
+
+	@Override
+	public Collection<GraphClass> getSubClasses(GraphClass graph, final Boolean recursive) {
+		
+		final HashSet<GraphClass> result = new HashSet<GraphClass>();
+		
+		result.add(graph);
+		new BFSWalker<GraphClass,Inclusion>( DataSet.inclGraph,
+                graph, null, GraphWalker.InitCode.DYNAMIC) {
+            public void visit(GraphClass v) {
+                result.add(v);
+                if (recursive)
+                {
+                	super.visit(v);
+                }
+            }
+        }.run();
+        
+        return result;
+	}
+
+	@Override
+	public Collection<GraphClass> getSuperClasses(GraphClass graph, final Boolean recursive) {
+		
+		final HashSet<GraphClass> result = new HashSet<GraphClass>();
+		
+		result.add(graph);
+		new RevBFSWalker<GraphClass,Inclusion>( DataSet.inclGraph,
+                graph, null, GraphWalker.InitCode.DYNAMIC) {
+            public void visit(GraphClass v) {
+                result.add(v);
+                if (recursive)
+                {
+                	super.visit(v);
+                }
+            }
+        }.run();
+        
+        return result;
+	}
+
+	@Override
+	public Map<Problem, Complexity> getComplexityMap(GraphClass graph) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<GraphClass, Complexity> getComplexityMap(Problem problem) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
+

@@ -59,8 +59,8 @@ public class ISGCIReader extends DefaultHandler{
     
     /* Statistics */
     private String date;
-    private String nodecount;
-    private String edgecount;
+    private int nodecount;
+    private int edgecount;
 
     private boolean parsingDone;
     
@@ -112,11 +112,11 @@ public class ISGCIReader extends DefaultHandler{
         return date;
     }    
     
-    public String getNodeCount() {
+    public int getNodeCount() {
         return nodecount;
     }    
     
-    public String getEdgeCount() {
+    public int getEdgeCount() {
         return edgecount;
     }    
     
@@ -129,8 +129,8 @@ public class ISGCIReader extends DefaultHandler{
         //---- Statistics ----
         if (Tags.STATS.equals(qName)) {
             date = atts.getValue(Tags.DATE);
-            nodecount = atts.getValue(Tags.NODECOUNT);
-            edgecount = atts.getValue(Tags.EDGECOUNT);
+            nodecount = Integer.parseInt(atts.getValue(Tags.NODECOUNT));
+            edgecount = Integer.parseInt(atts.getValue(Tags.EDGECOUNT));
         } else
 
         //---- GraphClasses ----

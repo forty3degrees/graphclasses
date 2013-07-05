@@ -17,6 +17,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Container;
 import javax.swing.*;
+
+import teo.data.services.IDataProvider;
 import teo.isgci.db.*;
 
 public class AboutDialog extends JDialog implements ActionListener {
@@ -35,6 +37,8 @@ public class AboutDialog extends JDialog implements ActionListener {
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         content.setLayout(gridbag);
+        
+        IDataProvider dataProvider = ISGCIMainFrame.DataProvider;
 
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = new Insets(10,10,0,10); 
@@ -62,14 +66,14 @@ public class AboutDialog extends JDialog implements ActionListener {
         content.add(label2b);
         
         c.insets = insetsTopMargin;
-        JLabel label7 = new JLabel(DataSet.getNodeCount()+" classes, "+
-                DataSet.getEdgeCount()+ " inclusions", JLabel.CENTER);
+        JLabel label7 = new JLabel(dataProvider.getNodeCount()+" classes, "+
+        		dataProvider.getEdgeCount()+ " inclusions", JLabel.CENTER);
         gridbag.setConstraints(label7, c);
         content.add(label7);
         
         c.insets = insetsZero;
         JLabel label5 = new JLabel("Database generated : "+
-                DataSet.getDate(), JLabel.CENTER);
+        		dataProvider.getDate(), JLabel.CENTER);
         gridbag.setConstraints(label5, c);
         content.add(label5);
         

@@ -1,0 +1,84 @@
+package teo.data.services;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Vector;
+
+import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import teo.Loader;
+import teo.Loader.Resolver;
+import teo.isgci.db.AbstractRelation;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.BFSWalker;
+import teo.isgci.grapht.GAlg;
+import teo.isgci.grapht.GraphWalker;
+import teo.isgci.grapht.Inclusion;
+import teo.isgci.grapht.RevBFSWalker;
+import teo.isgci.problem.Complexity;
+import teo.isgci.problem.Problem;
+import teo.isgci.util.LessLatex;
+import teo.isgci.xml.ISGCIReader;
+import teo.isgci.xml.NoteFilter;
+import teo.isgci.xml.XMLParser;
+
+/**
+ * Class to provide data to the application. Uses an XML file
+ * as the backing store for the data.
+ * 
+ * @author Calum McLellan
+ *
+ */
+public class XmlDataProvider extends DataProvider {
+	
+	public XmlDataProvider()
+	{
+	}
+
+	/**
+	 * Loads the data from the specified file into memory.
+	 * 
+	 * @param	data	The path to the XML file containing the application data
+	 */
+	@Override
+	public void loadData(String data) throws Exception {
+		if (initialized) {
+            return;
+		}
+		
+		/* Initialize the collections */
+        this.inclGraph = new SimpleDirectedGraph<GraphClass,Inclusion>(Inclusion.class);
+        this.problems = new Vector<Problem>();
+
+		/* Parse the XML */
+		Loader loader = new Loader("file:"+System.getProperty("user.dir")+"/", true);
+        ISGCIReader gcr = new ISGCIReader(inclGraph, problems);
+        XMLParser xml=new XMLParser(loader.openInputSource(data),
+                						gcr, loader.new Resolver());
+        xml.parse();
+        this.relations.addAll(gcr.getRelations());
+        
+        this.date = gcr.getDate();
+        this.nodeCount = gcr.getNodeCount();
+        this.edgeCount = gcr.getEdgeCount();
+        this.relations = gcr.getRelations();
+
+        // Gather the classnames
+        names = new TreeMap<String,GraphClass>(new LessLatex());
+        for (GraphClass gclass : inclGraph.vertexSet())
+            names.put(gclass.toString(), gclass);
+
+        // Gather the SCCs
+        sccs = GAlg.calcSCCMap(inclGraph);
+
+        initialized = true;
+	}
+
+}
+

@@ -15,7 +15,6 @@ import java.awt.event.*;
 import java.util.Set;
 import javax.swing.*;
 import org.jgrapht.graph.DefaultEdge;
-import teo.isgci.db.DataSet;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.Utility;
 
@@ -46,7 +45,7 @@ public class NodePopup extends JPopupMenu implements ActionListener {
         if (source == infoItem) {
         	System.out.println(view.getFullName());
             JDialog d = new GraphClassInformationDialog(
-                    parent, DataSet.getClass(view.getFullName()));
+                    parent, ISGCIMainFrame.DataProvider.getClass(view.getFullName()));
             d.setLocation(50, 50);
             d.pack();
             d.setSize(800, 600);

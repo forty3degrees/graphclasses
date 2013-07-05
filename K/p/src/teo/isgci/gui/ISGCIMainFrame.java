@@ -67,7 +67,8 @@ import teo.Actions.ExitAction;
 import teo.Actions.LoadAction;
 import teo.Actions.PrintAction;
 import teo.Actions.SaveAction;
-import teo.isgci.db.DataSet;
+import teo.data.services.IDataProvider;
+import teo.data.services.XmlDataProvider;
 import teo.isgci.gc.ForbiddenClass;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.GAlg;
@@ -141,6 +142,9 @@ public class ISGCIMainFrame extends JFrame
 	private static final String AUTO_FLIPPING_CONFIG = "AutoFlipConfig";
 	  
     public static final String APPLICATIONNAME = "ISGCI";
+    
+    public static final IDataProvider DataProvider = new XmlDataProvider();
+    
     public IncrementalHierarchicLayouter layouter;
     public OptionHandler groupLayoutOptions;
 
@@ -306,6 +310,14 @@ public class ISGCIMainFrame extends JFrame
         layouter = new IncrementalHierarchicLayouter();
         layouter.setOrthogonallyRouted(true);
         layouter.setRecursiveGroupLayeringEnabled(false);
+        
+        /* Load the data */
+        try {
+			ISGCIMainFrame.DataProvider.loadData("data/isgci.xml");
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
        
         view = createGraphView();
         
@@ -319,7 +331,6 @@ public class ISGCIMainFrame extends JFrame
         this.loader = loader;
         tracker = this;
 
-        DataSet.init(loader, "data/isgci.xml");
         ForbiddenClass.initRules(loader, "data/smallgraphs.xml");
         PSGraphics.init(loader);
         if (latex == null) {
@@ -632,7 +643,7 @@ public class ISGCIMainFrame extends JFrame
 
         SimpleDirectedGraph<GraphClass, Inclusion> g =
             new SimpleDirectedGraph<GraphClass, Inclusion>(Inclusion.class);
-        Graphs.addGraph(g, DataSet.inclGraph);
+        Graphs.addGraph(g, ISGCIMainFrame.DataProvider.getInclusionGraph());
         GAlg.transitiveReductionBruteForce(g);
 
         try {
@@ -788,9 +799,10 @@ public class ISGCIMainFrame extends JFrame
         problemsMenu = new JMenu("Problems");
         miOpenProblem = new JMenu("Boundary/Open classes");
         problemsMenu.add(miOpenProblem);
-        for (int i = 0; i < DataSet.problems.size(); i++) {
+        Problem[] problems = ISGCIMainFrame.DataProvider.getProblems();
+        for (int i = 0; i < problems.length; i++) {
             menu = new JMenuItem(
-                    ((Problem) DataSet.problems.elementAt(i)).getName());
+                    ((Problem) problems[i]).getName());
             miOpenProblem.add(menu);
             menu.addActionListener(this);
             menu.setActionCommand("miOpenProblem");
@@ -1073,10 +1085,11 @@ public class ISGCIMainFrame extends JFrame
         	}
         	System.out.println(sub);
             d = new GraphClassInformationDialog(
-                    this, DataSet.getClass(sub));
+                    this, ISGCIMainFrame.DataProvider.getClass(sub));
         	} else {
         		d = new GraphClassInformationDialog(
-                        this, DataSet.getClass(view.getGraph2D().selectedNodes().current().toString()));
+                        this, ISGCIMainFrame.DataProvider.getClass(
+                        		view.getGraph2D().selectedNodes().current().toString()));
         	}
             d.setLocation(50, 50);
             d.pack();

@@ -17,9 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
+
+import teo.data.services.IDataProvider;
+import teo.data.services.XmlDataProvider;
 import teo.isgci.gc.GraphClass;
+import teo.isgci.gui.ISGCIMainFrame;
 import teo.isgci.db.Algo;
-import teo.isgci.db.DataSet;
 
 public class IQ {
     /** The string that contains the query */
@@ -30,8 +33,7 @@ public class IQ {
     protected String error;
     /** The resulting set */
     protected Set<GraphClass> set;
-
-
+    
     /**
      * Create a query containing the given string and execute it immediately.
      */
@@ -83,8 +85,7 @@ public class IQ {
             System.exit(1);
         }
 
-        teo.Loader loader = new teo.Loader(args[0], true);
-        DataSet.init(loader, "data/isgci.xml");
+        ISGCIMainFrame.DataProvider.loadData("data/isgci.xml");
 
         if (args.length > 1) {
             IQ iq = new IQ(args[1]);

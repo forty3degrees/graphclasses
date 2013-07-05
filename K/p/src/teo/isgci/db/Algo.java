@@ -11,6 +11,7 @@
 package teo.isgci.db;
 
 import teo.isgci.grapht.*;
+import teo.isgci.gui.ISGCIMainFrame;
 import teo.isgci.gc.*;
 import teo.isgci.util.LessLatex;
 import java.util.*;
@@ -73,7 +74,8 @@ public final class Algo {
     public static ArrayList<GraphClass> subNodes(GraphClass node) {
         final ArrayList<GraphClass> res = new ArrayList<GraphClass>();
         new BFSWalker<GraphClass,Inclusion>(
-                DataSet.inclGraph, node, null, GraphWalker.InitCode.DYNAMIC) {
+        		ISGCIMainFrame.DataProvider.getInclusionGraph(),
+        		node, null, GraphWalker.InitCode.DYNAMIC) {
             public void visit(GraphClass v) {
                 res.add(v);
                 super.visit(v);
@@ -90,7 +92,7 @@ public final class Algo {
     public static ArrayList<GraphClass> superNodes(GraphClass node) {
         final ArrayList<GraphClass> res = new ArrayList<GraphClass>();
         new RevBFSWalker<GraphClass,Inclusion>(
-                DataSet.inclGraph, node, null, GraphWalker.InitCode.DYNAMIC) {
+        		ISGCIMainFrame.DataProvider.getInclusionGraph(), node, null, GraphWalker.InitCode.DYNAMIC) {
             public void visit(GraphClass v) {
                 res.add(v);
                 super.visit(v);
@@ -106,7 +108,7 @@ public final class Algo {
      */
     public static ArrayList<GraphClass> equNodes(GraphClass node) {
         ArrayList<GraphClass> res =
-                new ArrayList<GraphClass>(DataSet.getEquivalentClasses(node));
+                new ArrayList<GraphClass>(ISGCIMainFrame.DataProvider.getEquivalentClasses(node));
         Collections.sort(res, new LessLatex());
         return res;
     }
@@ -158,7 +160,7 @@ public final class Algo {
 
     public static List<GraphClass> findMinimalSuper(
             GraphClass a, GraphClass b) {
-        return findMinimalSuper(DataSet.inclGraph, a, b);
+        return findMinimalSuper(ISGCIMainFrame.DataProvider.getInclusionGraph(), a, b);
     }
 
 
@@ -208,7 +210,7 @@ public final class Algo {
 
     public static List<GraphClass> findMaximalSub(
             GraphClass a, GraphClass b) {
-        return findMaximalSub(DataSet.inclGraph, a, b);
+        return findMaximalSub(ISGCIMainFrame.DataProvider.getInclusionGraph(), a, b);
     }
 
 
@@ -217,7 +219,7 @@ public final class Algo {
      */
     public static Collection<GraphClass> nodesBetween(
             Collection<GraphClass> upper, Collection<GraphClass> lower) {
-        SimpleDirectedGraph<GraphClass,Inclusion> dg = DataSet.inclGraph;
+        SimpleDirectedGraph<GraphClass,Inclusion> dg = ISGCIMainFrame.DataProvider.getInclusionGraph();
 
         final HashSet<GraphClass> as = new HashSet<GraphClass>();
         final HashSet<GraphClass> bs = new HashSet<GraphClass>();
@@ -279,16 +281,16 @@ public final class Algo {
                 new ArrayUnenforcedSet( nodesBetween(
                 Collections.singleton(from), Collections.singleton(to) ));
         DirectedSubgraph<GraphClass,Inclusion> g =
-            new DirectedSubgraph(DataSet.inclGraph, nodes, null);
+            new DirectedSubgraph(ISGCIMainFrame.DataProvider.getInclusionGraph(), nodes, null);
         for (Inclusion e : g.edgeSet()) {
             if (!e.isProper())
                 continue;
             
             //System.err.println(e);
             List<Inclusion> p1 =
-                    GAlg.getPath(DataSet.inclGraph, from, e.getSuper());
+                    GAlg.getPath(ISGCIMainFrame.DataProvider.getInclusionGraph(), from, e.getSuper());
             List<Inclusion> p2 =
-                    GAlg.getPath(DataSet.inclGraph, e.getSub(), to);
+                    GAlg.getPath(ISGCIMainFrame.DataProvider.getInclusionGraph(), e.getSub(), to);
             //System.err.println(p1.size());
             //System.err.println(p2.size());
             p1.add(e);
@@ -313,17 +315,20 @@ public final class Algo {
         final SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> res = new
             SimpleDirectedGraph<Set<GraphClass>, DefaultEdge>(
                 DefaultEdge.class);
+        
+        SimpleDirectedGraph<GraphClass, Inclusion> inclusionGraph = 
+        						ISGCIMainFrame.DataProvider.getInclusionGraph();
 
         //---- Create vertices
         for (GraphClass gc : subnodes)
-            res.addVertex(DataSet.getEquivalentClasses(gc));
+            res.addVertex(ISGCIMainFrame.DataProvider.getEquivalentClasses(gc));
 
         //---- Create edges between SCC that exist in inclGraph
         for (Set<GraphClass> scc : res.vertexSet()) {
             for (GraphClass gc : scc)
-                for (Inclusion e  : DataSet.inclGraph.outgoingEdgesOf(gc)) {
-                    Set<GraphClass> sccTo = DataSet.getEquivalentClasses(
-                        DataSet.inclGraph.getEdgeTarget(e));
+                for (Inclusion e  : inclusionGraph.outgoingEdgesOf(gc)) {
+                    Set<GraphClass> sccTo = ISGCIMainFrame.DataProvider.getEquivalentClasses(
+                    		inclusionGraph.getEdgeTarget(e));
                     if (sccTo != scc  &&  res.containsVertex(sccTo)  &&
                             !res.containsEdge(scc, sccTo))
                         res.addEdge(scc, sccTo);
@@ -342,10 +347,10 @@ public final class Algo {
         for (final Set<GraphClass> scc : res.vertexSet()) {
             final Set compo = conn.connectedSetOf(scc);
             GraphClass orig = scc.iterator().next();
-            new BFSWalker<GraphClass,Inclusion>(DataSet.inclGraph, orig, null,
+            new BFSWalker<GraphClass,Inclusion>(inclusionGraph, orig, null,
                     GraphWalker.InitCode.DYNAMIC) {
                 public void explore(Inclusion e,GraphClass from,GraphClass to){
-                    Set<GraphClass> sccTo = DataSet.getEquivalentClasses(to);
+                    Set<GraphClass> sccTo = ISGCIMainFrame.DataProvider.getEquivalentClasses(to);
                     Set compoTo = res.containsVertex(sccTo) ?
                             conn.connectedSetOf(sccTo) : null;
                     /* Another node in the same connected component?

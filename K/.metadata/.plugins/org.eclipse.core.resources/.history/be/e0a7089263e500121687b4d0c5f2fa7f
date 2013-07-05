@@ -1,0 +1,110 @@
+package teo.data.services;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.Vector;
+
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import teo.isgci.db.AbstractRelation;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.Inclusion;
+import teo.isgci.problem.Complexity;
+import teo.isgci.problem.Problem;
+
+public abstract class DataProvider implements IDataService {
+
+	protected boolean initialized;
+    
+    protected String date;
+	protected int nodeCount;
+	protected int edgeCount;
+	
+
+    /** The inclusion graph */
+    public SimpleDirectedGraph<GraphClass,Inclusion> inclGraph;
+    /** Maps classnames to nodes */
+    protected TreeMap<String,GraphClass> names;
+    /** Maps graphclasses to their SCCs */
+    protected Map<GraphClass, Set<GraphClass> > sccs;
+
+    /** Problems */
+    public Vector<Problem> problems;
+
+    /** Relations not in inclGraph */
+    public List<AbstractRelation> relations;
+    
+    /** Loads the application data
+     */
+	@Override
+	public abstract void loadData(String path) throws Exception;
+
+	@Override
+	public AbstractRelation findRelation(GraphClass x, GraphClass y) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+    /**
+     * Returns the nodes of the available graphclasses ordered alphabetically.
+     */
+	@Override
+	public Collection<GraphClass> getGraphClasses() {
+		return Collections.unmodifiableCollection(this.names.values());
+	}
+
+    /**
+     * Return the node in inclGraph belonging to the given classname.
+     */
+    public GraphClass getClass(String name) {
+        return this.names.get(name);
+    }
+    
+	@Override
+	public Problem[] getProblems() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<GraphClass> getSubClasses(GraphClass graph,
+			Boolean recursive) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<GraphClass> getSuperClasses(GraphClass graph,
+			Boolean recursive) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Problem, Complexity> getComplexityMap(GraphClass graph) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<GraphClass, Complexity> getComplexityMap(Problem problem) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+    public String getDate() {
+        return date;
+    }        
+    
+    public int getNodeCount() {
+        return nodeCount;
+    }    
+    
+    public int getEdgeCount() {
+        return edgeCount;
+    }    
+}

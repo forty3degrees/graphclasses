@@ -23,13 +23,14 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
+
+import java.util.Collection;
 import java.util.Vector;
 import java.util.Iterator;
 import java.util.Collections;
 import java.util.ArrayList;
 import teo.isgci.problem.*;
 import teo.isgci.db.Algo;
-import teo.isgci.db.DataSet;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.LessLatex;
 
@@ -55,8 +56,7 @@ public class GraphClassInformationDialog extends JDialog
         this(parent, null);
     }
 
-    public GraphClassInformationDialog(ISGCIMainFrame parent,
-            GraphClass target) {
+    public GraphClassInformationDialog(ISGCIMainFrame parent, GraphClass target) {
         super(parent, "Graph Class Information", false);
         this.parent = parent;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -200,7 +200,7 @@ public class GraphClassInformationDialog extends JDialog
         gridbag.setConstraints(okPanel, c);
         contents.add(okPanel);
 
-        classesList.setListData(DataSet.getClasses());
+        classesList.setListData(ISGCIMainFrame.DataProvider.getGraphClasses());
 
         mouseAdapter = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -344,7 +344,7 @@ class ProblemsModel extends AbstractTableModel {
     }
 
     public int getRowCount() {
-        return DataSet.problems.size();
+        return ISGCIMainFrame.DataProvider.getProblems().length;
     }
 
     public String getColumnName(int col) {
@@ -352,12 +352,14 @@ class ProblemsModel extends AbstractTableModel {
     }
 
     public Object getValueAt(int row, int col) {
-        if (row < 0  ||  row >= DataSet.problems.size()  ||
+    	
+    	Problem[] problems = ISGCIMainFrame.DataProvider.getProblems();
+        if (row < 0  ||  row >= problems.length  ||
                 col < 0  ||  col > 1 ||
                 gc == null)
             return "???";
 
-        Problem p = DataSet.problems.elementAt(row);
+        Problem p = problems[row];
         if (col == 0)
             return p.getName();
         else if (col == 1)

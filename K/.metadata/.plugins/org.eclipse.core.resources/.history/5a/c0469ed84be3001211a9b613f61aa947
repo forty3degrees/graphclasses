@@ -1,0 +1,5 @@
+package teo.data.services;
+
+public interface IDataService {
+
+}

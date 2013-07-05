@@ -10,8 +10,9 @@
 
 package teo.isgci.gui;
 
-import teo.isgci.db.DataSet;
 import teo.isgci.db.Algo;
+import teo.isgci.gc.GraphClass;
+
 import java.io.IOException;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -21,7 +22,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.util.*;
-import java.util.Vector;
 
 /**
  * The dialog the checks for an inclusion between two graphclasses.
@@ -47,6 +47,8 @@ public class CheckInclusionDialog extends JDialog
         GridBagConstraints c = new GridBagConstraints();
         Container content = getContentPane();
         content.setLayout(gridbag);
+        
+        Collection<GraphClass> graphClasses = ISGCIMainFrame.DataProvider.getGraphClasses();
 
         c.gridwidth = 1;
         c.weightx = 0.0;
@@ -78,7 +80,7 @@ public class CheckInclusionDialog extends JDialog
         c.weightx = 1.0;
         c.weighty = 1.0;
         firstList = new NodeList(parent.latex);
-        firstList.setListData(DataSet.getClasses());
+        firstList.setListData(graphClasses);
         firstList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scroller = new JScrollPane(firstList);
         gridbag.setConstraints(scroller, c);
@@ -110,7 +112,7 @@ public class CheckInclusionDialog extends JDialog
         content.add(secondSearch);
 
         secondList = new NodeList(parent.latex);
-        secondList.setListData(DataSet.getClasses());
+        secondList.setListData(graphClasses);
         secondList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         scroller = new JScrollPane(secondList);
         c.weightx = 1.0;

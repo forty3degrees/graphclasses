@@ -155,7 +155,9 @@ public class ISGCIGraphCanvas extends
      * Set the appropriate properness of the given edgeview.
      */
     protected void setProperness(EdgeView<Set<GraphClass>,DefaultEdge> view) {
-        List<Inclusion> path = GAlg.getPath(DataSet.inclGraph,
+    	SimpleDirectedGraph<GraphClass, Inclusion> inclusionGraph = 
+    					ISGCIMainFrame.DataProvider.getInclusionGraph();
+        List<Inclusion> path = GAlg.getPath(inclusionGraph,
                 view.getFrom().iterator().next(),
                 view.getTo().iterator().next());
         view.setProper(Algo.isPathProper(path)  ||

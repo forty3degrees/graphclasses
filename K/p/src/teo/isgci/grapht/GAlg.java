@@ -100,7 +100,7 @@ public class GAlg {
 
     
     /**
-     * Return a path (list of edges) between src and dest in g or null if no
+     * Return a path (list of edges) between src and dest or null if no
      * path exist. If src==dest an empty list is returned.
      */
     public static <V,E> List<E> getPath(DirectedGraph<V,E> g, V src, V dest) {
