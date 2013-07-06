@@ -20,12 +20,12 @@ import org.xml.sax.InputSource;
 import gnu.getopt.Getopt;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
+import teo.data.db.*;
 import teo.data.services.IDataProvider;
+import teo.data.xml.*;
 import teo.isgci.grapht.*;
 import teo.isgci.gui.*;
-import teo.isgci.xml.*;
 import teo.isgci.gc.*;
-import teo.isgci.db.*;
 import teo.isgci.problem.*;
 import teo.Loader;
 

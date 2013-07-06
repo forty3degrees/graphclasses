@@ -1,0 +1,53 @@
+/*
+ * Displays graphs.
+ *
+ * $Header: /home/ux/CVSROOT/teo/teo/isgci/gui/GraphCanvas.java,v 2.0 2011/09/25 12:37:13 ux Exp $
+ *
+ * This file is part of the Information System on Graph Classes and their
+ * Inclusions (ISGCI) at http://www.graphclasses.org.
+ * Email: isgci@graphclasses.org
+ */
+
+package teo.graph.structure;
+
+import java.awt.Component;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.*;
+import javax.swing.*;
+import java.util.Collection;
+import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import org.xml.sax.SAXException;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+import org.jgrapht.VertexFactory;
+import teo.isgci.xml.GraphMLWriter;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.util.IntFunction;
+
+/**
+ * A canvas that can display a graph.
+ */
+public class GraphCanvas {
+
+    protected List<GraphView> graphs;
+    protected boolean drawUnproper;
+
+
+    public GraphCanvas() {
+        super();
+        graphs = new ArrayList<GraphView>();
+        dragInProcess = false;
+        drawUnproper = true;
+    }
+
+
+
+}
+
+/* EOF */

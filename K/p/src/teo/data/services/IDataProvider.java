@@ -1,13 +1,12 @@
 package teo.data.services;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import teo.isgci.db.AbstractRelation;
+import teo.data.db.AbstractRelation;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Complexity;

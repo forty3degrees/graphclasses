@@ -1,0 +1,5 @@
+package teo.graph.view;
+
+public interface IViewManagerEvents {
+
+}

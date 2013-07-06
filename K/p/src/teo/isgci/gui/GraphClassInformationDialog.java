@@ -29,8 +29,9 @@ import java.util.Vector;
 import java.util.Iterator;
 import java.util.Collections;
 import java.util.ArrayList;
+
+import teo.data.db.Algo;
 import teo.isgci.problem.*;
-import teo.isgci.db.Algo;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.LessLatex;
 

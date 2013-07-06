@@ -17,7 +17,8 @@ import java.util.*;
 //import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import teo.isgci.db.*;
+
+import teo.data.db.*;
 import teo.isgci.gui.ISGCIMainFrame;
 import teo.isgci.gui.MessageDialog;
 import teo.isgci.gui.NodeList;

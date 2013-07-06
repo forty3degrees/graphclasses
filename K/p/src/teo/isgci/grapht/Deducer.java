@@ -20,9 +20,10 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.alg.FloydWarshallShortestPaths;
+
+import teo.data.db.*;
 import teo.isgci.gc.*;
 import teo.isg.Graph;
-import teo.isgci.db.*;
 import teo.isgci.util.IDGenerator;
 import teo.isgci.util.Itera;
 import teo.isgci.util.Iterators;

@@ -11,6 +11,7 @@ import y.option.OptionHandler;
 import y.view.Graph2DPrinter;
 
 public class PrintAction extends AbstractAction {
+	private static final long serialVersionUID = 1L;
     PageFormat pageFormat;
 
     OptionHandler printOptions;

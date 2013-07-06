@@ -21,6 +21,7 @@ import y.util.D;
  * Action that loads the current graph from a file in GraphML format.
  */
 public class LoadAction extends AbstractAction {
+	private static final long serialVersionUID = 1L;
   JFileChooser chooser;
   ISGCIMainFrame parent;
 
@@ -96,12 +97,6 @@ public class LoadAction extends AbstractAction {
 	  
 	  InputStream is = new ByteArrayInputStream(bytes);
 	  
-	  if (is == null) {
-		  String message = "Unexpected error while loading stream." ;
-	      D.bug(message);
-	      throw new RuntimeException(message);
-	  }
-	  
 	  try {
 	        IOHandler ioh = null;
 	        ioh = createGraphMLIOHandler();
@@ -115,23 +110,13 @@ public class LoadAction extends AbstractAction {
 	      }
   }
   
-  protected void loadGraph(Class aClass, String resourceString) {
+  public void loadGraph(String resourceString) {
       try {
-  	URL resource = new URL("File:///U:/" + resourceString);
-      if (resource == null) {
-        String message = "Resource \"" + resourceString + "\" not found in classpath of " + aClass;
-        D.showError(message);
-        
-        throw new RuntimeException(message);
-      }
-      loadGraph(resource);
+    	  URL resource = new URL("File:///U:/" + resourceString);
+    	  loadGraph(resource);
       } catch (Exception e) {
       	
       }
-    }
-  
-  public void loadGraph(String resourceString) {
-      loadGraph(getClass(), resourceString);
     }
   
 }

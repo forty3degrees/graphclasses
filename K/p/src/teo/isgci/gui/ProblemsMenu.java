@@ -14,7 +14,8 @@ package teo.isgci.gui;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.Vector;
-import teo.isgci.db.*;
+
+import teo.data.db.*;
 import teo.isgci.problem.*;
 
 public class ProblemsMenu extends JMenu implements ActionListener {
@@ -49,7 +50,7 @@ public class ProblemsMenu extends JMenu implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        parent.graphCanvas.setProblem(
+        parent.viewManager.setProblem(
         		ISGCIMainFrame.DataProvider.getProblem(event.getActionCommand()));
     }
 }

@@ -8,10 +8,10 @@
  * Email: isgci@graphclasses.org
  */
 
+import teo.data.db.*;
+import teo.data.xml.*;
 import teo.isgci.grapht.*;
-import teo.isgci.xml.*;
 import teo.isgci.gc.*;
-import teo.isgci.db.*;
 import teo.isgci.problem.*;
 import teo.Loader;
 

@@ -11,9 +11,8 @@
 
 package teo.isgci.gui;
 
+import teo.graph.view.NodeView;
 import teo.isgci.gc.GraphClass;
-import teo.isgci.grapht.*;
-import java.io.IOException;
 import java.awt.Cursor;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -32,7 +31,9 @@ import java.util.Collection;
 public class GraphClassSelectionDialog extends JDialog
         implements ActionListener {
     
-    protected ISGCIMainFrame parent;
+	private static final long serialVersionUID = 1L;
+	
+	protected ISGCIMainFrame parent;
     protected NodeList classesList;
     protected JCheckBox superCheck, subCheck;
     protected JButton addButton, removeButton, newButton, cancelButton;
@@ -76,7 +77,7 @@ public class GraphClassSelectionDialog extends JDialog
         c.weightx = 1.0;
         c.weighty = 1.0;
         c.fill = GridBagConstraints.BOTH;
-        classesList = new NodeList(parent.latex);
+        classesList = new NodeList(ISGCIMainFrame.latex);
         JScrollPane scroller = new JScrollPane(classesList);
         gridbag.setConstraints(scroller, c);
         contents.add(scroller);
@@ -146,14 +147,7 @@ public class GraphClassSelectionDialog extends JDialog
         } else if (source == newButton) {
             Cursor oldcursor = parent.getCursor();
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            parent.graphCanvas.drawHierarchy(getNodes());
-            
-            for (Object o : classesList.getSelectedValues()) {
-                GraphClass gc = (GraphClass) o;
-                NodeView v = parent.graphCanvas.findNode(gc);
-                if (v != null)
-                    v.setNameAndLabel(gc.toString());
-            }
+            parent.viewManager.load(getNodes());
             
             setCursor(oldcursor);
             closeDialog();
@@ -173,7 +167,7 @@ public class GraphClassSelectionDialog extends JDialog
         boolean doSuper = superCheck.isSelected(),
                 doSub = subCheck.isSelected();
        
-        for (Object o : classesList.getSelectedValues()) {
+        for (Object o : classesList.getSelectedValuesList()) {
             GraphClass graph = (GraphClass) o;
             result.add(graph);
         }

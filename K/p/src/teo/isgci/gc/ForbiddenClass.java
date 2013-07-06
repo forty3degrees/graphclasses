@@ -38,11 +38,11 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.util.ArrayUnenforcedSet;
 
+import teo.data.xml.*;
 import teo.isgci.grapht.GAlg;
 import teo.isgci.util.Utility;
 import teo.isgci.util.LessLatex;
 import teo.isgci.util.Pair;
-import teo.isgci.xml.*;
 import teo.isg.*;
 
 /**

@@ -17,9 +17,10 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import org.jgrapht.DirectedGraph;
+
+import teo.data.db.Note;
 import teo.isgci.grapht.*;
 import teo.isgci.gc.*;
-import teo.isgci.db.Note;
 
 
 /**

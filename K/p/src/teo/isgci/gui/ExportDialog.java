@@ -41,7 +41,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
-import teo.isgci.xml.GraphMLWriter;
+import teo.data.xml.GraphMLWriter;
 import y.io.IOHandler;
 import yext.export.io.EPSOutputHandler;
 import yext.svg.io.SVGIOHandler;
@@ -426,11 +426,11 @@ public class ExportDialog extends JDialog implements ActionListener {
             GraphMLWriter w = new GraphMLWriter(out,
                     gmlYed.isSelected() ?
                         GraphMLWriter.MODE_YED : GraphMLWriter.MODE_PLAIN,
-                    parent.graphCanvas.getDrawUnproper(),
+                    parent.viewManager.getDrawUnproper(),
                     gmlHtml.isSelected());
 
             w.startDocument();
-            parent.graphCanvas.write(w);
+            parent.viewManager.write(w);
             w.endDocument();
         } catch (IOException ex)  {
             res = ex;

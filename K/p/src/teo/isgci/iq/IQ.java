@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 
+import teo.data.db.Algo;
 import teo.data.services.IDataProvider;
 import teo.data.services.XmlDataProvider;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.gui.ISGCIMainFrame;
-import teo.isgci.db.Algo;
 
 public class IQ {
     /** The string that contains the query */

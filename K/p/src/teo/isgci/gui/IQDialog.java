@@ -11,6 +11,7 @@
 
 package teo.isgci.gui;
 
+import teo.graph.view.NodeView;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.*;
 import teo.isgci.util.LatexGlyph;
@@ -156,11 +157,11 @@ public class IQDialog extends JDialog
         } else if (source == newButton) {
             Cursor oldcursor = parent.getCursor();
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            parent.graphCanvas.drawHierarchy(getNodes());
+            parent.viewManager.load(getNodes());
             
             for (Object o : classesList.getSelectedValues()) {
                 GraphClass gc = (GraphClass) o;
-                NodeView v = parent.graphCanvas.findNode(gc);
+                NodeView v = parent.viewManager.findNode(gc);
                 if (v != null)
                     v.setNameAndLabel(gc.toString());
             }

@@ -1,0 +1,131 @@
+/*
+ * The view of a connected graph.
+ *
+ * $Header: /home/ux/CVSROOT/teo/teo/isgci/gui/GraphView.java,v 2.0 2011/09/25 12:37:13 ux Exp $
+ *
+ * This file is part of the Information System on Graph Classes and their
+ * Inclusions (ISGCI) at http://www.graphclasses.org.
+ * Email: isgci@graphclasses.org
+ */
+
+package teo.isgci.gui;
+
+import java.awt.Component;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.xml.sax.SAXException;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import teo.isgci.gc.GraphClass;
+import teo.isgci.xml.GraphMLWriter;
+
+/**
+ * Display a graph in a GraphCanvas.
+ */
+public class GraphView {
+	
+    protected SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph;
+    /** Whether to include improper (non-strict) inclusions in the resulting graphML */
+    protected boolean includeUnproper;
+    /** NodeViews */
+    protected List<NodeView> views;
+    /** 'Extra' views: edges, virtual nodes */
+    protected List<View> eViews;
+
+
+    /**
+     * Create a new GraphView with nodes from DataSet.inclGraph.
+     * @param parent the GraphCanvas that displays this view
+     * @param nodes nodes the induce the graph to draw
+     */
+    public GraphView(SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> g) {
+
+        graph = g;
+        
+        // Create the NodeViews; EdgeView are created when laying out.
+        views = new ArrayList<NodeView>();
+        for (Set<GraphClass> v: g.vertexSet())
+            views.add(new NodeView(this, v));
+        
+
+        //layouter.layoutGraph();
+        eViews = new ArrayList<View>();
+
+        // Create the EdgeViews
+        for (DefaultEdge e : graph.edgeSet()) {
+            if (!isVirtual(graph.getEdgeSource(e))) {
+                EdgeView v = new EdgeView(this, e);
+                if (parent instanceof GraphCanvas)
+                    ((GraphCanvas) parent).setProperness(v);
+                eViews.add(v);
+            }
+        }
+    }
+
+    /** Sets whether to include improper (non-strict) inclusions in the resulting graphML */
+    public void setWriteUnproper(boolean b) {
+        includeUnproper = b;
+    }
+
+    /** Gets whether to include improper (non-strict) inclusions in the resulting graphML */
+    public boolean getDrawUnproper() {
+        return includeUnproper;
+    }
+
+    /**
+     * Return the view for the given node.
+     */
+    public NodeView getView(GraphClass node) {
+        for (NodeView v : views)
+            if (v.getNode() == node)
+                return v;
+        for (View v : eViews)
+            if (v instanceof NodeView  &&  ((NodeView) v).getNode() == node)
+                return (NodeView<V,E>) v;
+        return null;
+    }
+
+    /**
+     * Return the graph this view shows.
+     */
+    public SimpleDirectedGraph<V,E> getGraph() {
+        return graph;
+    }
+
+    /**
+     * Return all nodeviews belonging to non-virtual nodes.
+     */
+    public List<NodeView<V,E> > getNodeViews() {
+        return Collections.unmodifiableList(views);
+    }
+
+    /**
+     * Return true if the given node is virtual.
+     */
+    public boolean isVirtual(V node) {
+        return false;// layouter.getGDI(node).virt;
+    }
+
+    /**
+     * Writes this to w.
+     */
+    public void write(GraphMLWriter w) throws SAXException {
+        
+        for (View v : views)
+            v.write(w);
+        for (View v : eViews)
+            if (v instanceof EdgeView)
+                v.write(w);
+    }
+}
+
+/* EOF */

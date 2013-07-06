@@ -10,7 +10,7 @@
 
 package teo.isgci.gui;
 
-import teo.isgci.db.Algo;
+import teo.data.db.Algo;
 import teo.isgci.gc.GraphClass;
 
 import java.io.IOException;

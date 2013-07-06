@@ -17,6 +17,7 @@ import y.io.IOHandler;
 import y.util.D;
 
 public class SaveAction extends AbstractAction {
+	private static final long serialVersionUID = 1L;
     JFileChooser chooser;
     ISGCIMainFrame parent;
     public SaveAction(ISGCIMainFrame p) {

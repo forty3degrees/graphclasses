@@ -69,12 +69,14 @@ import teo.Actions.PrintAction;
 import teo.Actions.SaveAction;
 import teo.data.services.IDataProvider;
 import teo.data.services.XmlDataProvider;
+import teo.data.xml.GraphMLWriter;
+import teo.graph.view.IViewManagerListener;
+import teo.graph.view.ViewManager;
 import teo.isgci.gc.ForbiddenClass;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Problem;
-import teo.isgci.xml.GraphMLWriter;
 import y.base.DataMap;
 import y.base.Edge;
 import y.base.EdgeCursor;
@@ -134,7 +136,7 @@ import java.util.ArrayList;*/
 /** The main frame of the application.
  */
 public class ISGCIMainFrame extends JFrame
-        implements WindowListener, ActionListener, ItemListener {
+        implements WindowListener, ActionListener, ItemListener, IViewManagerListener {
 	private static final Pattern PATH_SEPARATOR_PATTERN = Pattern.compile("/");
 	
 	private static final Color LABEL_LINE_COLOR = new Color(153, 204, 255, 255);
@@ -166,7 +168,7 @@ public class ISGCIMainFrame extends JFrame
     
     // This is where the drawing goes.
     public JScrollPane drawingPane;
-    public ISGCIGraphCanvas graphCanvas;
+    public ViewManager viewManager;
     public JPanel mainPan;
     public Graph2DView view;
     private static LoadAction gLoader;
@@ -181,7 +183,16 @@ public class ISGCIMainFrame extends JFrame
     	}
     	
     	gLoader.loadGraph("myGraph.graphml");
-        
+    	
+    	this.refreshView();
+    }
+    
+    public void updateGraph() {
+    	this.refreshView();
+    }
+    
+    public void refreshView() {
+    
         for (NodeCursor nc = view.getGraph2D().nodes(); nc.ok(); nc.next())
         {
           Node n = nc.node();
@@ -203,55 +214,7 @@ public class ISGCIMainFrame extends JFrame
         
         dolayout();
      }
-       
-    public boolean export() {
-        boolean res = true;
-        FileOutputStream f;
-        try {
-        	
-        	File  myFile = new File("U:/myGraph.graphml");
-            f = new FileOutputStream(myFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-            MessageDialog.error(this, "Cannot open file for writing:\n");
-            return false;
-        }
 
-        try {
-               exportGML(f);            
-        } catch (Exception e) {
-            res = false;
-            e.printStackTrace();
-            MessageDialog.error(this, "Error while exporting:\n"+
-                e.toString());
-        }
-        return res;
-    }
-
-    /**
-     * Export to GraphML.
-     */
-    protected void exportGML(FileOutputStream f) throws Exception {
-        Exception res = null;
-        Writer out = null;
-        
-        try {
-            out = new OutputStreamWriter(f, "UTF-8");
-            GraphMLWriter w = new GraphMLWriter(out,GraphMLWriter.MODE_YED,
-                    graphCanvas.getDrawUnproper(),true);
-
-            w.startDocument();
-            graphCanvas.write(w);
-            w.endDocument();
-        } catch (IOException ex)  {
-            res = ex;
-        } finally {
-            out.close();
-        }
-        
-        if (res != null)
-            throw res;
-    }
     
     protected Graph2DView createGraphView() {
         Graph2DView view = new Graph2DView();
@@ -318,7 +281,8 @@ public class ISGCIMainFrame extends JFrame
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-       
+        viewManager = new ViewManager();
+        viewManager.addListener(this);
         view = createGraphView();
         
         ISGCIToolBar tool = new ISGCIToolBar(this);
@@ -930,8 +894,7 @@ public class ISGCIMainFrame extends JFrame
      * @return the panel
      */
     protected JComponent createMainPanel() {
-        graphCanvas = new ISGCIGraphCanvas(this);
-        drawingPane = new JScrollPane(graphCanvas,
+        drawingPane = new JScrollPane(
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         
@@ -1106,7 +1069,8 @@ public class ISGCIMainFrame extends JFrame
         } else if (object == miNew) {
             new ISGCIMainFrame(loader);
         } else if (object == miExport) {
-        	export();
+        	// NOTE
+        	viewManager.export();
             JDialog export = new ExportDialog(this);
             export.setLocation(50, 50);
             export.pack();
@@ -1159,9 +1123,9 @@ public class ISGCIMainFrame extends JFrame
         Object object = event.getSource();
 
         if (object == miDrawUnproper) {
-            graphCanvas.setDrawUnproper(
+        	viewManager.setDrawUnproper(
                     ((JCheckBoxMenuItem) object).getState());
-            export();
+        	viewManager.export();
             loadInitialGraph();
         }
     }
@@ -1405,6 +1369,16 @@ public class ISGCIMainFrame extends JFrame
     	      graph.updateViews();      
     	    }
     	  }
+
+		@Override
+		public void viewInitialized() {
+			this.loadInitialGraph();
+		}
+
+		@Override
+		public void viewUpdated() {
+			this.loadInitialGraph();
+		}
       
 }
 

@@ -18,8 +18,8 @@ import java.awt.Insets;
 import java.awt.Container;
 import javax.swing.*;
 
+import teo.data.db.*;
 import teo.data.services.IDataProvider;
-import teo.isgci.db.*;
 
 public class AboutDialog extends JDialog implements ActionListener {
     protected ISGCIMainFrame parent;

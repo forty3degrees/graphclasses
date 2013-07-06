@@ -30,9 +30,9 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
 
+import teo.data.db.*;
 import teo.data.services.IDataProvider;
 import teo.isgci.gc.*;
-import teo.isgci.db.*;
 import teo.isgci.problem.*;
 import teo.isgci.grapht.*;
 import teo.isgci.util.LessLatex;
@@ -254,7 +254,7 @@ inP:
         if (source == drawButton) {
             Cursor oldcursor = parent.getCursor();
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            parent.graphCanvas.drawHierarchy(
+            parent.viewManager.load(
                     ISGCIMainFrame.DataProvider.getNodes(lists.getSelectedNode(), this.problem));
             setCursor(oldcursor);
             closeDialog();

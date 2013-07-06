@@ -6,13 +6,13 @@ import java.util.Vector;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import teo.Loader;
+import teo.data.xml.ISGCIReader;
+import teo.data.xml.XMLParser;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Problem;
 import teo.isgci.util.LessLatex;
-import teo.isgci.xml.ISGCIReader;
-import teo.isgci.xml.XMLParser;
 
 /**
  * Class to provide data to the application. Uses an XML file

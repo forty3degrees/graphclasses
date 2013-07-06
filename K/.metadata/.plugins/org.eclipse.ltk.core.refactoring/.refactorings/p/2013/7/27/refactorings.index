@@ -4,3 +4,18 @@
 1373025791275	Infer generic type arguments
 1373026151161	Rename type 'IDataService'
 1373057720920	Delete element
+1373108480915	Move compilation units
+1373108515581	Move compilation units
+1373109412467	Delete element
+1373109435812	Rename compilation unit 'ISGCIGraphCanvas.java'
+1373109561407	Delete element
+1373109827783	Rename field 'views'
+1373110098483	Rename type 'GraphManager'
+1373121500642	Delete element
+1373121524967	Delete element
+1373122479255	Delete element
+1373128070830	Rename package 'teo.graph.structure'
+1373128156985	Rename package 'teo.graph.yfiles'
+1373128246630	Rename package 'teo.isgci.xml'
+1373128786674	Rename package 'teo.isgci.db'
+1373152406024	Rename type 'IViewManagerEvents'

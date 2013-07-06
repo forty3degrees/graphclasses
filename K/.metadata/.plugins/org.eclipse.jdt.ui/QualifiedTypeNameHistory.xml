@@ -17,14 +17,12 @@
 <fullyQualifiedTypeName name="java.awt.event.MouseEvent"/>
 <fullyQualifiedTypeName name="java.awt.Component"/>
 <fullyQualifiedTypeName name="y.view.Graph2DViewActions.CloseGroupsAction"/>
-<fullyQualifiedTypeName name="java.awt.Color"/>
 <fullyQualifiedTypeName name="java.lang.System"/>
 <fullyQualifiedTypeName name="java.io.InputStream"/>
 <fullyQualifiedTypeName name="teo.Loader"/>
 <fullyQualifiedTypeName name="teo.isgci.problem.Problem"/>
 <fullyQualifiedTypeName name="java.util.LinkedList"/>
 <fullyQualifiedTypeName name="teo.isgci.grapht.Inclusion"/>
-<fullyQualifiedTypeName name="java.util.Map"/>
 <fullyQualifiedTypeName name="teo.isgci.problem.Complexity"/>
 <fullyQualifiedTypeName name="teo.isgci.grapht.BFSWalker"/>
 <fullyQualifiedTypeName name="teo.isgci.xml.ISGCIReader"/>
@@ -37,8 +35,17 @@
 <fullyQualifiedTypeName name="teo.isgci.gui.ISGCIMainFrame"/>
 <fullyQualifiedTypeName name="teo.data.services.XmlDataProvider"/>
 <fullyQualifiedTypeName name="java.util.Collection"/>
-<fullyQualifiedTypeName name="teo.isgci.gc.GraphClass"/>
 <fullyQualifiedTypeName name="org.jgrapht.graph.SimpleDirectedGraph"/>
 <fullyQualifiedTypeName name="teo.data.services.IDataProvider"/>
 <fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="java.util.Set"/>
+<fullyQualifiedTypeName name="teo.isgci.gc.GraphClass"/>
+<fullyQualifiedTypeName name="org.jgrapht.graph.DefaultEdge"/>
+<fullyQualifiedTypeName name="java.util.Map"/>
+<fullyQualifiedTypeName name="java.util.Collections"/>
+<fullyQualifiedTypeName name="teo.graph.structure.GraphView"/>
+<fullyQualifiedTypeName name="teo.graph.structure.ViewManager"/>
+<fullyQualifiedTypeName name="java.awt.Color"/>
+<fullyQualifiedTypeName name="teo.graph.view.IViewManagerListener"/>
+<fullyQualifiedTypeName name="java.io.StringWriter"/>
 </qualifiedTypeNameHistroy>

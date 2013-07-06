@@ -12,13 +12,12 @@ import java.util.Vector;
 
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import teo.isgci.db.AbstractRelation;
+import teo.data.db.AbstractRelation;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.BFSWalker;
 import teo.isgci.grapht.GraphWalker;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.grapht.RevBFSWalker;
-import teo.isgci.gui.ISGCIMainFrame;
 import teo.isgci.problem.Complexity;
 import teo.isgci.problem.Problem;
 

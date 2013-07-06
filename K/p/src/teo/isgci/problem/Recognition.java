@@ -15,9 +15,10 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 import org.jgrapht.DirectedGraph;
+
+import teo.data.db.Note;
 import teo.isgci.grapht.*;
 import teo.isgci.gc.*;
-import teo.isgci.db.Note;
 
 /**
  * Stores information about recognizing a graph.

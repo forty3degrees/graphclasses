@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 
+import teo.data.db.Algo;
 import teo.data.services.IDataProvider;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.gui.ISGCIMainFrame;
-import teo.isgci.db.Algo;
 
 /**
  * IQNode is a node in the parse tree of an ISGCI Query.

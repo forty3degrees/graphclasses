@@ -28,12 +28,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
+
+import teo.data.db.*;
+import teo.graph.view.NodeView;
 import teo.isgci.gui.*;
 import teo.isgci.gc.ForbiddenClass;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.grapht.GAlg;
-import teo.isgci.db.*;
 import teo.isgci.util.LessLatex;
 
 
@@ -557,11 +559,11 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         } else if (source == drawButton) {
             Cursor oldcursor = parent.getCursor();
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            parent.graphCanvas.drawHierarchy(Algo.nodesBetween(upper, lower));
+            parent.viewManager.load(Algo.nodesBetween(upper, lower));
 
-            NodeView node1 = parent.graphCanvas.findNode(
+            NodeView node1 = parent.viewManager.findNode(
                     ISGCIMainFrame.DataProvider.getClass(nodeName1));
-            NodeView node2 = parent.graphCanvas.findNode(
+            NodeView node2 = parent.viewManager.findNode(
             		ISGCIMainFrame.DataProvider.getClass(nodeName2));
             if (node1 != null  && node2 != null) {
                 node1.setNameAndLabel(nodeName1);
@@ -570,7 +572,6 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             
             setCursor(oldcursor);
             closeDialog();
-            parent.graphCanvas.repaint();
         } else if (source == refButton) {
             parent.loader.showDocument("classes/refs00.html");
         }

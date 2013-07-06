@@ -18,7 +18,9 @@ import java.awt.event.*;
 import java.util.List;
 import java.util.Collections;
 import javax.swing.*;
-import teo.isgci.db.*;
+
+import teo.data.db.*;
+import teo.graph.view.NodeView;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.LessLatex;
 
@@ -34,7 +36,7 @@ public class SearchDialog extends JDialog implements ActionListener {
         super(parent, "Search for a graphclass", true);
         this.parent = parent;
         group = new ButtonGroup();
-        Algo.NamePref mode = parent.graphCanvas.getNamingPref();
+        Algo.NamePref mode = parent.viewManager.getNamingPref();
         Container content = getContentPane();
 
         GridBagLayout gridbag = new GridBagLayout();
@@ -93,7 +95,7 @@ public class SearchDialog extends JDialog implements ActionListener {
         if (source == cancelButton) {
             closeDialog();
         } else if (source == searchButton) {
-            NodeView view = parent.graphCanvas.findNode(
+            NodeView view = parent.viewManager.findNode(
                             classesList.getSelectedNode());
             //parent.graphCanvas.markOnly(view);
             closeDialog();
