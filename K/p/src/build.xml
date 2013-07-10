@@ -239,7 +239,7 @@
 		 <include name="data/psprolog.txt"/>
 	      </fileset>
 	      <fileset dir="${data.dir}">
-		 <include name="images/*.gif"/>
+		 <include name="images/*.*"/>
 	      </fileset>
 	   </jar>
 	   <signjar alias="isgci"

@@ -202,7 +202,7 @@ public class LoadAction extends AbstractAction {
   
   public void loadGraph(String resourceString) {
       try {
-    	  URL resource = new URL("File:///U:/" + resourceString);
+    	  URL resource = new URL("File:///C:/" + resourceString);
     	  loadGraph(resource);
       } catch (Exception e) {
       	

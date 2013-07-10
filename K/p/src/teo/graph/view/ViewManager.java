@@ -16,24 +16,24 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
-import java.util.ArrayList;
 import java.util.List;
-import org.xml.sax.SAXException;
-import org.jgrapht.graph.SimpleDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
+import java.util.Set;
 
-import teo.data.db.*;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+import org.xml.sax.SAXException;
+
+import teo.data.db.Algo;
 import teo.data.xml.GraphMLWriter;
 import teo.graph.drawing.IDrawingService;
-import teo.isgci.problem.Problem;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.gui.ISGCIMainFrame;
+import teo.isgci.problem.Problem;
 import y.util.D;
 
 /**
@@ -105,6 +105,55 @@ public class ViewManager {
     	return result;
     }
 
+    
+    public void add(Collection<GraphClass> nodes) {
+    	
+    	Collection<GraphClass> newNodes = new ArrayList<GraphClass>();
+    	for (GraphView gv : graphs) {
+    		for (Set<GraphClass> l : gv.getGraph().vertexSet()) {
+    			for (GraphClass gc : nodes) {
+    				if (l.contains(gc)) {
+    					newNodes.add(gc);
+    				}
+    			}
+    		}
+    	}   
+    	
+    	//nodes.removeAll(newNodes);
+    	
+    	if (nodes.isEmpty()) {
+    		return;
+    	}
+    	
+        SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
+            Algo.createHierarchySubgraph(nodes);
+
+        List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
+                GAlg.split(graph, DefaultEdge.class);
+        
+        try {
+        	
+        	for (SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> g : list) {        		
+        		addGraph(g);
+            }
+        	
+        	
+            
+        } catch (Error e) {
+
+            if (e instanceof OutOfMemoryError || e instanceof StackOverflowError) {
+            	graphs.clear();
+            } else {
+                throw(e);
+            }
+        }
+
+        this.export();        
+
+        /* Notify any listeners that the view was initialized */
+        
+    }
+    
     /**
      * Add the given graph to this canvas.
      */
@@ -113,6 +162,28 @@ public class ViewManager {
     	
         gv.setIncludeUnproper(drawUnproper);
         graphs.add(gv);
+        
+        for (NodeView nv : gv.getNodes()) {
+            nv.updateColor(this.problem);
+            nv.setNameAndLabel(Algo.getName(nv.getNode(), namingPref)); 
+        }
+        
+        this.refresh();
+        return gv;
+    }
+    
+    protected GraphView addToGraph(SimpleDirectedGraph<Set<GraphClass>,DefaultEdge> g) {
+    	GraphView gv = new GraphView(g);
+    	
+        gv.setIncludeUnproper(drawUnproper);
+        for (Set<GraphClass> gc : g.vertexSet()) {
+        	graphs.get(0).graph.addVertex(gc);
+        }
+        
+
+        //graphs.get(0).graph.addEdge(arg0, arg1)
+        
+        //graphs.add(gv);
         
         for (NodeView nv : gv.getNodes()) {
             nv.updateColor(this.problem);

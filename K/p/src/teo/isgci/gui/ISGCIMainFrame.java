@@ -32,12 +32,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -56,12 +55,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.SimpleDirectedGraph;
+import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
+import org.pushingpixels.flamingo.api.ribbon.JRibbonFrame;
 
 import teo.Actions.DeleteSelection;
 import teo.Actions.ExitAction;
@@ -133,7 +135,7 @@ import java.util.ArrayList;*/
 
 /** The main frame of the application.
  */
-public class ISGCIMainFrame extends JFrame
+public class ISGCIMainFrame extends JRibbonFrame
         implements WindowListener, ActionListener, ItemListener, IDrawingService {
 	/**
 	 * 
@@ -230,6 +232,14 @@ public class ISGCIMainFrame extends JFrame
     public ISGCIMainFrame(teo.Loader loader) {
         super(APPLICATIONNAME);
         
+        UIManager.installLookAndFeel("JGoodies Windows",
+				"com.jgoodies.looks.windows.WindowsLookAndFeel");
+
+			try {
+			UIManager.setLookAndFeel(new MetalLookAndFeel());
+		} catch (Exception exc) {
+		}
+        
         gLoader = new LoadAction(this);
         layouter = new IncrementalHierarchicLayouter();
         layouter.setOrthogonallyRouted(true);
@@ -242,11 +252,13 @@ public class ISGCIMainFrame extends JFrame
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+        setTitle("ISGCI");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         viewManager = new ViewManager();
         viewManager.attachDrawingService(this);
         view = createGraphView();
         
-        ISGCIToolBar tool = new ISGCIToolBar(this);
+        //ISGCIToolBar tool = new ISGCIToolBar(this);
         
         applyRealizerDefaults(view.getGraph2D(), true, true);
 
@@ -274,13 +286,36 @@ public class ISGCIMainFrame extends JFrame
 //            closeWindow();
 //        }
         
-        final JMenuBar jmb = createMenuBar();
+        
+        try{
+
+            URL resource = ISGCIMainFrame.class.getClassLoader().getResource("images/favicon.png");
+            
+            ImageWrapperResizableIcon icon = ImageWrapperResizableIcon.getIcon(resource, new Dimension(32, 32));
+            
+            setApplicationIcon(icon);
+            
+            //SimpleResizableIcon head = new SimpleResizableIcon(RibbonElementPriority.TOP, 32, 32);
+            
+            
+            } catch( Exception ex) {
+            	System.out.println(ex.getMessage());
+            }
+            
+            
+            
+            final ISGCIRibbon rmb = new ISGCIRibbon(this);
+            if (rmb != null) {
+            	
+            }
+        
+        /*final JMenuBar jmb = createMenuBar();
         if (jmb != null) {
             rootPane.add(jmb);
           }
          
         setJMenuBar(createMenus());
-        
+        */
         getContentPane().add("Center", createMainPanel());
         getContentPane().add("Center", createCanvasPanel());
         
@@ -288,10 +323,10 @@ public class ISGCIMainFrame extends JFrame
         registerListeners();
         setLocation(20, 20);
         pack();
-        final JToolBar jtb = tool.createToolBar();
+       /* final JToolBar jtb = tool.createToolBar();
         if (jtb != null) {
           mainPan.add(jtb, BorderLayout.NORTH);
-        }
+        }*/
         setVisible(true);
         
         Graph2D rootGraph = view.getGraph2D();
@@ -600,7 +635,7 @@ public class ISGCIMainFrame extends JFrame
     protected void registerListeners() {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(this);
-        miNew.addActionListener(this);
+        /*miNew.addActionListener(this);
         miExport.addActionListener(this);
         miExit.addActionListener(this);
         miNaming.addActionListener(this);
@@ -614,7 +649,7 @@ public class ISGCIMainFrame extends JFrame
         miOpenProblem.addActionListener(this);
         miSmallgraphs.addActionListener(this);
         miHelp.addActionListener(this);
-        miAbout.addActionListener(this);
+        miAbout.addActionListener(this);*/
         
         Graph2DViewMouseWheelZoomListener wheelZoomListener = new Graph2DViewMouseWheelZoomListener();
         //zoom in/out at mouse pointer location 
@@ -764,7 +799,11 @@ public class ISGCIMainFrame extends JFrame
           add(infoItem = new JMenuItem("Information"));
           infoItem.addActionListener(this);  
         
+          add(addUp = new JMenuItem("Add Superclasses"));
+          addUp.addActionListener(this);
           
+          add(addDown = new JMenuItem("Add Subclasses"));
+          addDown.addActionListener(this);
           
         add(infoItem = new JMenuItem("Information"));
         infoItem.addActionListener(this);       
@@ -775,10 +814,16 @@ public class ISGCIMainFrame extends JFrame
 
         pm.addSeparator();
         
+        pm.add(addUp);
+        pm.add(addDown);
+        
+        pm.addSeparator();
+        
         pm.add(infoItem);
       }
     
-    
+    JMenuItem  addUp;
+    JMenuItem  addDown;
     JMenuItem  infoItem;
     JMenuItem  selectItem;
     JMenuItem  selectItemUp;
@@ -987,6 +1032,45 @@ public class ISGCIMainFrame extends JFrame
     	view.updateView();
     }
     
+    
+    public void addSuperClasses() {
+    	Graph2D g = view.getGraph2D();
+    	NodeCursor n = g.selectedNodes();
+    	ArrayList<Node> l = new ArrayList<Node>();
+    	Collection<GraphClass> gCol = new ArrayList<GraphClass>();
+    	for (int i = 0; i < n.size(); ++i) {
+    		Node neigh =  n.node(); 
+    		String s = n.current().toString();
+    		s = s.replace("<html>", "");
+    		s = s.replace("</html>", "");
+    		System.out.println(s);
+    		gCol.add(DataProvider.getClass(s));
+    		n.next();
+    	}
+    	this.viewManager.add(ISGCIMainFrame.DataProvider.getNodes(gCol, true, false));
+    	
+    	view.updateView();
+    }
+    
+    public void addSubClasses() {
+    	Graph2D g = view.getGraph2D();
+    	NodeCursor n = g.selectedNodes();
+    	ArrayList<Node> l = new ArrayList<Node>();
+    	Collection<GraphClass> gCol = new ArrayList<GraphClass>();
+    	for (int i = 0; i < n.size(); ++i) {
+    		Node neigh =  n.node(); 
+    		String s = n.current().toString();
+    		s = s.replace("<html>", "");
+    		s = s.replace("</html>", "");
+    		System.out.println(s);
+    		gCol.add(DataProvider.getClass(s));
+    		n.next();
+    	}
+    	this.viewManager.add(ISGCIMainFrame.DataProvider.getNodes(gCol, false, true));
+    	
+    	view.updateView();
+    }
+    
     /**
      * Eventhandler for menu selections
      */
@@ -1011,22 +1095,27 @@ public class ISGCIMainFrame extends JFrame
             d = new GraphClassInformationDialog(
                     this, ISGCIMainFrame.DataProvider.getClass(sub));
         	} else {
-        		d = new GraphClassInformationDialog(
-                        this, ISGCIMainFrame.DataProvider.getClass(
-                        		view.getGraph2D().selectedNodes().current().toString()));
+  		    		d = new GraphClassInformationDialog(
+  		    				this, ISGCIMainFrame.DataProvider.getClass(
+               		view.getGraph2D().selectedNodes().current().toString()));
         	}
-            d.setLocation(50, 50);
-            d.pack();
-            d.setSize(800, 600);
-            d.setVisible(true);
+        d.setLocation(50, 50);
+        d.pack();
+        d.setSize(800, 600);
+        d.setVisible(true);
+            
         } else if (object == miExit) {
             closeWindow();
         } else if (object == selectItem) {
             selectNeighbors();
-        }else if (object == selectItemUp) {
+        } else if (object == selectItemUp) {
             selectSuperClasses();
-        }else if (object == selectItemDown) {
+        } else if (object == selectItemDown) {
             selectSubClasses();
+        } else if (object == addUp) {
+        	addSuperClasses();
+        } else if (object == addDown) {
+        	addSubClasses();
         } else if (object == miNew) {
             new ISGCIMainFrame(loader);
         } else if (object == miExport) {

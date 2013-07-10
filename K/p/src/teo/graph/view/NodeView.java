@@ -34,11 +34,11 @@ public class NodeView {
     protected Color color;
     
     /** Colours for different complexities */
-    public static final Color COLOR_LIN = Color.green;
-    public static final Color COLOR_P = Color.green.darker();
-    public static final Color COLOR_NPC = Color.red;
-    public static final Color COLOR_INTERMEDIATE = SColor.brighter(Color.red);
-    public static final Color COLOR_UNKNOWN = Color.white;
+    public static Color COLOR_LIN = Color.green;
+    public static Color COLOR_P = Color.green.darker();
+    public static Color COLOR_NPC = Color.red;
+    public static Color COLOR_INTERMEDIATE = SColor.brighter(Color.red);
+    public static Color COLOR_UNKNOWN = Color.white;
 
     public NodeView(GraphView parent, Set<GraphClass> node) {
         this.parent = parent;
@@ -119,6 +119,15 @@ public class NodeView {
 	        }
         }
         
+    }
+    
+    
+    public void setColoring(Color lin, Color p, Color i, Color npc, Color u) {
+       	COLOR_LIN = lin;
+       	COLOR_P = p;
+       	COLOR_INTERMEDIATE = i;
+       	COLOR_NPC = npc;
+       	COLOR_UNKNOWN = u;
     }
     
     /**
