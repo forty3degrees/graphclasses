@@ -51,6 +51,13 @@ public class EdgeView {
         return to;
     }
 
+    public NodeView getFromNode() {
+        return parent.getView(this.from);
+    }
+    public NodeView getToNode() {
+        return parent.getView(this.to);
+    }
+
     /**
      * Writes this to w.
      */
@@ -58,9 +65,9 @@ public class EdgeView {
             throws SAXException {
         w.writeEdge(
             Integer.toString(
-                parent.getNodeViews().indexOf(parent.getView(this.from))),
+                parent.getNodes().indexOf(parent.getView(this.from))),
             Integer.toString(
-                parent.getNodeViews().indexOf(parent.getView(this.to))),
+                parent.getNodes().indexOf(parent.getView(this.to))),
                 isProper);
     }
 }

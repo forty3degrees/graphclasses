@@ -28,27 +28,31 @@ import org.jgrapht.graph.DefaultEdge;
 
 import teo.data.db.*;
 import teo.data.xml.GraphMLWriter;
+import teo.graph.drawing.IDrawingService;
 import teo.isgci.problem.Problem;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.gui.ISGCIMainFrame;
+import y.util.D;
 
 /**
  * A canvas that can display an inclusion graph.
  */
 public class ViewManager {
-    private List<IViewManagerListener> listeners = new ArrayList<IViewManagerListener>();
+	
+	
+    private List<IDrawingService> drawingServices = new ArrayList<IDrawingService>();
 
-    public void addListener(IViewManagerListener toAdd) {
-        listeners.add(toAdd);
+    public void attachDrawingService(IDrawingService service) {
+    	drawingServices.add(service);
     }
 
-	
-    protected Problem problem;
-    protected Algo.NamePref namingPref;
-    protected List<GraphView> graphs;
-    protected boolean drawUnproper;
+	private boolean isLoading = false;
+	private Problem problem;
+	private Algo.NamePref namingPref;
+	private List<GraphView> graphs;
+	private boolean drawUnproper;
 
 
     public ViewManager() {
@@ -110,7 +114,7 @@ public class ViewManager {
         gv.setIncludeUnproper(drawUnproper);
         graphs.add(gv);
         
-        for (NodeView nv : gv.getNodeViews()) {
+        for (NodeView nv : gv.getNodes()) {
             nv.updateColor(this.problem);
             nv.setNameAndLabel(Algo.getName(nv.getNode(), namingPref)); 
         }
@@ -157,6 +161,7 @@ public class ViewManager {
      * Create a hierarchy subgraph of the given classes
      */
     public void load(Collection<GraphClass> nodes) {
+    	this.isLoading = true;
     	
         SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
             Algo.createHierarchySubgraph(nodes);
@@ -179,18 +184,20 @@ public class ViewManager {
             }
         }
 
-        this.export();        
-
         /* Notify any listeners that the view was initialized */
-        for (IViewManagerListener l : listeners) {
-            l.viewInitialized();
+        D.bug("loading graph. " + drawingServices.size() + " listeners");
+        for (IDrawingService ds : drawingServices) {
+            ds.initializeView(this.graphs);
         }
+    	this.isLoading = false;
     }
     
     public void refresh() {
-        /* Notify any listeners that the view should be refreshed */
-        for (IViewManagerListener l : listeners) {
-            l.viewUpdated();
+        if (!isLoading) {
+	        /* Notify any attached services that the view should be refreshed */
+	        for (IDrawingService ds : drawingServices) {
+	            ds.updateView(this.graphs);
+	        }
         }
     }
 
@@ -199,8 +206,10 @@ public class ViewManager {
      */
     public void setPreferedNames() {
         for (GraphView gv : graphs)
-            for (NodeView v : gv.getNodeViews())
+            for (NodeView v : gv.getNodes())
                v.setNameAndLabel(Algo.getName(v.getNode(), namingPref)); 
+        
+        this.refresh();
     }
 
 
@@ -209,7 +218,7 @@ public class ViewManager {
      */
     public NodeView findNode(GraphClass gc) {
         for (GraphView gv : graphs) {
-            for (NodeView v : gv.getNodeViews())
+            for (NodeView v : gv.getNodes())
                 if (v.getNode().contains(gc))
                     return v;
         }
@@ -298,7 +307,7 @@ public class ViewManager {
      */
     public void setComplexityColors() {
         for (GraphView gv : graphs)
-            for (NodeView v : gv.getNodeViews())
+            for (NodeView v : gv.getNodes())
                v.updateColor(this.problem);
     }
 
@@ -306,9 +315,6 @@ public class ViewManager {
     public void setNamingPref(Algo.NamePref pref) {
         namingPref = pref;
         setPreferedNames();
-//        if (myPar.export()) {
-//        	myPar.loadInitialGraph();
-//        }
     }
 
     public Algo.NamePref getNamingPref() {

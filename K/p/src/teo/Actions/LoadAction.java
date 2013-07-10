@@ -7,15 +7,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import teo.graph.view.EdgeView;
+import teo.graph.view.GraphView;
+import teo.graph.view.NodeView;
 import teo.isgci.gui.ISGCIMainFrame;
+import y.base.Edge;
+import y.base.Node;
 import y.io.GraphMLIOHandler;
 import y.io.IOHandler;
 import y.util.D;
+import y.view.EdgeRealizer;
+import y.view.Graph2D;
+import y.view.NodeRealizer;
 
 /**
  * Action that loads the current graph from a file in GraphML format.
@@ -92,7 +105,7 @@ public class LoadAction extends AbstractAction {
    * Fill the Graph with explicit information contained within the graphML string.
    * @param gmlString
    */
-  protected void loadGraphMLString(String gmlString) {
+  public void loadGraphMLString(String gmlString) {
 	  byte[] bytes = gmlString.getBytes();
 	  
 	  InputStream is = new ByteArrayInputStream(bytes);
@@ -108,6 +121,83 @@ public class LoadAction extends AbstractAction {
 	        D.bug(message);
 	        throw new RuntimeException(message, e);
 	      }
+  }
+  
+  private Map<NodeView, Node> currentNodes = null;
+  private List<EdgeView> currentEdges = null;
+  public void loadGraph(Collection<GraphView> graphs) {
+	  
+	  Graph2D graph = parent.view.getGraph2D();
+	  graph.clear();
+
+	  currentNodes = new HashMap<NodeView, Node>();
+	  currentEdges = new ArrayList<EdgeView>();
+	  Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
+	  
+	  for (GraphView view : graphs) {
+		  List<NodeView> nodes = view.getNodes();
+		  List<EdgeView> edges = view.getEdges();
+		  D.bug("Before: " + nodes.size() + " nodes & " + edges.size() + " edges");
+
+		  NodeRealizer realizer = graph.getDefaultNodeRealizer().createCopy();
+		  for (EdgeView edge : edges) {
+			  NodeView from = edge.getFromNode();
+			  NodeView to = edge.getToNode();
+
+			  Node tempFrom;
+			  if (currentNodes.containsKey(from)) {
+				  tempFrom = currentNodes.get(from);
+			  }
+			  else {
+				  realizer = graph.getDefaultNodeRealizer().createCopy();
+				  realizer.setLabelText(from.getLabel());
+				  realizer.setFillColor(from.getColor());
+				  tempFrom = graph.createNode(realizer);
+				  currentNodes.put(from, tempFrom);
+			  }
+			  Node tempTo;
+			  if (currentNodes.containsKey(to)) {
+				  tempTo = currentNodes.get(to);
+			  }
+			  else {
+				  realizer = graph.getDefaultNodeRealizer().createCopy();
+				  realizer.setLabelText(to.getLabel());
+				  realizer.setFillColor(to.getColor());
+				  tempTo = graph.createNode(realizer);
+				  currentNodes.put(to, tempTo);
+			  }
+			  
+			  if (nodeMap.containsKey(tempFrom)) {
+				  nodeMap.get(tempFrom).add(tempTo);
+			  }
+			  else {
+				  ArrayList<Node> toNodes = new ArrayList<Node>();
+				  toNodes.add(tempTo);
+				  nodeMap.put(tempFrom, toNodes);
+			  }
+			  currentEdges.add(edge);
+		  }
+		  
+		  for (Node from : nodeMap.keySet()) {
+			  D.bug("From " + from);			  
+			  List<Node> toNodes = nodeMap.get(from);
+			  for (Node to : toNodes) {
+				  D.bug("\tTo " + to);
+				  graph.createEdge(from, to);
+			  }
+		  }			  
+		  for (NodeView node : nodes) {
+			  if (!currentNodes.containsKey(node)) {
+				  realizer = graph.getDefaultNodeRealizer().createCopy();
+				  realizer.setLabelText(node.getLabel());
+				  realizer.setFillColor(node.getColor());
+				  Node temp = graph.createNode(realizer);
+				  currentNodes.put(node, temp);
+				  D.bug("Adding ophaned node");
+			  }
+		  }	
+		  D.bug("After: " + currentNodes.size() + " nodes & " + currentEdges.size() + " edges");		  
+	  }
   }
   
   public void loadGraph(String resourceString) {

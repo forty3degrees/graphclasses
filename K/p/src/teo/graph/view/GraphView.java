@@ -57,12 +57,10 @@ public class GraphView {
 
         // Create the EdgeViews
         for (DefaultEdge e : graph.edgeSet()) {
-            if (!isVirtual(graph.getEdgeSource(e))) {
-                EdgeView v = new EdgeView(this, e);
-                
-                setProperness(v);
-                edges.add(v);
-            }
+            EdgeView v = new EdgeView(this, e);
+            
+            setProperness(v);
+            edges.add(v);
         }
     }
 
@@ -101,16 +99,13 @@ public class GraphView {
     /**
      * Return all nodeviews belonging to non-virtual nodes.
      */
-    public List<NodeView> getNodeViews() {
+    public List<NodeView> getNodes() {
         return Collections.unmodifiableList(nodes);
     }
 
-    /**
-     * Return true if the given node is virtual.
-     */
-    public boolean isVirtual(Set<GraphClass> node) {
-        return false;// layouter.getGDI(node).virt;
-    }
+	public List<EdgeView> getEdges() {
+		return Collections.unmodifiableList(this.edges);
+	}
 
     /**
      * Writes this to w.

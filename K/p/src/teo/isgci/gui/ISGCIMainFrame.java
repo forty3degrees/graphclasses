@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -70,7 +71,8 @@ import teo.Actions.SaveAction;
 import teo.data.services.IDataProvider;
 import teo.data.services.XmlDataProvider;
 import teo.data.xml.GraphMLWriter;
-import teo.graph.view.IViewManagerListener;
+import teo.graph.drawing.IDrawingService;
+import teo.graph.view.GraphView;
 import teo.graph.view.ViewManager;
 import teo.isgci.gc.ForbiddenClass;
 import teo.isgci.gc.GraphClass;
@@ -78,17 +80,13 @@ import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Problem;
 import y.base.DataMap;
-import y.base.Edge;
 import y.base.EdgeCursor;
 import y.base.Node;
 import y.base.NodeCursor;
 import y.base.NodeList;
 import y.geom.OrientedRectangle;
-import y.io.IOHandler;
 import y.layout.hierarchic.IncrementalHierarchicLayouter;
 import y.layout.hierarchic.incremental.IncrementalHintsFactory;
-import y.layout.organic.OrganicLayouter;
-import y.module.SmartOrganicLayoutModule;
 import y.module.YModule;
 import y.option.ConstraintManager;
 import y.option.DefaultEditorFactory;
@@ -97,6 +95,7 @@ import y.option.EditorFactory;
 import y.option.GuiFactory;
 import y.option.OptionHandler;
 import y.option.OptionItem;
+import y.util.D;
 import y.util.Maps;
 import y.view.AutoDragViewMode;
 import y.view.BridgeCalculator;
@@ -127,7 +126,6 @@ import y.view.TooltipMode;
 import y.view.ViewMode;
 import y.view.YLabel;
 import y.view.hierarchy.HierarchyManager;
-import yext.svg.io.SVGIOHandler;
 
 /*import teo.isgci.gc.GraphClass;
 import java.util.ArrayList;*/
@@ -136,7 +134,12 @@ import java.util.ArrayList;*/
 /** The main frame of the application.
  */
 public class ISGCIMainFrame extends JFrame
-        implements WindowListener, ActionListener, ItemListener, IViewManagerListener {
+        implements WindowListener, ActionListener, ItemListener, IDrawingService {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private static final Pattern PATH_SEPARATOR_PATTERN = Pattern.compile("/");
 	
 	private static final Color LABEL_LINE_COLOR = new Color(153, 204, 255, 255);
@@ -172,48 +175,6 @@ public class ISGCIMainFrame extends JFrame
     public JPanel mainPan;
     public Graph2DView view;
     private static LoadAction gLoader;
-
-
-    public void loadInitialGraph() {
-    	view.getGraph2D().clear();
-    	try {
-    	
-    	} catch (Exception ex) {
-    		
-    	}
-    	
-    	gLoader.loadGraph("myGraph.graphml");
-    	
-    	this.refreshView();
-    }
-    
-    public void updateGraph() {
-    	this.refreshView();
-    }
-    
-    public void refreshView() {
-    
-        for (NodeCursor nc = view.getGraph2D().nodes(); nc.ok(); nc.next())
-        {
-          Node n = nc.node();
-          
-          ShapeNodeRealizer nr = (ShapeNodeRealizer)view.getGraph2D().getRealizer(n);
-          nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
-          
-          if (nr.getFillColor() == Color.WHITE) {
-        	  //nr.setLineColor(new Color(255, 153, 0));
-        	  //nr.setFillColor(new Color(255, 153, 0));
-          }
-          nr.setSize(80, 20);
-          nr.getLabel().setFontSize(5);
-          
-          configureNodeLabel(nr.getLabel(), SmartNodeLabelModel.POSITION_CENTER);
-          
-          nr.repaint();
-        }
-        
-        dolayout();
-     }
 
     
     protected Graph2DView createGraphView() {
@@ -282,7 +243,7 @@ public class ISGCIMainFrame extends JFrame
 			e1.printStackTrace();
 		}
         viewManager = new ViewManager();
-        viewManager.addListener(this);
+        viewManager.attachDrawingService(this);
         view = createGraphView();
         
         ISGCIToolBar tool = new ISGCIToolBar(this);
@@ -1125,8 +1086,6 @@ public class ISGCIMainFrame extends JFrame
         if (object == miDrawUnproper) {
         	viewManager.setDrawUnproper(
                     ((JCheckBoxMenuItem) object).getState());
-        	viewManager.export();
-            loadInitialGraph();
         }
     }
         
@@ -1371,15 +1330,60 @@ public class ISGCIMainFrame extends JFrame
     	  }
 
 		@Override
-		public void viewInitialized() {
-			this.loadInitialGraph();
+		public void initializeView(List<GraphView> graphs) {
+	        D.bug("entering initializeView");
+	    	view.getGraph2D().clear();
+	    	try {	    	
+	    		//String graphML = this.viewManager.getCurrentGraphML();
+		    	
+		    	//gLoader.loadGraphMLString(graphML);
+	    		gLoader.loadGraph(this.viewManager.getCurrentViews());
+	    	} catch (Exception ex) {
+	    		// TODO
+	    	}
+	    	
+	    	this.refreshView();
 		}
 
 		@Override
-		public void viewUpdated() {
-			this.loadInitialGraph();
+		public void updateView(List<GraphView> graphs) {
+	        D.bug("entering updateView");
+	    	view.getGraph2D().clear();
+	    	try {	    	
+	    		String graphML = this.viewManager.getCurrentGraphML();
+		    	
+		    	gLoader.loadGraphMLString(graphML);
+	    	} catch (Exception ex) {
+	    		// TODO
+	    	}
+	    	
+	    	this.refreshView();
 		}
-      
+	    
+	    public void refreshView() {
+	    
+	        for (NodeCursor nc = view.getGraph2D().nodes(); nc.ok(); nc.next())
+	        {
+	          Node n = nc.node();
+	          
+	          ShapeNodeRealizer nr = (ShapeNodeRealizer)view.getGraph2D().getRealizer(n);
+	          nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
+	          
+	          if (nr.getFillColor() == Color.WHITE) {
+	        	  //nr.setLineColor(new Color(255, 153, 0));
+	        	  //nr.setFillColor(new Color(255, 153, 0));
+	          }
+	          nr.setSize(80, 20);
+	          nr.getLabel().setFontSize(5);
+	          
+	          configureNodeLabel(nr.getLabel(), SmartNodeLabelModel.POSITION_CENTER);
+	          
+	          nr.repaint();
+	        }
+	        
+	        dolayout();
+	     }
+
 }
 
 

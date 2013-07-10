@@ -125,7 +125,7 @@ public class NodeView {
      * Writes this nodeview to w.
      */
     public void write(GraphMLWriter w) throws SAXException {
-        w.writeNode(Integer.toString(parent.getNodeViews().indexOf(this)),
+        w.writeNode(Integer.toString(parent.getNodes().indexOf(this)),
                 getLabel(), getColor());
     }
 
