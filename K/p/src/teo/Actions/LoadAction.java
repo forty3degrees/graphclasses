@@ -26,6 +26,7 @@ import y.base.Node;
 import y.io.GraphMLIOHandler;
 import y.io.IOHandler;
 import y.util.D;
+import y.view.Arrow;
 import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
@@ -183,7 +184,9 @@ public class LoadAction extends AbstractAction {
 			  List<Node> toNodes = nodeMap.get(from);
 			  for (Node to : toNodes) {
 				  D.bug("\tTo " + to);
-				  graph.createEdge(from, to);
+				  EdgeRealizer edgeRealizer = graph.getDefaultEdgeRealizer().createCopy();
+				  edgeRealizer.setTargetArrow(Arrow.STANDARD);
+				  graph.createEdge(from, to, edgeRealizer);
 			  }
 		  }			  
 		  for (NodeView node : nodes) {
@@ -198,11 +201,12 @@ public class LoadAction extends AbstractAction {
 		  }	
 		  D.bug("After: " + currentNodes.size() + " nodes & " + currentEdges.size() + " edges");		  
 	  }
+	  parent.dolayout();
   }
   
   public void loadGraph(String resourceString) {
       try {
-    	  URL resource = new URL("File:///C:/" + resourceString);
+    	  URL resource = new URL("File:///U:/" + resourceString);
     	  loadGraph(resource);
       } catch (Exception e) {
       	

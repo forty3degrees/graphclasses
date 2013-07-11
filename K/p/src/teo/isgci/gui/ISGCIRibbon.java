@@ -148,7 +148,6 @@ public class ISGCIRibbon extends JRibbon implements ActionListener{
 			public void actionPerformed(ActionEvent e) {
 				m_parent.viewManager.setDrawUnproper(
 	                    unprop.isSelected());
-				m_parent.viewManager.refresh();
 			}
 		});
 		result.addRibbonComponent(new JRibbonComponent(

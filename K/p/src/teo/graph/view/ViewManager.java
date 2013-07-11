@@ -212,6 +212,8 @@ public class ViewManager {
         drawUnproper = b;
         for (GraphView gv : graphs)
             gv.setIncludeUnproper(b);
+        
+        this.refresh();
     }
 
     public boolean getDrawUnproper() {
