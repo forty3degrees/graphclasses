@@ -66,6 +66,7 @@ import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
 import org.pushingpixels.flamingo.api.ribbon.JRibbonFrame;
 
 import teo.Actions.DeleteSelection;
+import teo.Actions.EditLabel;
 import teo.Actions.ExitAction;
 import teo.Actions.LoadAction;
 import teo.Actions.PrintAction;
@@ -82,6 +83,7 @@ import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Problem;
 import y.base.DataMap;
+import y.base.Edge;
 import y.base.EdgeCursor;
 import y.base.Node;
 import y.base.NodeCursor;
@@ -357,6 +359,9 @@ public class ISGCIMainFrame extends JRibbonFrame
         .put(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0), "select");
         
         view.getRootPane().getInputMap(mainPan.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "delete");
+        
+        view.getRootPane().getInputMap(mainPan.WHEN_IN_FOCUSED_WINDOW)
         .put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "selectUp");
         
         view.getRootPane().getInputMap(mainPan.WHEN_IN_FOCUSED_WINDOW)
@@ -382,6 +387,38 @@ public class ISGCIMainFrame extends JRibbonFrame
                 selectSubClasses();
             }
         });
+        
+        view.getRootPane().getActionMap().put("delete", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteSelected();
+            }
+        });
+    }
+    
+    private void deleteSelected() {
+    	Graph2D g = view.getGraph2D();
+    	NodeCursor n = g.selectedNodes();
+    	ArrayList<Node> l = new ArrayList<Node>();
+    	Collection<GraphClass> gCol = new ArrayList<GraphClass>();
+    	for (int i = 0; i < n.size(); ++i) {
+    		Node neigh =  n.node(); 
+    		String s = n.current().toString();
+    		if (s.contains("<sub>")) {
+        		if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>")).contains(",")) {
+        			s = s.replace("<sub>", "_{");
+            		s = s.replace("</sub>", "}");
+        		} else {
+        			s = s.replace("<sub>", "_");
+            		s = s.replace("</sub>", "");
+        		}
+    		}
+    		gCol.add(DataProvider.getClass(s));
+    		n.next();
+    	}
+    	this.viewManager.del(ISGCIMainFrame.DataProvider.getNodes(gCol, false, false));
+    	
+    	view.updateView();
     }
     
     private Overview createOverview(Graph2DView view) {
@@ -504,6 +541,7 @@ public class ISGCIMainFrame extends JRibbonFrame
 
         //allow moving view port with right drag gesture
         editMode.allowMovingWithPopup(true);
+        editMode.allowLabelSelection(true);
         
         //add hierarchy actions to the views popup menu
         editMode.setPopupMode(createPopupMode());
@@ -565,6 +603,7 @@ public class ISGCIMainFrame extends JRibbonFrame
         final Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
         layoutExecutor.getLayoutMorpher().setSmoothViewTransform(true);
         layoutExecutor.doLayout(view, layouter);
+        view.fitContent();
       }
     
      
@@ -861,7 +900,8 @@ public class ISGCIMainFrame extends JRibbonFrame
     
     protected TooltipMode createTooltipMode() {
         TooltipMode tooltipMode = new TooltipMode();
-        tooltipMode.setEdgeTipEnabled(false);
+        tooltipMode.setEdgeTipEnabled(true);
+       
         return tooltipMode;
       }
    
@@ -870,6 +910,8 @@ public class ISGCIMainFrame extends JRibbonFrame
     	EditMode editMode = createEditMode();
         editMode.allowNodeCreation(false);
         editMode.allowEdgeCreation(false);
+        editMode.allowNodeEditing(false);
+ 
         
         if (editMode != null) {
           view.addViewMode(editMode);
@@ -884,11 +926,11 @@ public class ISGCIMainFrame extends JRibbonFrame
         }
 
         //view.addViewMode(new AutoDragViewMode());
-        
-        /*editMode.setPopupMode(new PopupMode() {
+        /*
+        editMode.setPopupMode(new PopupMode() {
             public JPopupMenu getEdgePopup(Edge e) {
               JPopupMenu pm = new JPopupMenu();
-              pm.add(new EditLabel(e));
+              pm.add(new EditLabel(e, par));
               return pm;
             }
           });*/
@@ -1041,11 +1083,15 @@ public class ISGCIMainFrame extends JRibbonFrame
     	for (int i = 0; i < n.size(); ++i) {
     		Node neigh =  n.node(); 
     		String s = n.current().toString();
-    		s = s.replace("<html>", "");
-    		s = s.replace("</html>", "");
-    		s = s.replace("<sub>", "_{");
-    		s = s.replace("</sub>", "}");
-    		System.out.println(s);
+    		if (s.contains("<sub>")) {
+        		if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>")).contains(",")) {
+        			s = s.replace("<sub>", "_{");
+            		s = s.replace("</sub>", "}");
+        		} else {
+        			s = s.replace("<sub>", "_");
+            		s = s.replace("</sub>", "");
+        		}
+    		}
     		gCol.add(DataProvider.getClass(s));
     		n.next();
     	}
@@ -1062,11 +1108,15 @@ public class ISGCIMainFrame extends JRibbonFrame
     	for (int i = 0; i < n.size(); ++i) {
     		Node neigh =  n.node(); 
     		String s = n.current().toString();
-    		s = s.replace("<html>", "");
-    		s = s.replace("</html>", "");
-    		s = s.replace("<sub>", "_{");
-    		s = s.replace("</sub>", "}");
-    		System.out.println(s);
+    		if (s.contains("<sub>")) {
+        		if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>")).contains(",")) {
+        			s = s.replace("<sub>", "_{");
+            		s = s.replace("</sub>", "}");
+        		} else {
+        			s = s.replace("<sub>", "_");
+            		s = s.replace("</sub>", "");
+        		}
+    		}
     		gCol.add(DataProvider.getClass(s));
     		n.next();
     	}
@@ -1087,15 +1137,28 @@ public class ISGCIMainFrame extends JRibbonFrame
         	JDialog d;
         	if (sub.length() >= 0) {
         		//ToDo: Catch unknown Sequences (\cap ... )
-        	sub = sub.substring(6, sub.indexOf("</html>"));
+        	/*sub = sub.substring(6, sub.indexOf("</html>"));
         	if (sub.indexOf('?') >= 0) {
         		String newSub = sub.substring(0, sub.indexOf(" "));
         		newSub += "$\\cap$ ";
         		newSub += sub.substring(sub.indexOf("?") + 1);
         		sub = newSub;
         		
-        	}
-        	System.out.println(sub);
+        	}*/
+        		sub = sub.replace("<html>", "");
+        		sub = sub.replace("</html>", "");
+        		
+        		if (sub.contains("<sub>")) {
+	        		if (sub.substring(sub.indexOf("<sub>"), sub.indexOf("</sub>")).contains(",")) {
+	        			sub = sub.replace("<sub>", "_{");
+	            		sub = sub.replace("</sub>", "}");
+	        		} else {
+	        			sub = sub.replace("<sub>", "_");
+	            		sub = sub.replace("</sub>", "");
+	        		}
+        		}
+        		
+        		
             d = new GraphClassInformationDialog(
                     this, ISGCIMainFrame.DataProvider.getClass(sub));
         	} else {
@@ -1139,7 +1202,6 @@ public class ISGCIMainFrame extends JRibbonFrame
             search.setLocation(50,50);
             search.setVisible(true);
         } else if (object == miGraphClassInformation) {
-        	System.out.println(this.getName());
             JDialog info = new GraphClassInformationDialog(this);
             info.setLocation(50, 50);
             info.pack();
@@ -1443,9 +1505,7 @@ public class ISGCIMainFrame extends JRibbonFrame
 	        D.bug("entering updateView");
 	    	view.getGraph2D().clear();
 	    	try {	    	
-	    		String graphML = this.viewManager.getCurrentGraphML();
-		    	
-		    	gLoader.loadGraphMLString(graphML);
+	    		gLoader.loadGraph(this.viewManager.getCurrentViews());
 	    	} catch (Exception ex) {
 	    		// TODO
 	    	}
@@ -1455,6 +1515,24 @@ public class ISGCIMainFrame extends JRibbonFrame
 	    
 	    public void refreshView() {
 	    
+	    	//Find the maximum width of all used Labels.
+	    	//Alternative: Skip the first run and set the current labelwidth for all node = different nodeswidths
+	    	double maxlen = 0;
+	    	for (NodeCursor nc = view.getGraph2D().nodes(); nc.ok(); nc.next())
+		    {
+	    		Node n = nc.node();
+	    		ShapeNodeRealizer nr = (ShapeNodeRealizer)view.getGraph2D().getRealizer(n);
+		        nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
+		        
+		        double len = nr.getLabel().getContentWidth();
+
+		        if (len > maxlen) {
+		        	maxlen = len;
+		        	
+		        }
+		        
+		    }
+	    	
 	        for (NodeCursor nc = view.getGraph2D().nodes(); nc.ok(); nc.next())
 	        {
 	          Node n = nc.node();
@@ -1462,11 +1540,7 @@ public class ISGCIMainFrame extends JRibbonFrame
 	          ShapeNodeRealizer nr = (ShapeNodeRealizer)view.getGraph2D().getRealizer(n);
 	          nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
 	          
-	          if (nr.getFillColor() == Color.WHITE) {
-	        	  //nr.setLineColor(new Color(255, 153, 0));
-	        	  //nr.setFillColor(new Color(255, 153, 0));
-	          }
-	          nr.setSize(80, 20);
+	          nr.setSize(Math.max(maxlen, 30), 20);
 	          nr.getLabel().setFontSize(5);
 	          
 	          configureNodeLabel(nr.getLabel(), SmartNodeLabelModel.POSITION_CENTER);

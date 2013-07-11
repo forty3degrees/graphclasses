@@ -156,17 +156,20 @@ public void add(Collection<GraphClass> nodes) {
 	public void del(Collection<GraphClass> nodes) {
 	
 		Collection<GraphClass> newNodes = new ArrayList<GraphClass>();
+		Collection<GraphClass> done = new ArrayList<GraphClass>();
 		for (GraphView gv : graphs) {
 			for (Set<GraphClass> l : gv.getGraph().vertexSet()) {
 				for (GraphClass gc : l) {
 					boolean contained = false;
 					for (GraphClass mc : Algo.equNodes(gc)) {
-						if (nodes.contains(mc)) {
+						if (nodes.contains(mc) || done.contains(mc)) {
 							contained = true;
 							break;
 						}
 					}
+					
 					if (!contained) {
+						done.add(gc);
 						newNodes.add(gc);
 						System.out.println(gc.toString() + " drin.");
 					} else {

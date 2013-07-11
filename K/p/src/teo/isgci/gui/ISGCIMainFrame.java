@@ -599,11 +599,11 @@ public class ISGCIMainFrame extends JRibbonFrame
      * Layout all included graphs.
      */
     public void dolayout() {
-    	view.fitContent();
         layouter.setLayoutMode(IncrementalHierarchicLayouter.LAYOUT_MODE_FROM_SCRATCH);
         final Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
         layoutExecutor.getLayoutMorpher().setSmoothViewTransform(true);
         layoutExecutor.doLayout(view, layouter);
+        view.fitContent();
       }
     
      
@@ -1540,7 +1540,7 @@ public class ISGCIMainFrame extends JRibbonFrame
 	          ShapeNodeRealizer nr = (ShapeNodeRealizer)view.getGraph2D().getRealizer(n);
 	          nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
 	          
-	          nr.setSize(Math.max(maxlen, 30), 20);
+	          nr.setSize(Math.max(maxlen/2, 30), 20);
 	          nr.getLabel().setFontSize(5);
 	          
 	          configureNodeLabel(nr.getLabel(), SmartNodeLabelModel.POSITION_CENTER);
