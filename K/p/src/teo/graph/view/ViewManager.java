@@ -106,19 +106,18 @@ public class ViewManager {
     }
 
     
-    public void add(Collection<GraphClass> nodes) {
+public void add(Collection<GraphClass> nodes) {
     	
     	Collection<GraphClass> newNodes = new ArrayList<GraphClass>();
     	for (GraphView gv : graphs) {
     		for (Set<GraphClass> l : gv.getGraph().vertexSet()) {
-    			for (GraphClass gc : nodes) {
-    				if (l.contains(gc)) {
-    					newNodes.add(gc);
-    				}
+    			for (GraphClass gc : l) {
+    				nodes.add(gc);
     			}
     		}
     	}   
     	
+    	graphs.clear();
     	//nodes.removeAll(newNodes);
     	
     	if (nodes.isEmpty()) {
@@ -153,6 +152,65 @@ public class ViewManager {
         /* Notify any listeners that the view was initialized */
         
     }
+
+	public void del(Collection<GraphClass> nodes) {
+	
+		Collection<GraphClass> newNodes = new ArrayList<GraphClass>();
+		for (GraphView gv : graphs) {
+			for (Set<GraphClass> l : gv.getGraph().vertexSet()) {
+				for (GraphClass gc : l) {
+					boolean contained = false;
+					for (GraphClass mc : Algo.equNodes(gc)) {
+						if (nodes.contains(mc)) {
+							contained = true;
+							break;
+						}
+					}
+					if (!contained) {
+						newNodes.add(gc);
+						System.out.println(gc.toString() + " drin.");
+					} else {
+						System.out.println(gc.toString() + " deleted.");
+					}
+				}
+			}
+		}   
+		
+		graphs.clear();
+		//nodes.removeAll(newNodes);
+		
+		if (newNodes.isEmpty()) {
+			//return;
+		}
+		
+	    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
+	        Algo.createHierarchySubgraph(newNodes);
+	
+	    List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
+	            GAlg.split(graph, DefaultEdge.class);
+	    
+	    try {
+	    	
+	    	for (SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> g : list) {        		
+	    		addGraph(g);
+	        }
+	    	
+	    	
+	        
+	    } catch (Error e) {
+	
+	        if (e instanceof OutOfMemoryError || e instanceof StackOverflowError) {
+	        	graphs.clear();
+	        } else {
+	            throw(e);
+	        }
+	    }
+	
+	    this.export();        
+	
+	    /* Notify any listeners that the view was initialized */
+	    
+	}
     
     /**
      * Add the given graph to this canvas.
@@ -333,7 +391,7 @@ public class ViewManager {
     	boolean res = true;
     	FileOutputStream f;
     	try {
-    		File  myFile = new File("U:/myGraph.graphml");
+    		File  myFile = new File("D:/myGraph.graphml");
     		f = new FileOutputStream(myFile);
 	    } catch (Exception e) {
 	        e.printStackTrace();

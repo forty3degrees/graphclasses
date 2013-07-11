@@ -168,10 +168,12 @@ public class GraphClassSelectionDialog extends JDialog
                 doSub = subCheck.isSelected();
        
         for (Object o : classesList.getSelectedValuesList()) {
+        	System.out.println(o.getClass());
             GraphClass graph = (GraphClass) o;
             result.add(graph);
         }
 
+        System.out.println(result);
         return ISGCIMainFrame.DataProvider.getNodes(result, doSuper, doSub);
     }    
 }

@@ -607,9 +607,6 @@ protected void configureApplicationMenu() {
 		appMenuRichTooltip.addDescriptionSection("Tooltip 2");
 		
 		try {
-			System.out.println("Loading Images");
-			System.out.println(ISGCIMainFrame.class.getClassLoader().getResource("images/appmenubutton-tooltip-main.png"));
-
 			appMenuRichTooltip
 					.setMainImage(ImageIO
 							.read(ISGCIMainFrame.class.getClassLoader().getResource("images/appmenubutton-tooltip-main.png")));

@@ -14,7 +14,7 @@ public class EditLabel extends AbstractAction {
     Edge e;
     ISGCIMainFrame parent;
 
-    EditLabel(Edge e, ISGCIMainFrame p) {
+    public EditLabel(Edge e, ISGCIMainFrame p) {
       super("Edit Preferred Length");
       this.e = e;
       parent = p;
