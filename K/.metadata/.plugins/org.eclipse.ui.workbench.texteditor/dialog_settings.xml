@@ -2,30 +2,31 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="257" key="DIALOG_WIDTH"/>
-		<item value="466" key="DIALOG_Y_ORIGIN"/>
-		<item value="1250" key="DIALOG_X_ORIGIN"/>
+		<item value="614" key="DIALOG_Y_ORIGIN"/>
 		<item value="372" key="DIALOG_HEIGHT"/>
+		<item value="1336" key="DIALOG_X_ORIGIN"/>
 		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="true" key="wrap"/>
-		<item value="false" key="casesensitive"/>
 		<item value="false" key="isRegEx"/>
+		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="draw" key="selection"/>
+		<item value="Policy" key="selection"/>
 		<list key="findhistory">
-			<item value="draw"/>
-			<item value="drawButton"/>
-			<item value="draw&quot;"/>
-			<item value="repai"/>
-			<item value="loadinit"/>
-			<item value="loadinit+"/>
-			<item value="svg"/>
-			<item value="jgrapht"/>
+			<item value="policy"/>
+			<item value="result.setResizePolicies(CoreRibbonResizePolicies.getCorePoliciesNone(result));"/>
+			<item value="Draw"/>
+			<item value=" 32, 32)"/>
+			<item value="confi"/>
+			<item value="task"/>
+			<item value="Layout"/>
+			<item value="createTool"/>
 		</list>
 		<list key="replacehistory">
 			<item value=""/>
+			<item value=" 48, 48)"/>
 		</list>
 	</section>
 </section>

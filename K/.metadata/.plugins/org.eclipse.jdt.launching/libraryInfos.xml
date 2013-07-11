@@ -57,25 +57,6 @@
 <entry path="C:\Program Files\Java\jdk1.7.0_21\jre\lib\endorsed"/>
 </endorsedDirs>
 </libraryInfo>
-<libraryInfo home="C:\Program Files\Java\jdk1.7.0_25\jre" version="1.7.0_25">
-<bootpath>
-<entry path="C:\Program Files\Java\jdk1.7.0_25\jre\lib\resources.jar"/>
-<entry path="C:\Program Files\Java\jdk1.7.0_25\jre\lib\rt.jar"/>
-<entry path="C:\Program Files\Java\jdk1.7.0_25\jre\lib\sunrsasign.jar"/>
-<entry path="C:\Program Files\Java\jdk1.7.0_25\jre\lib\jsse.jar"/>
-<entry path="C:\Program Files\Java\jdk1.7.0_25\jre\lib\jce.jar"/>
-<entry path="C:\Program Files\Java\jdk1.7.0_25\jre\lib\charsets.jar"/>
-<entry path="C:\Program Files\Java\jdk1.7.0_25\jre\lib\jfr.jar"/>
-<entry path="C:\Program Files\Java\jdk1.7.0_25\jre\classes"/>
-</bootpath>
-<extensionDirs>
-<entry path="C:\Program Files\Java\jdk1.7.0_25\jre\lib\ext"/>
-<entry path="C:\WINDOWS\Sun\Java\lib\ext"/>
-</extensionDirs>
-<endorsedDirs>
-<entry path="C:\Program Files\Java\jdk1.7.0_25\jre\lib\endorsed"/>
-</endorsedDirs>
-</libraryInfo>
 <libraryInfo home="D:\KN\eclipse_knime_2.7.2\jre" version="1.7.0_07">
 <bootpath>
 <entry path="D:\KN\eclipse_knime_2.7.2\jre\lib\resources.jar"/>
