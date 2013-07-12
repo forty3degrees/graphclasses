@@ -11,7 +11,6 @@
 <fullyQualifiedTypeName name="javax.swing.filechooser.FileFilter"/>
 <fullyQualifiedTypeName name="java.net.URI"/>
 <fullyQualifiedTypeName name="java.util.regex.Pattern"/>
-<fullyQualifiedTypeName name="y.base.Node"/>
 <fullyQualifiedTypeName name="y.view.GenericNodeRealizer.Factory"/>
 <fullyQualifiedTypeName name="java.awt.color.ICC_ProfileRGB"/>
 <fullyQualifiedTypeName name="java.awt.event.MouseEvent"/>
@@ -29,7 +28,6 @@
 <fullyQualifiedTypeName name="teo.isgci.xml.NoteFilter"/>
 <fullyQualifiedTypeName name="teo.isgci.db.AbstractRelation"/>
 <fullyQualifiedTypeName name="teo.data.services.IDataService"/>
-<fullyQualifiedTypeName name="teo.data.services.DataProvider"/>
 <fullyQualifiedTypeName name="org.jgrapht.DirectedGraph"/>
 <fullyQualifiedTypeName name="teo.isgci.gui.ISGCIMainFrame"/>
 <fullyQualifiedTypeName name="teo.data.services.XmlDataProvider"/>
@@ -53,4 +51,7 @@
 <fullyQualifiedTypeName name="java.awt.Color"/>
 <fullyQualifiedTypeName name="java.util.Collection"/>
 <fullyQualifiedTypeName name="org.pushingpixels.flamingo.api.ribbon.resize.CoreRibbonResizePolicies.None"/>
+<fullyQualifiedTypeName name="teo.data.services.DataProvider"/>
+<fullyQualifiedTypeName name="y.base.Node"/>
+<fullyQualifiedTypeName name="teo.Actions.EdgeAction"/>
 </qualifiedTypeNameHistroy>

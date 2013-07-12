@@ -66,7 +66,7 @@ import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
 import org.pushingpixels.flamingo.api.ribbon.JRibbonFrame;
 
 import teo.Actions.DeleteSelection;
-import teo.Actions.EditLabel;
+import teo.Actions.EdgeAction;
 import teo.Actions.ExitAction;
 import teo.Actions.LoadAction;
 import teo.Actions.PrintAction;
@@ -85,6 +85,7 @@ import teo.isgci.problem.Problem;
 import y.base.DataMap;
 import y.base.Edge;
 import y.base.EdgeCursor;
+import y.base.EdgeList;
 import y.base.Node;
 import y.base.NodeCursor;
 import y.base.NodeList;
@@ -545,8 +546,11 @@ public class ISGCIMainFrame extends JRibbonFrame
         
         //add hierarchy actions to the views popup menu
         editMode.setPopupMode(createPopupMode());
+        
         editMode.getMouseInputMode().setNodeSearchingEnabled(true);
-
+        editMode.getMouseInputMode().setEdgeSearchingEnabled(true);
+        
+        
         //Add a visual indicator for the target node of an edge creation - makes it easier to
         //see the target for nested graphs
         ViewMode createEdgeMode = editMode.getCreateEdgeMode();
@@ -886,7 +890,7 @@ public class ISGCIMainFrame extends JRibbonFrame
     }
     
     protected PopupMode createPopupMode() {
-        return new HierarchicPopupMode();
+        return new HierarchicPopupMode(this);
       }
     
      
@@ -1412,7 +1416,14 @@ public class ISGCIMainFrame extends JRibbonFrame
     
         
       class HierarchicPopupMode extends PopupMode {
-    	    public JPopupMenu getPaperPopup(double x, double y) {
+    	    ISGCIMainFrame m_parent;
+    	    
+    	    public HierarchicPopupMode(ISGCIMainFrame par) {
+    	    	super();
+    	    	m_parent = par;
+    	    }
+    	    
+    	  	public JPopupMenu getPaperPopup(double x, double y) {
     	      JPopupMenu pm = new JPopupMenu();
     	      populateGroupingPopup(pm, x, y, null, false);
     	      return pm;
@@ -1429,6 +1440,16 @@ public class ISGCIMainFrame extends JRibbonFrame
     	      JPopupMenu pm = new JPopupMenu();
     	      populateGroupingPopup(pm, x, y, null, getGraph2D().selectedNodes().ok());
     	      return pm;
+    	    }
+    	    
+    	    public JPopupMenu getEdgePopup(final Edge e) {
+    	        JPopupMenu pm = new JPopupMenu();
+    	        addEdgeActions(pm, new EdgeList(e).edges());
+    	        return pm;
+    	      }
+    	    
+    	    private void addEdgeActions(JPopupMenu pm, EdgeCursor sec) {
+    	        pm.add(new EdgeAction("Infortmation", sec, false, m_parent));
     	    }
     	  }
       

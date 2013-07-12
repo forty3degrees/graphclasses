@@ -1,0 +1,28 @@
+package teo.Actions;
+
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+
+import y.base.Edge;
+import y.base.EdgeCursor;
+
+public class EdgeAction extends AbstractAction {
+	    private EdgeCursor ec;
+	    private boolean resetPCs;
+	
+	    public EdgeAction(String name, EdgeCursor edges, boolean resetPCs) {
+	      super(name);
+	      this.ec = edges;
+	      this.resetPCs = resetPCs;
+	    }
+	
+	    public void actionPerformed(ActionEvent a) {
+	      for (ec.toFirst(); ec.ok(); ec.next()) {
+	        final Edge edge = ec.edge();
+	        
+	      }
+	      
+	    }
+}
+

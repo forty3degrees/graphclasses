@@ -1,0 +1,41 @@
+package teo.Actions;
+
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.JDialog;
+
+import teo.isgci.gui.InclusionResultDialog;
+import y.base.Edge;
+import y.base.EdgeCursor;
+import y.base.Node;
+
+public class EdgeAction extends AbstractAction {
+	    private EdgeCursor ec;
+	    private boolean resetPCs;
+	
+	    public EdgeAction(String name, EdgeCursor edges, boolean resetPCs) {
+	      super(name);
+	      this.ec = edges;
+	      this.resetPCs = resetPCs;
+	    }
+	
+	    public void actionPerformed(ActionEvent a) {
+	      if (ec.current() == null) {
+	    	  return;
+	    	  Edge e = ec.edge();
+	    	  Node s = e.source();
+	    	  Node t = e.target();
+	        
+	        JDialog d = InclusionResultDialog.newInstance(parent,
+	                DataSet.getClass(
+	                    parent.graphCanvas.getView(view.getFrom()).getFullName()),
+	                DataSet.getClass(
+	                    parent.graphCanvas.getView(view.getTo()).getFullName()));
+
+	        System.out.println("Edge Action clicked");
+	      }
+	      
+	    }
+}
+
