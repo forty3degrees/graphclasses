@@ -11,18 +11,32 @@
 package teo.isgci.gui;
 
 import java.awt.Container;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.*;
-import java.util.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import javax.swing.*;
+import java.util.List;
 
-import teo.data.db.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+
+import teo.data.db.Algo;
 import teo.graph.view.NodeView;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.LessLatex;
+import y.base.Node;
+import y.base.NodeCursor;
+import y.view.Graph2D;
+import y.view.ShapeNodeRealizer;
 
 public class SearchDialog extends JDialog implements ActionListener {
     protected ISGCIMainFrame parent;
@@ -74,14 +88,37 @@ public class SearchDialog extends JDialog implements ActionListener {
         cancelButton.addActionListener(this);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     
-//        List<GraphClass> names = parent.graphCanvas.getClasses();
-//        if (!names.isEmpty()) {
-//            Collections.sort(names, new LessLatex());
-//            classesList.setListData(names);
-//        }
-//        pack();
-//        setSize(300, 350);
-//    
+        
+        
+        Graph2D g = parent.view.getGraph2D();
+    	NodeCursor n = g.nodes();
+    	ArrayList<Node> l = new ArrayList<Node>();
+    	Collection<GraphClass> gCol = new ArrayList<GraphClass>();
+    	for (int i = 0; i < n.size(); ++i) {
+    		Node neigh =  n.node(); 
+    		String s = n.current().toString();
+    		if (s.contains("<sub>")) {
+        		if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>")).contains(",")) {
+        			s = s.replace("<sub>", "_{");
+            		s = s.replace("</sub>", "}");
+        		} else {
+        			s = s.replace("<sub>", "_");
+            		s = s.replace("</sub>", "");
+        		}
+    		}
+    		gCol.addAll(Algo.equNodes(parent.DataProvider.getClass(s)));
+    		n.next();
+    	}
+   	
+        
+        List<GraphClass> names = new ArrayList(gCol);
+        
+        if (!names.isEmpty()) {
+            Collections.sort(names, new LessLatex());
+            classesList.setListData(names);
+        }
+        pack();
+        setSize(300, 350);
     }
 
 
@@ -98,6 +135,26 @@ public class SearchDialog extends JDialog implements ActionListener {
             NodeView view = parent.viewManager.findNode(
                             classesList.getSelectedNode());
             //parent.graphCanvas.markOnly(view);
+            for (NodeCursor nc = parent.view.getGraph2D().nodes(); nc.ok(); nc.next()) {
+            	Node n = nc.node();
+            	String s = n.toString();
+            	
+        		if (s.contains("<sub>")) {
+            		if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>")).contains(",")) {
+            			s = s.replace("<sub>", "_{");
+                		s = s.replace("</sub>", "}");
+            		} else {
+            			s = s.replace("<sub>", "_");
+                		s = s.replace("</sub>", "");
+            		}
+        		}
+        		System.out.println(view.getLabel() + " " + s + " " + view.toString());
+        		if (view.getLabel().equals(s)) {
+        			System.out.println("JEP");
+        			parent.view.getGraph2D().setSelected(n, true);
+        		}
+        		parent.view.repaint();
+    	    }
             closeDialog();
         }
     }

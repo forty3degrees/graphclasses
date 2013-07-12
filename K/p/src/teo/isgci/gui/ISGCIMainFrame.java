@@ -403,7 +403,6 @@ public class ISGCIMainFrame extends JRibbonFrame
     	ArrayList<Node> l = new ArrayList<Node>();
     	Collection<GraphClass> gCol = new ArrayList<GraphClass>();
     	for (int i = 0; i < n.size(); ++i) {
-    		Node neigh =  n.node(); 
     		String s = n.current().toString();
     		if (s.contains("<sub>")) {
         		if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>")).contains(",")) {

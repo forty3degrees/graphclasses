@@ -33,7 +33,6 @@
 <fullyQualifiedTypeName name="teo.data.services.XmlDataProvider"/>
 <fullyQualifiedTypeName name="org.jgrapht.graph.SimpleDirectedGraph"/>
 <fullyQualifiedTypeName name="teo.data.services.IDataProvider"/>
-<fullyQualifiedTypeName name="java.util.List"/>
 <fullyQualifiedTypeName name="java.util.Set"/>
 <fullyQualifiedTypeName name="teo.isgci.gc.GraphClass"/>
 <fullyQualifiedTypeName name="org.jgrapht.graph.DefaultEdge"/>
@@ -49,9 +48,11 @@
 <fullyQualifiedTypeName name="org.pushingpixels.flamingo.api.common.icon.DecoratedResizableIcon.IconDecorator"/>
 <fullyQualifiedTypeName name="java.awt.Component"/>
 <fullyQualifiedTypeName name="java.awt.Color"/>
-<fullyQualifiedTypeName name="java.util.Collection"/>
 <fullyQualifiedTypeName name="org.pushingpixels.flamingo.api.ribbon.resize.CoreRibbonResizePolicies.None"/>
 <fullyQualifiedTypeName name="teo.data.services.DataProvider"/>
 <fullyQualifiedTypeName name="y.base.Node"/>
 <fullyQualifiedTypeName name="teo.Actions.EdgeAction"/>
+<fullyQualifiedTypeName name="java.awt.List"/>
+<fullyQualifiedTypeName name="java.util.Collection"/>
+<fullyQualifiedTypeName name="java.util.List"/>
 </qualifiedTypeNameHistroy>
