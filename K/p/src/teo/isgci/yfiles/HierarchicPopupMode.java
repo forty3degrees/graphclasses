@@ -3,12 +3,16 @@ package teo.isgci.yfiles;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
+import java.util.Iterator;
 
+import javax.swing.AbstractAction;
 import javax.swing.JDialog;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import teo.isgci.core.App;
+import teo.isgci.data.db.Algo;
 import teo.isgci.data.gc.GraphClass;
 import teo.isgci.view.gui.GraphClassInformationDialog;
 import teo.isgci.view.gui.ISGCIMainFrame;
@@ -18,6 +22,7 @@ import y.base.EdgeList;
 import y.base.Node;
 import y.view.Graph2D;
 import y.view.PopupMode;
+import y.view.ShapeNodeRealizer;
 
 
 public class HierarchicPopupMode extends PopupMode implements ActionListener {
@@ -25,11 +30,13 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
 	private JMenuItem  addUp;
 	private JMenuItem  addDown;
 	private JMenuItem  infoItem;
+	private JMenuItem  namingItem;
 	private JMenuItem  selectItem;
 	private JMenuItem  selectItemUp;
 	private JMenuItem  selectItemDown;
+	private JMenu  namingMenu;
     private ISGCIMainFrame parent;
-	private YFilesDrawingService drawingService;
+	private final YFilesDrawingService drawingService;
     private Graph2D graph2D;
     
     public HierarchicPopupMode(ISGCIMainFrame parent, YFilesDrawingService drawingService, Graph2D graph2D) {
@@ -41,20 +48,20 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
     
   	public JPopupMenu getPaperPopup(double x, double y) {
       JPopupMenu pm = new JPopupMenu();
-      populatePopup(pm, x, y, null, false);
+      populatePopup(pm, x, y, null, false, null);
       return pm;
     }
 
     public JPopupMenu getNodePopup(Node v) {
       Graph2D graph = getGraph2D();
       JPopupMenu pm = new JPopupMenu();
-      populatePopup(pm, graph.getCenterX(v), graph.getCenterY(v), v, true);
+      populatePopup(pm, graph.getCenterX(v), graph.getCenterY(v), v, true, v);
       return pm;
     }
 
     public JPopupMenu getSelectionPopup(double x, double y) {
       JPopupMenu pm = new JPopupMenu();
-      populatePopup(pm, x, y, null, getGraph2D().selectedNodes().ok());
+      populatePopup(pm, x, y, null, getGraph2D().selectedNodes().ok(), null);
       return pm;
     }
     
@@ -68,7 +75,7 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         pm.add(new EdgeAction("Information", sec, this.parent));
     }
 
-  	protected void populatePopup(JPopupMenu pm, final double x, final double y, Node node, boolean selected) {
+  	protected void populatePopup(JPopupMenu pm, final double x, final double y, Node node, boolean selected, final Node n) {
           
       	parent.add(selectItem = new JMenuItem("Show Neighbors"));
         selectItem.addActionListener(this);
@@ -89,7 +96,30 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         addDown.addActionListener(this);
             
         parent.add(infoItem = new JMenuItem("Information"));
-        infoItem.addActionListener(this);       
+        infoItem.addActionListener(this);
+        
+        if (n != null) {
+        	namingMenu = new JMenu("Change Name");
+        	GraphClass gClass = App.DataProvider.getClass(n.toString());
+        	Iterator<GraphClass> classes = Algo.equNodes(gClass).iterator();
+
+        	while (classes.hasNext()) {
+        		System.out.println("drin2");
+        		final GraphClass c = classes.next();
+        		System.out.println(c);
+        		JMenuItem item = new JMenuItem(c.toString());
+        		item.addActionListener(new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                    	System.out.println(n.toString() + " -> " + c.toString());
+                    	drawingService.graph2D.setLabelText(n, c.toString());
+                    	drawingService.graph2D.updateViews();
+                    }
+                });
+            	namingMenu.add(item);
+        	}
+        	
+        }
          
         pm.add(selectItem);
         pm.add(selectItemUp);
@@ -103,6 +133,9 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         pm.addSeparator();
          
         pm.add(infoItem);
+        if (n != null) {
+        	pm.add(namingMenu);
+        }
     }
   	
 

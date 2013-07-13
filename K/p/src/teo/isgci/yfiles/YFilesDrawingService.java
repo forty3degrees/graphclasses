@@ -84,7 +84,7 @@ import yext.svg.io.SVGIOHandler;
 public class YFilesDrawingService implements IDrawingService {
 
 	private Graph2DView graphView = null;
-	private Graph2D graph2D = null;
+	public Graph2D graph2D = null;
 	private IncrementalHierarchicLayouter layouter = null;
 	private Map<NodeView, Node> currentNodes = null;
 	private List<EdgeView> currentEdges = null;

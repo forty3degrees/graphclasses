@@ -2,27 +2,27 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="257" key="DIALOG_WIDTH"/>
-		<item value="257" key="DIALOG_Y_ORIGIN"/>
+		<item value="386" key="DIALOG_Y_ORIGIN"/>
+		<item value="1168" key="DIALOG_X_ORIGIN"/>
 		<item value="372" key="DIALOG_HEIGHT"/>
-		<item value="1093" key="DIALOG_X_ORIGIN"/>
 		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="true" key="wrap"/>
-		<item value="false" key="isRegEx"/>
 		<item value="false" key="casesensitive"/>
+		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="this.refreshView" key="selection"/>
+		<item value="hierarch" key="selection"/>
 		<list key="findhistory">
-			<item value="dolayout"/>
-			<item value="ISGCIMainFrame.DataProvider"/>
-			<item value="NodeRealizer"/>
-			<item value="DataProvider"/>
-			<item value="noderealizer"/>
-			<item value="no"/>
-			<item value="setsel"/>
-			<item value="getClass"/>
+			<item value="Hierarch"/>
+			<item value="ShapeNode"/>
+			<item value="App"/>
+			<item value="AbstractAction"/>
+			<item value="ribbon"/>
+			<item value="searchdi"/>
+			<item value="popup"/>
+			<item value="YFiles"/>
 		</list>
 		<list key="replacehistory">
 			<item value="this.refreshView"/>
