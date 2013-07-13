@@ -12,8 +12,9 @@ package teo.isgci.iq;
 
 import java.util.ArrayList;
 
-import teo.isgci.gc.GraphClass;
-import teo.isgci.gui.ISGCIMainFrame;
+import teo.isgci.core.App;
+import teo.isgci.data.gc.GraphClass;
+import teo.isgci.view.gui.ISGCIMainFrame;
 
 class IQSemantics extends mouse.runtime.SemanticsBase {
     /** error or null */
@@ -121,7 +122,7 @@ class IQSemantics extends mouse.runtime.SemanticsBase {
         }
 
         GraphClass thegc = null;
-        for (GraphClass g : ISGCIMainFrame.DataProvider.getGraphClasses())
+        for (GraphClass g : App.DataProvider.getGraphClasses())
             if (name.equals(g.getID())  ||  name.equals(g.toString()))
                 thegc = g;
         if (thegc == null) {

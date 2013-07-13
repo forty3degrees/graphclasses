@@ -1,0 +1,30 @@
+package teo.isgci.drawing;
+
+import java.io.FileOutputStream;
+import java.util.Collection;
+import java.util.List;
+
+import javax.swing.JComponent;
+
+import teo.isgci.core.GraphView;
+import teo.isgci.core.NodeView;
+import teo.isgci.data.gc.GraphClass;
+import teo.isgci.gui.PSGraphics;
+
+public interface IDrawingService {
+	JComponent getCanvas();
+	
+	void initializeView(List<GraphView> graphs);
+	void updateView(List<GraphView> graphs);
+	void updateColors(List<GraphView> graphs);
+	
+	void exportGraphics(PSGraphics g);
+	void exportPS(String file) throws Exception;
+	void exportSVG(String file) throws Exception;
+	
+	void selectNeighbors();
+    void selectSuperClasses();
+    void selectSubClasses();
+    Collection<GraphClass> getSelection();
+    void search(NodeView view);
+}

@@ -1,0 +1,49 @@
+package teo.Actions;
+
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
+
+import teo.isgci.gui.ISGCIMainFrame;
+
+/**
+ * Action that loads the current graph from a file in GraphML format.
+ */
+public class LoadAction extends AbstractAction {
+	private static final long serialVersionUID = 1L;
+  JFileChooser chooser;
+  ISGCIMainFrame parent;
+
+  public LoadAction(ISGCIMainFrame p) {
+    super("Load...");
+    chooser = null;
+    parent = p;
+  }
+
+  public void actionPerformed(ActionEvent e) {
+//    if (chooser == null) {
+//      chooser = new JFileChooser();
+//      chooser.setAcceptAllFileFilterUsed(false);
+//      chooser.addChoosableFileFilter(new FileFilter() {
+//        public boolean accept(File f) {
+//          return f.isDirectory() || f.getName().endsWith(".graphml");
+//        }
+//
+//        public String getDescription() {
+//          return "GraphML Format (.graphml)";
+//        }
+//      });
+//    }
+//    if (chooser.showOpenDialog(parent.mainPan) == JFileChooser.APPROVE_OPTION) {
+//      URL resource = null;
+//      try {
+//        resource = chooser.getSelectedFile().toURI().toURL();
+//      } catch (MalformedURLException urlex) {
+//        urlex.printStackTrace();
+//      }
+//      loadGraph(resource);
+//    }
+  }
+  
+}

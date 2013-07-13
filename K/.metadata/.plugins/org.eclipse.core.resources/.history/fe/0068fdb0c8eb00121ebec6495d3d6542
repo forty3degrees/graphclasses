@@ -1,0 +1,44 @@
+package teo.isgci.core;
+
+import java.awt.Frame;
+import java.util.HashMap;
+import java.util.Map;
+
+import teo.isgci.data.XmlDataProvider;
+import teo.isgci.view.gui.ISGCIMainFrame;
+import teo.isgci.yfiles.YFilesDrawingService;
+
+public class App {
+	
+	public static final IDataProvider DataProvider = new XmlDataProvider();
+	private static final Map<Frame, IDrawingService> drawingServices = 
+			new HashMap<Frame, IDrawingService>();
+	private static final Map<Frame, ViewManager> viewManagers = 
+			new HashMap<Frame, ViewManager>();
+		
+	private static void createServices(ISGCIMainFrame parent) {
+
+		ViewManager viewManager = new ViewManager();
+		IDrawingService drawingService = new YFilesDrawingService();
+		viewManager.attachDrawingService(drawingService);
+		drawingService.setParent(parent);
+
+		App.viewManagers.put(parent, viewManager);
+		App.drawingServices.put(parent, drawingService);
+	}
+	
+	public static IDrawingService getDrawingService(ISGCIMainFrame parent) {
+		if (!App.drawingServices.containsKey(parent)) {
+			createServices(parent);
+		}
+		return App.drawingServices.get(parent);
+	}
+	
+	public static ViewManager getViewManager(ISGCIMainFrame parent) {
+		if (App.viewManagers.containsKey(parent)) {
+			createServices(parent);
+		}
+		return App.viewManagers.get(parent);
+	}
+	
+}

@@ -1,0 +1,14 @@
+package teo.isgci.drawing;
+
+import java.util.List;
+
+import javax.swing.JComponent;
+
+import teo.isgci.core.GraphView;
+
+public interface IDrawingService {
+	void initializeView(List<GraphView> graphs);
+	void updateView(List<GraphView> graphs);
+	void updateColors(List<GraphView> graphs);
+	JComponent getCanvas();
+}

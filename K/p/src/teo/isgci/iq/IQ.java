@@ -18,11 +18,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 
-import teo.data.db.Algo;
-import teo.data.services.IDataProvider;
-import teo.data.services.XmlDataProvider;
-import teo.isgci.gc.GraphClass;
-import teo.isgci.gui.ISGCIMainFrame;
+import teo.isgci.core.App;
+import teo.isgci.core.IDataProvider;
+import teo.isgci.data.XmlDataProvider;
+import teo.isgci.data.db.Algo;
+import teo.isgci.data.gc.GraphClass;
+import teo.isgci.view.gui.ISGCIMainFrame;
 
 public class IQ {
     /** The string that contains the query */
@@ -85,7 +86,7 @@ public class IQ {
             System.exit(1);
         }
 
-        ISGCIMainFrame.DataProvider.loadData("data/isgci.xml");
+        App.DataProvider.loadData("data/isgci.xml");
 
         if (args.length > 1) {
             IQ iq = new IQ(args[1]);

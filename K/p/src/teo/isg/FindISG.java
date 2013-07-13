@@ -19,9 +19,9 @@ import org.xml.sax.SAXException;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.*;
 import gnu.getopt.Getopt;
-import teo.data.xml.*;
-import teo.isgci.grapht.GAlg;
-import teo.isgci.util.Itera;
+import teo.isgci.core.util.Itera;
+import teo.isgci.data.grapht.GAlg;
+import teo.isgci.data.xml.*;
 
 public class FindISG{
     

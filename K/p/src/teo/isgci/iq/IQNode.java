@@ -16,10 +16,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 
-import teo.data.db.Algo;
-import teo.data.services.IDataProvider;
-import teo.isgci.gc.GraphClass;
-import teo.isgci.gui.ISGCIMainFrame;
+import teo.isgci.core.App;
+import teo.isgci.core.IDataProvider;
+import teo.isgci.data.db.Algo;
+import teo.isgci.data.gc.GraphClass;
+import teo.isgci.view.gui.ISGCIMainFrame;
 
 /**
  * IQNode is a node in the parse tree of an ISGCI Query.
@@ -68,15 +69,15 @@ class IQop extends IQNode {
     public Set<GraphClass> eval() {
         Set<GraphClass> set = null;
         if ("=".equals(op)) {
-            set = new HashSet<GraphClass>(ISGCIMainFrame.DataProvider.getEquivalentClasses(gc.gc));
+            set = new HashSet<GraphClass>(App.DataProvider.getEquivalentClasses(gc.gc));
         } else if (op.charAt(0) == '<') {
             set = new HashSet<GraphClass>(Algo.subNodes(gc.gc));
             if (!"<=".equals(op))
-                set.removeAll(ISGCIMainFrame.DataProvider.getEquivalentClasses(gc.gc));
+                set.removeAll(App.DataProvider.getEquivalentClasses(gc.gc));
         } else if (op.charAt(0) == '>') {
             set = new HashSet<GraphClass>(Algo.superNodes(gc.gc));
             if (!">=".equals(op))
-                set.removeAll(ISGCIMainFrame.DataProvider.getEquivalentClasses(gc.gc));
+                set.removeAll(App.DataProvider.getEquivalentClasses(gc.gc));
         } else
             throw new RuntimeException("Unknown operator "+ op);
         return set;
@@ -97,7 +98,7 @@ class IQnot extends IQNode {
 
     public Set<GraphClass> eval() {
         Set<GraphClass> set = new HashSet<GraphClass>();
-        set.addAll(ISGCIMainFrame.DataProvider.getGraphClasses());
+        set.addAll(App.DataProvider.getGraphClasses());
         set.removeAll(gc.eval());
         return set;
     }

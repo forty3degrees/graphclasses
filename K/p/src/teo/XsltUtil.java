@@ -11,7 +11,8 @@
 package teo;
 
 import java.io.*;
-import teo.isgci.util.Latex2Html;
+
+import teo.isgci.core.util.Latex2Html;
 
 public class XsltUtil {
 

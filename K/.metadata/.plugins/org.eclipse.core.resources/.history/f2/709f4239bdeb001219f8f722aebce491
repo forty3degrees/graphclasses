@@ -1,0 +1,28 @@
+package teo.Actions;
+
+import java.awt.event.ActionEvent;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
+
+import javax.swing.AbstractAction;
+
+import teo.isgci.gui.ISGCIMainFrame;
+import y.option.OptionHandler;
+import y.view.Graph2DPrinter;
+
+public class PrintAction extends AbstractAction {
+	private static final long serialVersionUID = 1L;
+    PageFormat pageFormat;
+
+    OptionHandler printOptions;
+    ISGCIMainFrame parent;
+
+    public PrintAction(ISGCIMainFrame p) {
+      super("Print");
+      parent = p;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+    	
+    }
+  }

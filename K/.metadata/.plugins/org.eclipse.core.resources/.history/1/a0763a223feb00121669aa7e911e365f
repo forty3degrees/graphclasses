@@ -1,0 +1,817 @@
+/*
+ * The main window of ISGCI. Also the class to start the program.
+ *
+ * $Header: /home/ux/CVSROOT/teo/teo/isgci/gui/ISGCIMainFrame.java,v 2.4 2013/04/07 10:51:04 ux Exp $
+ *
+ * This file is part of the Information System on Graph Classes and their
+ * Inclusions (ISGCI) at http://www.graphclasses.org.
+ * Email: isgci@graphclasses.org
+ */
+
+package teo.isgci.gui;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.SimpleDirectedGraph;
+import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
+import org.pushingpixels.flamingo.api.ribbon.JRibbonFrame;
+
+import teo.Actions.DeleteSelection;
+import teo.Actions.ExitAction;
+import teo.Actions.LoadAction;
+import teo.Actions.PrintAction;
+import teo.Actions.SaveAction;
+import teo.isgci.core.App;
+import teo.isgci.core.GraphView;
+import teo.isgci.core.ViewManager;
+import teo.isgci.data.gc.ForbiddenClass;
+import teo.isgci.data.gc.GraphClass;
+import teo.isgci.data.grapht.GAlg;
+import teo.isgci.data.grapht.Inclusion;
+import teo.isgci.data.problem.Problem;
+import teo.isgci.data.services.IDataProvider;
+import teo.isgci.data.services.XmlDataProvider;
+import teo.isgci.data.xml.GraphMLWriter;
+import teo.isgci.drawing.EdgeAction;
+import teo.isgci.drawing.IDrawingService;
+import y.base.DataMap;
+import y.base.Edge;
+import y.base.EdgeCursor;
+import y.base.EdgeList;
+import y.base.Node;
+import y.base.NodeCursor;
+import y.base.NodeList;
+import y.geom.OrientedRectangle;
+import y.layout.hierarchic.IncrementalHierarchicLayouter;
+import y.layout.hierarchic.incremental.IncrementalHintsFactory;
+import y.module.YModule;
+import y.option.ConstraintManager;
+import y.option.DefaultEditorFactory;
+import y.option.Editor;
+import y.option.EditorFactory;
+import y.option.GuiFactory;
+import y.option.OptionHandler;
+import y.option.OptionItem;
+import y.util.D;
+import y.util.Maps;
+import y.view.AutoDragViewMode;
+import y.view.BridgeCalculator;
+import y.view.CreateEdgeMode;
+import y.view.DefaultGraph2DRenderer;
+import y.view.DefaultLabelConfiguration;
+import y.view.EdgeLabel;
+import y.view.EdgeRealizer;
+import y.view.EditMode;
+import y.view.GenericNodeRealizer;
+import y.view.GenericNodeRealizer.Factory;
+import y.view.Graph2D;
+import y.view.Graph2DLayoutExecutor;
+import y.view.Graph2DView;
+import y.view.Graph2DViewActions;
+import y.view.Graph2DViewMouseWheelZoomListener;
+import y.view.MovePortMode;
+import y.view.NavigationComponent;
+import y.view.NodeLabel;
+import y.view.NodeRealizer;
+import y.view.Overview;
+import y.view.PopupMode;
+import y.view.ShapeNodeRealizer;
+import y.view.ShinyPlateNodePainter;
+import y.view.SmartEdgeLabelModel;
+import y.view.SmartNodeLabelModel;
+import y.view.TooltipMode;
+import y.view.ViewMode;
+import y.view.YLabel;
+import y.view.hierarchy.HierarchyManager;
+
+/*import teo.isgci.gc.GraphClass;
+import java.util.ArrayList;*/
+
+
+/** The main frame of the application.
+ */
+public class ISGCIMainFrame extends JRibbonFrame
+        implements WindowListener, ActionListener, ItemListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private static final Pattern PATH_SEPARATOR_PATTERN = Pattern.compile("/");
+		  
+    public static final String APPLICATIONNAME = "ISGCI";
+    
+    public OptionHandler groupLayoutOptions;
+
+    public static ISGCIMainFrame tracker; // Needed for MediaTracker (hack)
+    public static LatexGraphics latex;
+    public static Font font;
+
+    protected teo.Loader loader;
+    private BridgeCalculator bridgeCalculator;
+
+    // The menu
+    protected JMenuItem miNew, miExport, miExit;
+    protected JMenuItem miNaming, miSearching, miDrawUnproper;
+    protected JMenuItem miSelectGraphClasses, miCheckInclusion;
+    protected JMenuItem miGraphClassInformation;
+    protected JMenuItem miCut, miCopy, miPaste, miDelete, miSelectAll;
+    protected JMenu miOpenProblem, miColourProblem;
+    protected JMenuItem miSmallgraphs, miHelp, miAbout;
+    
+    // This is where the drawing goes.
+    public JScrollPane drawingPane;
+    public JPanel mainPan;
+
+        
+    /** Creates the frame.
+     * @param locationURL The path/URL to the applet/application.
+     * @param isApplet true iff the program runs as an applet.
+     */
+    public ISGCIMainFrame(teo.Loader loader) {
+        super(APPLICATIONNAME);
+        
+        // TINO
+        // CAN THIS HAPPEN MORE THAN ONCE??
+        App.Current.DrawingService.setParent(this);
+        
+        UIManager.installLookAndFeel("JGoodies Windows",
+				"com.jgoodies.looks.windows.WindowsLookAndFeel");
+
+			try {
+			UIManager.setLookAndFeel(new MetalLookAndFeel());
+		} catch (Exception exc) {
+		}
+        
+        /* Load the data */
+        try {
+			App.Current.DataProvider.loadData("data/isgci.xml");
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        setTitle("ISGCI");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        //ISGCIToolBar tool = new ISGCIToolBar(this);
+
+        
+        loader.register();
+        this.loader = loader;
+        tracker = this;
+
+        ForbiddenClass.initRules(loader, "data/smallgraphs.xml");
+        PSGraphics.init(loader);
+        if (latex == null) {
+            latex = new LatexGraphics();
+            latex.init(loader);
+        }
+
+        // TINO Create Maps??
+//        boolean createMaps = false;
+//        try {
+//            createMaps = System.getProperty("org.isgci.mappath") != null;
+//        } catch (Exception e) {}
+
+//        if (createMaps) {       // Create maps and terminate
+//            createCanvasPanel();
+//            new teo.isgci.util.LandMark(this).createMaps();
+//            closeWindow();
+//        }
+        
+        
+        try{
+
+            URL resource = ISGCIMainFrame.class.getClassLoader().getResource("images/favicon.png");
+            
+            ImageWrapperResizableIcon icon = ImageWrapperResizableIcon.getIcon(resource, new Dimension(32, 32));
+            
+            setApplicationIcon(icon);
+            
+            //SimpleResizableIcon head = new SimpleResizableIcon(RibbonElementPriority.TOP, 32, 32);
+            
+            
+            } catch( Exception ex) {
+            	System.out.println(ex.getMessage());
+            }
+            
+            
+            
+            final ISGCIRibbon rmb = new ISGCIRibbon(this);
+            if (rmb != null) {
+            	
+            }
+        
+        /*final JMenuBar jmb = createMenuBar();
+        if (jmb != null) {
+            rootPane.add(jmb);
+          }
+         
+        setJMenuBar(createMenus());
+        */
+        getContentPane().add("Center", createMainPanel());
+        getContentPane().add("Center", createCanvasPanel());
+        
+
+        registerListeners();
+        setLocation(20, 20);
+        pack();
+       /* final JToolBar jtb = tool.createToolBar();
+        if (jtb != null) {
+          mainPan.add(jtb, BorderLayout.NORTH);
+        }*/
+        setVisible(true);
+        
+        //prepare option handler for group layout options
+        Object[] groupStrategyEnum = {"Global Layering", "Recursive Layering"};
+        Object[] groupAlignmentEnum = {"Top", "Center", "Bottom"};
+        groupLayoutOptions = new OptionHandler("Layout Properties");
+        ConstraintManager cm = new ConstraintManager(groupLayoutOptions);
+        OptionItem gsi = groupLayoutOptions.addEnum("Group Layering Strategy", groupStrategyEnum, 0);
+        OptionItem eci = groupLayoutOptions.addBool("Enable Compact Layering", true);
+        OptionItem gai = groupLayoutOptions.addEnum("Group Alignment", groupAlignmentEnum, 0);
+        cm.setEnabledOnValueEquals(gsi, "Recursive Layering", eci);
+        cm.setEnabledOnValueEquals(gsi, "Recursive Layering", gai);
+        cm.setEnabledOnCondition(cm.createConditionValueEquals(gsi, "Recursive Layering").and(
+            cm.createConditionValueEquals(eci, Boolean.TRUE).inverse()), gai);
+        
+    }
+    
+    /**
+     * Write the entire database in GraphML to isgcifull.graphml.
+     */
+//    private void writeGraphML() {
+//        OutputStreamWriter out = null;
+//
+//        SimpleDirectedGraph<GraphClass, Inclusion> g =
+//            new SimpleDirectedGraph<GraphClass, Inclusion>(Inclusion.class);
+//        Graphs.addGraph(g, App.Current.DataProvider.getInclusionGraph());
+//        GAlg.transitiveReductionBruteForce(g);
+//
+//        try {
+//            out = new OutputStreamWriter(
+//                    new FileOutputStream("isgcifull.graphml"), "UTF-8");
+//            GraphMLWriter w = new GraphMLWriter(out,
+//                        GraphMLWriter.MODE_PLAIN,
+//                        true,
+//                        false);
+//            w.startDocument();
+//            for (GraphClass gc : g.vertexSet()) {
+//                w.writeNode(gc.getID(), gc.toString(), Color.WHITE);
+//            }
+//            for (Inclusion e : g.edgeSet()) {
+//                w.writeEdge(e.getSuper().getID(), e.getSub().getID(),
+//                        e.isProper());
+//            }
+//            w.endDocument();
+//            out.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+
+    /**
+     * Creates and attaches the necessary eventlisteners.
+     */
+    protected void registerListeners() {
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(this);
+        
+        // TINO
+        /*miNew.addActionListener(this);
+        miExport.addActionListener(this);
+        miExit.addActionListener(this);
+        miNaming.addActionListener(this);
+        miSearching.addActionListener(this);
+        miDrawUnproper.addItemListener(this);
+        miSelectGraphClasses.addActionListener(this);
+        miCheckInclusion.addActionListener(this);
+        miGraphClassInformation.addActionListener(this);
+        //miDelete.addActionListener(this);
+        //miSelectAll.addActionListener(this);
+        miOpenProblem.addActionListener(this);
+        miSmallgraphs.addActionListener(this);
+        miHelp.addActionListener(this);
+        miAbout.addActionListener(this);*/
+        
+    }
+
+    protected Action createLoadAction() {
+        return new LoadAction(this);
+      }
+
+      protected Action createSaveAction() {
+        return new SaveAction(this);
+      }
+
+      // TINO
+//      protected Action createDeleteSelectionAction() {
+//        return new DeleteSelection();
+//      }
+    
+    protected JMenuBar createMenuBar() {
+    	JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("File");
+        Action action;
+        action = createLoadAction();
+        if (action != null) {
+          menu.add(action);
+        }
+        action = createSaveAction();
+        if (action != null) {
+          menu.add(action);
+        }
+        menu.addSeparator();
+        menu.add(new PrintAction(this));
+        menu.addSeparator();
+        menu.add(new ExitAction());
+        menuBar.add(menu);
+        
+        if (getExampleResources() != null && getExampleResources().length != 0) {
+          createExamplesMenu(menuBar);
+        }
+        
+        return menuBar;
+      }
+    
+    protected void createExamplesMenu(JMenuBar menuBar) {
+        final String[] fileNames = getExampleResources();
+        if (fileNames == null) {
+          return;
+        }
+
+        final JMenu menu = new JMenu("Example Graphs");
+        menuBar.add(menu);
+
+        for (int i = 0; i < fileNames.length; i++) {
+          final String filename = fileNames[i];
+          final String[] path = PATH_SEPARATOR_PATTERN.split(filename);
+          menu.add(new AbstractAction(path[path.length - 1]) {
+            public void actionPerformed(ActionEvent e) {
+            	App.Current.ViewManager.loadGraph(filename);
+            }
+          });
+        }
+      }
+    protected String[] getExampleResources() {
+        return null;
+      }
+    /**
+     * Creates the menu system.
+     * @return The created JMenuBar
+     * @see JMenuBar
+     */
+    protected JMenuBar createMenus() {
+        JMenuBar mainMenuBar = new JMenuBar();
+        JMenu fileMenu, editMenu, viewMenu,  graphMenu, helpMenu, problemsMenu;
+        JMenuItem menu;
+
+        fileMenu = new JMenu("File");
+        fileMenu.add(miNew = new JMenuItem("New window"));
+        fileMenu.add(miExport = new JMenuItem("Export drawing..."));
+        fileMenu.add(miExit = new JMenuItem("Exit"));
+        mainMenuBar.add(fileMenu);
+
+        /*editMenu = new Menu("Edit");
+        editMenu.add(miDelete = new MenuItem("Delete"));
+        editMenu.add(miSelectAll = new MenuItem("Select all"));
+        mainMenuBar.add(editMenu);*/
+
+        viewMenu = new JMenu("View");
+        viewMenu.add(miSearching = new JMenuItem("Search in drawing..."));
+        viewMenu.add(miNaming = new JMenuItem("Naming preference..."));
+        viewMenu.add(miDrawUnproper =
+                new JCheckBoxMenuItem("Mark unproper inclusions", true));
+        /* menu = new ScaleMenu();
+        menu.setEnabled(false);
+        viewMenu.add(menu); */
+        mainMenuBar.add(viewMenu);
+
+        graphMenu = new JMenu("Graph classes");
+        miGraphClassInformation = new JMenuItem("Browse Database");
+        graphMenu.add(miGraphClassInformation);
+        miCheckInclusion = new JMenuItem("Find Relation...");
+        graphMenu.add(miCheckInclusion);
+        miSelectGraphClasses = new JMenuItem("Draw...");
+        graphMenu.add(miSelectGraphClasses);
+        mainMenuBar.add(graphMenu);
+
+        problemsMenu = new JMenu("Problems");
+        miOpenProblem = new JMenu("Boundary/Open classes");
+        problemsMenu.add(miOpenProblem);
+        Problem[] problems = App.Current.DataProvider.getProblems();
+        for (int i = 0; i < problems.length; i++) {
+            menu = new JMenuItem(
+                    ((Problem) problems[i]).getName());
+            miOpenProblem.add(menu);
+            menu.addActionListener(this);
+            menu.setActionCommand("miOpenProblem");
+        }
+        miColourProblem = new ProblemsMenu(this, "Colour for problem");
+        problemsMenu.add(miColourProblem);
+        mainMenuBar.add(problemsMenu);
+
+        
+        helpMenu = new JMenu("Help");
+        miSmallgraphs = new JMenuItem("Small graphs");
+        helpMenu.add(miSmallgraphs);
+        miHelp = new JMenuItem("Help");
+        helpMenu.add(miHelp);
+        miAbout = new JMenuItem("About");
+        helpMenu.add(miAbout);
+        //mainMenuBar.add(Box.createHorizontalGlue());
+        mainMenuBar.add(helpMenu);
+        
+        return mainMenuBar;
+    }
+    
+    
+    
+    /**
+     * Creates the drawing canvas with scrollbars at the bottom and at the
+     * right.
+     * @return the panel
+     */
+    protected JComponent createCanvasPanel() {
+        mainPan = new JPanel();
+        mainPan.setLayout(new BorderLayout());
+
+        //mainPan.add(graphCanvas, BorderLayout.CENTER);
+        mainPan.add(App.Current.DrawingService.getCanvas(), BorderLayout.CENTER);
+        
+        return mainPan;
+    }
+    
+     
+//    private Action createDeleteSelectionActionImpl() {
+//        final Graph2DViewActions.DeleteSelectionAction action =
+//                new Graph2DViewActions.DeleteSelectionAction(view);
+//        action.setKeepingParentGroupNodeSizes(true);
+//        return action;
+//      }
+    
+    
+    /**
+     * Creates the drawing canvas with scrollbars at the bottom and at the
+     * right.
+     * @return the panel
+     */
+    protected JComponent createMainPanel() {
+        drawingPane = new JScrollPane(
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        
+        drawingPane.getHorizontalScrollBar().setUnitIncrement(100);
+        drawingPane.getVerticalScrollBar().setUnitIncrement(100);
+        
+        return drawingPane;
+    }
+
+
+    /**
+     * Center the canvas on the given point.
+     */
+    public void centerCanvas(Point p) {
+        JViewport viewport = drawingPane.getViewport();
+        Dimension port = viewport.getExtentSize();
+        Dimension view = viewport.getViewSize();
+
+        p.x -= port.width/2;
+        if (p.x + port.width > view.width)
+            p.x = view.width - port.width;
+        if (p.x < 0)
+            p.x = 0;
+        p.y -= port.height/2;
+        if (p.y + port.height > view.height)
+            p.y = view.height - port.height;
+        if (p.y < 0)
+            p.y = 0;
+        viewport.setViewPosition(p);
+    }
+
+    public void printPort() {
+        Rectangle view = getViewport();
+        System.err.println("port: "+view);
+    }
+
+    public Rectangle getViewport() {
+        return drawingPane.getViewport().getViewRect();
+    }
+
+    
+    /** Closes the window and possibly terminates the program. */
+    public void closeWindow() {
+        setVisible(false);
+        dispose();
+        loader.unregister();
+    }
+
+    /**
+     * Eventhandler for window events
+     */
+    public void windowClosing(WindowEvent e) {
+        closeWindow();
+    }
+
+    /**
+     * Required to overload (abstract)
+     */
+    public void windowOpened(WindowEvent e) {}
+    public void windowClosed(WindowEvent e) {}
+    public void windowIconified(WindowEvent e) {}
+    public void windowDeiconified(WindowEvent e) {}
+    public void windowDeactivated(WindowEvent e) {}
+    public void windowActivated(WindowEvent e) {}
+
+    
+    /**
+     * Eventhandler for menu selections
+     */
+    public void actionPerformed(ActionEvent event) {
+        Object object = event.getSource();
+
+        Object source = event.getSource();
+        if (object == miExit) {
+            closeWindow();
+        } else if (object == miNew) {
+            new ISGCIMainFrame(loader);
+        } else if (object == miExport) {
+        	// NOTE
+        	App.Current.ViewManager.export();
+            JDialog export = new ExportDialog(this);
+            export.setLocation(50, 50);
+            export.pack();
+            export.setVisible(true);
+        } else if (object == miNaming) {
+            JDialog d = new NamingDialog(this);
+            d.setLocation(50,50);
+            d.pack();
+            d.setVisible(true);
+        } else if (object == miSearching) {
+            JDialog search = new SearchDialog(this);
+            search.setLocation(50,50);
+            search.setVisible(true);
+        } else if (object == miGraphClassInformation) {
+            JDialog info = new GraphClassInformationDialog(this);
+            info.setLocation(50, 50);
+            info.pack();
+            info.setSize(800, 600);
+            info.setVisible(true);
+        } else if (object == miCheckInclusion) {
+            JDialog check = new CheckInclusionDialog(this);
+            check.setLocation(50, 50);
+            check.pack();
+            check.setSize(700, 400);
+            check.setVisible(true);
+        } else if (object == miSelectGraphClasses) {
+            JDialog select = new GraphClassSelectionDialog(this);
+            select.setLocation(50, 50);
+            select.pack();
+            select.setSize(500, 400);
+            select.setVisible(true);
+        } else if (object == miAbout) {
+            JDialog select = new AboutDialog(this);
+            select.setLocation(50, 50);
+            select.setVisible(true);
+        } else if (object == miHelp) {
+            loader.showDocument("help.html");
+        } else if (object == miSmallgraphs) {
+            loader.showDocument("smallgraphs.html");
+        } else if (event.getActionCommand() == "miOpenProblem") {
+            JDialog open=new OpenProblemDialog(this,
+                    ((JMenuItem) event.getSource()).getText());
+            open.setLocation(50, 50);
+            open.setVisible(true);
+        }
+    }
+
+    public void itemStateChanged(ItemEvent event) {
+        Object object = event.getSource();
+
+        if (object == miDrawUnproper) {
+        	App.Current.ViewManager.setDrawUnproper(
+                    ((JCheckBoxMenuItem) object).getState());
+        }
+    }
+        
+    public static class OptionSupport {
+    private final EditorFactory editorFactory;
+
+    /**
+     * Displays the OptionHandler of the given module in a dialog and runs the module on the given graph if either the
+     * <code>Ok</code> or <code>Apply</code> button were pressed. The creation of the dialog is delegated to {@link
+     * #createDialog(y.option.OptionHandler, java.awt.event.ActionListener, java.awt.Frame)}
+     *
+     * @param module the option handler.
+     * @param graph  an optional ActionListener that is added to each button of the dialog.
+     * @param owner  the owner of the created dialog.
+     */
+    public static void showDialog(final YModule module, final Graph2D graph, final boolean runOnOk, Frame owner) {
+      if (module.getOptionHandler() == null) {
+        module.start(graph);
+      } else {
+        final ActionListener listener = new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            module.start(graph);
+          }
+        };
+
+        showDialog(module.getOptionHandler(), listener, runOnOk, owner);
+      }
+    }
+
+    /**
+     * Displays the given OptionHandler in a dialog and invokes the given ActionListener if either the <code>Ok</code>
+     * or <code>Apply</code> button were pressed. The creation of the dialog is delegated to {@link
+     * #createDialog(y.option.OptionHandler, java.awt.event.ActionListener, java.awt.Frame)}
+     *
+     * @param oh       the option handler.
+     * @param listener the ActionListener that is invoked if either the <code>Ok</code> or <code>Apply</code> button
+     *                 were pressed.
+     * @param owner    the owner of the created dialog.
+     */
+    public static void showDialog(final OptionHandler oh, final ActionListener listener,
+                                  final boolean runOnOk, Frame owner) {
+      final ActionListener delegatingListener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+          final String actionCommand = e.getActionCommand();
+          if ("Apply".equals(actionCommand) || (runOnOk && "Ok".equals(actionCommand))) {
+            EventQueue.invokeLater(new Runnable() {
+              public void run() {
+                listener.actionPerformed(e);
+              }
+            });
+          }
+        }
+      };
+
+      final JDialog dialog = new OptionSupport().createDialog(oh, delegatingListener, owner);
+      dialog.setVisible(true);
+    }
+
+    public OptionSupport() {
+      editorFactory = new DefaultEditorFactory();
+    }
+
+    /**
+     * Returns an dialog for the editor of the given option handler which contains four control buttons: Ok, Apply,
+     * Reset, and Cancel. An optional ActionListener can be used to add custom behavior to these buttons.
+     *
+     * @param oh       the option handler.
+     * @param listener an optional ActionListener that is added to each button of the dialog.
+     * @param owner    the owner of the created dialog.
+     */
+    public JDialog createDialog(final OptionHandler oh, ActionListener listener, Frame owner) {
+      final JDialog dialog = new JDialog(owner, getTitle(oh), true);
+
+      final AbstractAction applyAction = new AbstractAction("Apply") {
+        public void actionPerformed(ActionEvent e) {
+          if (oh.checkValues()) {
+            oh.commitValues();
+          }
+        }
+      };
+      final JButton applyButton = createButton(applyAction, listener);
+      applyButton.setDefaultCapable(true);
+      applyButton.requestFocus();
+
+      final AbstractAction closeAction = new AbstractAction("Cancel") {
+        public void actionPerformed(ActionEvent e) {
+          dialog.dispose();
+        }
+      };
+
+      final AbstractAction okAction = new AbstractAction("Ok") {
+        public void actionPerformed(ActionEvent e) {
+          if (oh.checkValues()) {
+            oh.commitValues();
+            dialog.dispose();
+          }
+        }
+      };
+
+      final AbstractAction resetAction = new AbstractAction("Reset") {
+        public void actionPerformed(ActionEvent e) {
+          oh.resetValues();
+        }
+      };
+
+      final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+      buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 11, 5));
+      buttonPanel.add(createButton(okAction, listener));
+      buttonPanel.add(createButton(closeAction, listener));
+      buttonPanel.add(applyButton);
+      buttonPanel.add(createButton(resetAction, listener));
+
+      final Editor editor = getEditorFactory().createEditor(oh);
+      final JComponent editorComponent = editor.getComponent();
+      if (editorComponent instanceof JPanel) {
+        editorComponent.setBorder(BorderFactory.createEmptyBorder(11, 5, 5, 5));
+      } else {
+        editorComponent.setBorder(BorderFactory.createEmptyBorder(9, 9, 15, 9));
+      }
+
+      final JPanel contentPanel = new JPanel(new BorderLayout(0, 0));
+      contentPanel.add(editorComponent, BorderLayout.CENTER);
+      contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+      dialog.setContentPane(contentPanel);
+      dialog.getRootPane().getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "APPLY_ACTION");
+      dialog.getRootPane().getActionMap().put("APPLY_ACTION", applyAction);
+      dialog.getRootPane().getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "CANCEL_ACTION");
+      dialog.getRootPane().getActionMap().put("CANCEL_ACTION", closeAction);
+      dialog.getRootPane().setDefaultButton(applyButton);
+      dialog.pack();
+      dialog.setSize(dialog.getPreferredSize());
+      dialog.setResizable(false);
+      dialog.setLocationRelativeTo(owner);
+
+      return dialog;
+    }
+
+    protected EditorFactory getEditorFactory() {
+      return editorFactory;
+    }
+
+    String getTitle(OptionHandler oh) {
+      final Object title = oh.getAttribute(OptionHandler.ATTRIBUTE_TITLE);
+      if (title instanceof String) {
+        return (String) title;
+      }
+
+      final Object titleKey = oh.getAttribute(OptionHandler.ATTRIBUTE_TITLE_KEY);
+      if (titleKey instanceof String) {
+        return getTitle(oh, (String) titleKey);
+      } else {
+        return getTitle(oh, oh.getName());
+      }
+    }
+
+    static String getTitle(OptionHandler oh, String title) {
+      final GuiFactory guiFactory = oh.getGuiFactory();
+      return guiFactory == null ? title : guiFactory.getString(title);
+    }
+
+    static JButton createButton(AbstractAction action, ActionListener listener) {
+      final JButton button = new JButton(action);
+      button.addActionListener(listener);
+      return button;
+
+    }
+  }
+
+    	  
+}
+
+
+/* EOF */

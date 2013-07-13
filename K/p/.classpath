@@ -2,21 +2,21 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/eclipse_knime_2.7.2"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/batik.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/getopt.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/gnu.getopt.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/jgrapht.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/Mouse.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/saxon.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/saxon8.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/vectorgraphics.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/xalan.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/xml-writer.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/y.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/yexport.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/ysvg.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/flamingo.jar"/>
-	<classpathentry kind="lib" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/forms-1.2.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/batik.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/getopt.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/gnu.getopt.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/jgrapht.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/mouse.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/saxon.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/saxon8.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/vectorgraphics.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/xalan.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/xml-writer.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/y.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/yexport.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/ysvg.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/flamingo.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Calum/Documents/GitHub/graphclasses/K/p/src/stuff/Isgci/lib/forms-1.2.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

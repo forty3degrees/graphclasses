@@ -1,0 +1,34 @@
+1373653238815	Rename package 'teo.data.db'
+1373653259555	Rename package 'teo.isgci.data.models'
+1373653296647	Rename package 'teo.graph.view'
+1373653321882	Rename package 'teo.isgci.gc'
+1373653343649	Rename package 'teo.data.services'
+1373653517494	Rename package 'teo.graph.drawing'
+1373653534321	Rename package 'teo.isgci.grapht'
+1373653585387	Rename package 'teo.data.xml'
+1373653638075	Move compilation unit
+1373653679767	Rename package 'teo.isgci.util'
+1373653760287	Rename package 'teo.isgci.problem'
+1373655300569	Delete element
+1373661862055	Delete element
+1373662842668	Move compilation unit
+1373664484514	Move compilation unit
+1373664490768	Move compilation unit
+1373665096305	Move compilation unit
+1373665120778	Move compilation unit
+1373666094495	Extract method 'initializeView'
+1373717959729	Delete element
+1373718731255	Delete element
+1373719245116	Delete element
+1373721493647	Rename package 'teo.isgci.gui'
+1373721516422	Rename package 'teo.Actions'
+1373721542308	Move compilation unit
+1373721556303	Move compilation unit
+1373721572535	Rename package 'teo.isgci.data.services'
+1373721592492	Rename package 'teo.isgci.drawing'
+1373724021341	Rename field 'm_parent'
+1373740637270	Extract method 'processEdge'
+1373742636744	Extract method 'createNode'
+1373744082960	Extract method 'doLayout'
+1373744427976	Extract method 'updateNodeSize'
+1373744673890	Extract method 'doLayout'
