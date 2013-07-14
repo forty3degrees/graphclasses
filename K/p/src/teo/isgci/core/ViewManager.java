@@ -220,7 +220,6 @@ public class ViewManager {
             nv.setNameAndLabel(Algo.getName(nv.getNode(), namingPref)); 
         }
         
-        this.refresh();
         return gv;
     }
     

@@ -31,6 +31,7 @@ import javax.swing.ListSelectionModel;
 
 import teo.isgci.core.App;
 import teo.isgci.core.NodeView;
+import teo.isgci.core.ViewManager;
 import teo.isgci.core.util.LessLatex;
 import teo.isgci.data.db.Algo;
 import teo.isgci.data.gc.GraphClass;
@@ -88,33 +89,15 @@ public class SearchDialog extends JDialog implements ActionListener {
         cancelButton.addActionListener(this);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     
-        
-        // TINO: Does this do the same as getSelection()
-//        Graph2D g = parent.view.getGraph2D();
-//    	NodeCursor n = g.nodes();
-//    	ArrayList<Node> l = new ArrayList<Node>();
-//    	Collection<GraphClass> gCol = new ArrayList<GraphClass>();
-//    	for (int i = 0; i < n.size(); ++i) {
-//    		String s = n.current().toString();
-//    		if (s.contains("<sub>")) {
-//        		if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>")).contains(",")) {
-//        			s = s.replace("<sub>", "_{");
-//            		s = s.replace("</sub>", "}");
-//        		} else {
-//        			s = s.replace("<sub>", "_");
-//            		s = s.replace("</sub>", "");
-//        		}
-//    		}
-//    		gCol.addAll(Algo.equNodes(App.DataProvider.getClass(s)));
-//    		n.next();
-//    	}
+    	List<GraphClass> graphs = new ArrayList<GraphClass>();
+    	ViewManager viewManager = App.getViewManager(parent);
+    	for (NodeView node : viewManager.getCurrentNodes()) {
+    		graphs.addAll(node.getNode());
+    	}
    	
-        
-        List<GraphClass> names = new ArrayList<GraphClass>(App.getDrawingService(parent).getSelection());
-        
-        if (!names.isEmpty()) {
-            Collections.sort(names, new LessLatex());
-            classesList.setListData(names);
+        if (!graphs.isEmpty()) {
+            Collections.sort(graphs, new LessLatex());
+            classesList.setListData(graphs);
         }
         pack();
         setSize(300, 350);

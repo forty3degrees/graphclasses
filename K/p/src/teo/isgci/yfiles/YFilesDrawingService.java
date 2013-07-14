@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -78,18 +77,19 @@ import y.view.TooltipMode;
 import y.view.ViewMode;
 import y.view.YLabel;
 import y.view.GenericNodeRealizer.Factory;
+import y.view.hierarchy.HierarchyManager;
 import yext.export.io.EPSOutputHandler;
 import yext.svg.io.SVGIOHandler;
 
 public class YFilesDrawingService implements IDrawingService {
 
 	private Graph2DView graphView = null;
-	public Graph2D graph2D = null;
 	private IncrementalHierarchicLayouter layouter = null;
 	private Map<NodeView, Node> currentNodes = null;
 	private List<EdgeView> currentEdges = null;
 	private ISGCIMainFrame parent;
 	private PageFormat pageFormat;
+	private Graph2D graph2D = null;
 
 	private static final Color LABEL_LINE_COLOR = new Color(153, 204, 255, 255);
 	private static final Color LABEL_BACKGROUND_COLOR = Color.WHITE;
@@ -125,11 +125,6 @@ public class YFilesDrawingService implements IDrawingService {
 
 		/* Add the glass panel */
 		addGlassPaneComponents();
-
-		/* Create a hierarchy manager with the given graph */
-		// new HierarchyManager(rootGraph) //
-		// createHierarchyManager(this.graph2D);
-		// TINO
 
 		/* Register the graph view with the DefaultGraph2DRenderer */
 		BridgeCalculator bridgeCalculator = new BridgeCalculator();
@@ -194,6 +189,7 @@ public class YFilesDrawingService implements IDrawingService {
 
 	@Override
 	public void updateView(List<GraphView> graphs) {
+		D.bug("entering updateView");
 		Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
 
 		for (GraphView view : graphs) {
@@ -299,14 +295,23 @@ public class YFilesDrawingService implements IDrawingService {
 
 	@Override
 	public void refreshView() {
+		/* Don't ask me why this has to be in the order it is - it just does :) */
+		layouter.setLayoutMode(IncrementalHierarchicLayouter.LAYOUT_MODE_FROM_SCRATCH);
+		final Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
+		layoutExecutor.getLayoutMorpher().setSmoothViewTransform(true);
+		this.graphView.fitContent();
 		updateNodeSize();
+		layoutExecutor.doLayout(this.graphView, layouter);
+	}
+
+	@Override
+	public void doLayout() {
 		layouter.setLayoutMode(IncrementalHierarchicLayouter.LAYOUT_MODE_FROM_SCRATCH);
 		final Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
 		layoutExecutor.getLayoutMorpher().setSmoothViewTransform(true);
 		layoutExecutor.doLayout(this.graphView, layouter);
-		this.graphView.fitContent();
 	}
-
+	
 	@Override
 	/**
 	 * Fill the Graph with explicit information contained within the graphML string.
@@ -595,6 +600,7 @@ public class YFilesDrawingService implements IDrawingService {
 				maxlen = len;
 			}
 		}
+		System.out.println("Max Width: " + maxlen);
 
 		for (NodeCursor nc = graph2D.nodes(); nc.ok(); nc.next()) {
 			Node n = nc.node();
@@ -840,8 +846,7 @@ public class YFilesDrawingService implements IDrawingService {
 		editMode.allowLabelSelection(true);
 
 		// add hierarchy actions to the views popup menu
-		editMode.setPopupMode(new HierarchicPopupMode(this.parent, this,
-				this.graph2D));
+		editMode.setPopupMode(new HierarchicPopupMode(this.parent, this));
 
 		editMode.getMouseInputMode().setNodeSearchingEnabled(true);
 		editMode.getMouseInputMode().setEdgeSearchingEnabled(true);
@@ -940,56 +945,6 @@ public class YFilesDrawingService implements IDrawingService {
 		}
 	}
 
-	// private void deleteSelected() {
-	// Graph2D g = view.getGraph2D();
-	// NodeCursor n = g.selectedNodes();
-	// ArrayList<Node> l = new ArrayList<Node>();
-	// Collection<GraphClass> gCol = new ArrayList<GraphClass>();
-	// for (int i = 0; i < n.size(); ++i) {
-	// String s = n.current().toString();
-	// if (s.contains("<sub>")) {
-	// if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>")).contains(",")) {
-	// s = s.replace("<sub>", "_{");
-	// s = s.replace("</sub>", "}");
-	// } else {
-	// s = s.replace("<sub>", "_");
-	// s = s.replace("</sub>", "");
-	// }
-	// }
-	// gCol.add(DataProvider.getClass(s));
-	// n.next();
-	// }
-	// this.viewManager.del(App.DataProvider.getNodes(gCol, false, false));
-	//
-	// view.updateView();
-	// }
-
-	//
-	// public void addSubClasses() {
-	// Graph2D g = this.graphView.getGraph2D();
-	// NodeCursor n = g.selectedNodes();
-	// ArrayList<Node> l = new ArrayList<Node>();
-	// Collection<GraphClass> gCol = new ArrayList<GraphClass>();
-	// for (int i = 0; i < n.size(); ++i) {
-	// Node neigh = n.node();
-	// String s = n.current().toString();
-	// if (s.contains("<sub>")) {
-	// if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>")).contains(",")) {
-	// s = s.replace("<sub>", "_{");
-	// s = s.replace("</sub>", "}");
-	// } else {
-	// s = s.replace("<sub>", "_");
-	// s = s.replace("</sub>", "");
-	// }
-	// }
-	// gCol.add(DataProvider.getClass(s));
-	// n.next();
-	// }
-	// this.viewManager.add(App.DataProvider.getNodes(gCol, false, true));
-	//
-	// this.graphView.updateView();
-	// }
-	//
 	class OpenFoldersAndLayoutAction extends
 			Graph2DViewActions.OpenFoldersAction {
 

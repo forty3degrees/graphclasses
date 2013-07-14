@@ -457,7 +457,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		layGraph.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				App.getDrawingService(parent).refreshView();
+				App.getDrawingService(parent).doLayout();
 			}
 		});
 		layoutBand.addCommandButton(layGraph,
@@ -508,9 +508,9 @@ protected ResizableIcon getIcon(String ressourceString) {
 		RibbonTask helpTask = new RibbonTask("Help", helpClasses);//, quickExportBand, quickExportPrefBand);
 
 		parent.getRibbon().addTask(gcTask);
-		parent.getRibbon().addTask(fileTask);
-		parent.getRibbon().addTask(viewTask);
 		parent.getRibbon().addTask(probTask);
+		parent.getRibbon().addTask(viewTask);
+		parent.getRibbon().addTask(fileTask);
 		parent.getRibbon().addTask(helpTask);
 
 		parent.getRibbon().configureHelp(new SimpleResizableIcon(RibbonElementPriority.TOP, 10, 10),

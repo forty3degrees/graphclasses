@@ -131,7 +131,7 @@ public class ISGCIMainFrame extends JRibbonFrame
             latex.init(loader);
         }
 
-        // TINO
+        // de Ridder
 //        boolean createMaps = false;
 //        try {
 //            createMaps = System.getProperty("org.isgci.mappath") != null;
@@ -206,6 +206,7 @@ public class ISGCIMainFrame extends JRibbonFrame
         registerListeners();
         setLocation(20, 20);
         pack();
+        //this.setSize(1200, 800);
         setVisible(true);
                 
     }
@@ -215,25 +216,7 @@ public class ISGCIMainFrame extends JRibbonFrame
      */
     protected void registerListeners() {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(this);
-        
-        // TINO
-        /*miNew.addActionListener(this);
-        miExport.addActionListener(this);
-        miExit.addActionListener(this);
-        miNaming.addActionListener(this);
-        miSearching.addActionListener(this);
-        miDrawUnproper.addItemListener(this);
-        miSelectGraphClasses.addActionListener(this);
-        miCheckInclusion.addActionListener(this);
-        miGraphClassInformation.addActionListener(this);
-        //miDelete.addActionListener(this);
-        //miSelectAll.addActionListener(this);
-        miOpenProblem.addActionListener(this);
-        miSmallgraphs.addActionListener(this);
-        miHelp.addActionListener(this);
-        miAbout.addActionListener(this);*/
-        
+        addWindowListener(this);        
     }
 
       protected Action createSaveAction() {

@@ -30,28 +30,19 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
 	private JMenuItem  addUp;
 	private JMenuItem  addDown;
 	private JMenuItem  infoItem;
-	private JMenuItem  namingItem;
 	private JMenuItem  selectItem;
 	private JMenuItem  selectItemUp;
 	private JMenuItem  selectItemDown;
 	private JMenu  namingMenu;
     private ISGCIMainFrame parent;
 	private final YFilesDrawingService drawingService;
-    private Graph2D graph2D;
     
-    public HierarchicPopupMode(ISGCIMainFrame parent, YFilesDrawingService drawingService, Graph2D graph2D) {
+    public HierarchicPopupMode(ISGCIMainFrame parent, YFilesDrawingService drawingService) {
     	super();
     	this.drawingService = drawingService;
-    	this.graph2D = graph2D; 
     	this.parent = parent;
     }
     
-  	public JPopupMenu getPaperPopup(double x, double y) {
-      JPopupMenu pm = new JPopupMenu();
-      populatePopup(pm, x, y, null, false, null);
-      return pm;
-    }
-
     public JPopupMenu getNodePopup(Node v) {
       Graph2D graph = getGraph2D();
       JPopupMenu pm = new JPopupMenu();
@@ -77,17 +68,14 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
 
   	protected void populatePopup(JPopupMenu pm, final double x, final double y, Node node, boolean selected, final Node n) {
           
-      	parent.add(selectItem = new JMenuItem("Show Neighbors"));
+      	parent.add(selectItem = new JMenuItem("Select Neighbors"));
         selectItem.addActionListener(this);
           
-        parent.add(selectItemUp = new JMenuItem("Show SuperClasses"));
+        parent.add(selectItemUp = new JMenuItem("Select SuperClasses"));
         selectItemUp.addActionListener(this);
           
-        parent.add(selectItemDown = new JMenuItem("Show Subclasses"));
+        parent.add(selectItemDown = new JMenuItem("Select Subclasses"));
         selectItemDown.addActionListener(this);
-            
-        parent.add(infoItem = new JMenuItem("Information"));
-        infoItem.addActionListener(this);  
           
         parent.add(addUp = new JMenuItem("Add Superclasses"));
         addUp.addActionListener(this);
@@ -95,10 +83,12 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         parent.add(addDown = new JMenuItem("Add Subclasses"));
         addDown.addActionListener(this);
             
-        parent.add(infoItem = new JMenuItem("Information"));
-        infoItem.addActionListener(this);
         
         if (n != null) {
+
+            parent.add(infoItem = new JMenuItem("Information"));
+            infoItem.addActionListener(this);
+            
         	namingMenu = new JMenu("Change Name");
         	GraphClass gClass = App.DataProvider.getClass(n.toString());
         	Iterator<GraphClass> classes = Algo.equNodes(gClass).iterator();
@@ -112,8 +102,8 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                     	System.out.println(n.toString() + " -> " + c.toString());
-                    	drawingService.graph2D.setLabelText(n, c.toString());
-                    	drawingService.graph2D.updateViews();
+                    	getGraph2D().setLabelText(n, c.toString());
+                    	getGraph2D().updateViews();
                     }
                 });
             	namingMenu.add(item);
@@ -147,8 +137,7 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
 
         Object source = event.getSource();
         if (source == infoItem) {
-        	// TINO: view!!!
-        	String sub = graph2D.selectedNodes().node().toString();
+        	String sub = getGraph2D().selectedNodes().node().toString();
         	JDialog d;
         	if (sub.length() >= 0) {
         		//ToDo: Catch unknown Sequences (\cap ... )
@@ -179,7 +168,7 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         	} else {
   		    		d = new GraphClassInformationDialog(
   		    				this.parent, App.DataProvider.getClass(
-  		    						graph2D.selectedNodes().current().toString()));
+  		    						getGraph2D().selectedNodes().current().toString()));
         	}
 	        d.setLocation(50, 50);
 	        d.pack();
