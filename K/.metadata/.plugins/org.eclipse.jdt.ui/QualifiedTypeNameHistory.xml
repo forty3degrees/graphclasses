@@ -47,7 +47,6 @@
 <fullyQualifiedTypeName name="teo.isgci.core.App"/>
 <fullyQualifiedTypeName name="java.util.Map"/>
 <fullyQualifiedTypeName name="java.util.HashMap"/>
-<fullyQualifiedTypeName name="teo.isgci.yfiles.YFilesDrawingService"/>
 <fullyQualifiedTypeName name="teo.isgci.core.IDrawingService"/>
 <fullyQualifiedTypeName name="java.awt.Frame"/>
 <fullyQualifiedTypeName name="teo.isgci.view.gui.ISGCIMainFrame"/>
@@ -60,4 +59,5 @@
 <fullyQualifiedTypeName name="teo.isgci.data.db.Algo"/>
 <fullyQualifiedTypeName name="teo.isgci.core.ViewManager"/>
 <fullyQualifiedTypeName name="y.view.hierarchy.HierarchyManager"/>
+<fullyQualifiedTypeName name="teo.isgci.yfiles.YFilesDrawingService"/>
 </qualifiedTypeNameHistroy>

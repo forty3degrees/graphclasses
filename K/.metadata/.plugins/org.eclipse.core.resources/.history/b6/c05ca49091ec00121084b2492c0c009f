@@ -115,11 +115,6 @@ public class YFilesDrawingService implements IDrawingService {
 		this.graphView.getCanvasComponent().addMouseWheelListener(
 				wheelZoomListener);
 
-		/* This must be created here (before setting up the graph) so it 
-		 * can be used in the tooltip method (createEditMode).
-		 */
-		nodeLabelMap = new HashMap<String, String>();
-
 		this.graph2D = graphView.getGraph2D();
 		applyRealizerDefaults(this.graph2D, true, true);
 
@@ -135,6 +130,11 @@ public class YFilesDrawingService implements IDrawingService {
 		BridgeCalculator bridgeCalculator = new BridgeCalculator();
 		((DefaultGraph2DRenderer) this.graphView.getGraph2DRenderer())
 				.setBridgeCalculator(bridgeCalculator);
+
+		/* This must be created here so it can be used in the tooltip
+		 *  method (createEditMode).
+		 */
+		nodeLabelMap = new HashMap<String, String>();
 	}
 
 	@Override
@@ -871,11 +871,15 @@ public class YFilesDrawingService implements IDrawingService {
 
 	private EditMode createEditMode() {
 		
-		final YFilesDrawingService drawingService = this;
+		final Map<String, String> nameMap = this.nodeLabelMap;
 		EditMode editMode = new EditMode(){
-		      /* Overwrite getNodeTip with the classes full name */
+		      //overwrite getNodeTip with custom tooltip information
 		      public String getNodeTip(Node v) {
-		        return drawingService.getNodeName(v);
+		        String s = v.toString();
+		        if (nameMap.containsKey(s)) {
+		        	s = nameMap.get(s);
+		        }
+		        return  s;
 		      }
 		    };
 		// show the highlighting which is turned off by default

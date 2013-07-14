@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -78,20 +77,19 @@ import y.view.TooltipMode;
 import y.view.ViewMode;
 import y.view.YLabel;
 import y.view.GenericNodeRealizer.Factory;
+import y.view.hierarchy.HierarchyManager;
 import yext.export.io.EPSOutputHandler;
 import yext.svg.io.SVGIOHandler;
 
 public class YFilesDrawingService implements IDrawingService {
 
 	private Graph2DView graphView = null;
-	private Graph2D graph2D = null;
 	private IncrementalHierarchicLayouter layouter = null;
 	private Map<NodeView, Node> currentNodes = null;
 	private List<EdgeView> currentEdges = null;
-	private Map<Node, List<Edge>> fromEdgeMap = null;
-	private Map<Node, List<Edge>> toEdgeMap = null;
 	private ISGCIMainFrame parent;
 	private PageFormat pageFormat;
+	private Graph2D graph2D = null;
 
 	private static final Color LABEL_LINE_COLOR = new Color(153, 204, 255, 255);
 	private static final Color LABEL_BACKGROUND_COLOR = Color.WHITE;
@@ -128,11 +126,6 @@ public class YFilesDrawingService implements IDrawingService {
 		/* Add the glass panel */
 		addGlassPaneComponents();
 
-		/* Create a hierarchy manager with the given graph */
-		// new HierarchyManager(rootGraph) //
-		// createHierarchyManager(this.graph2D);
-		// TINO
-
 		/* Register the graph view with the DefaultGraph2DRenderer */
 		BridgeCalculator bridgeCalculator = new BridgeCalculator();
 		((DefaultGraph2DRenderer) this.graphView.getGraph2DRenderer())
@@ -152,8 +145,6 @@ public class YFilesDrawingService implements IDrawingService {
 
 		currentNodes = new HashMap<NodeView, Node>();
 		currentEdges = new ArrayList<EdgeView>();
-		fromEdgeMap = new HashMap<Node, List<Edge>>();
-		toEdgeMap = new HashMap<Node, List<Edge>>();
 		Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
 
 		for (GraphView view : graphs) {
@@ -178,22 +169,6 @@ public class YFilesDrawingService implements IDrawingService {
 					edgeRealizer.setTargetArrow(Arrow.STANDARD);
 					
 					Edge edge = graph2D.createEdge(from, to, edgeRealizer);
-
-					/* Keep the maps up to date so we can find the edge later */
-					if (fromEdgeMap.containsKey(from)) {
-						fromEdgeMap.get(from).add(edge);
-					} else {
-						ArrayList<Edge> fromEdges = new ArrayList<Edge>();
-						fromEdges.add(edge);
-						fromEdgeMap.put(from, fromEdges);
-					}
-					if (toEdgeMap.containsKey(to)) {
-						toEdgeMap.get(to).add(edge);
-					} else {
-						ArrayList<Edge> toEdges = new ArrayList<Edge>();
-						toEdges.add(edge);
-						toEdgeMap.put(to, toEdges);
-					}
 				}
 			}
 			for (NodeView node : nodes) {
@@ -214,6 +189,7 @@ public class YFilesDrawingService implements IDrawingService {
 
 	@Override
 	public void updateView(List<GraphView> graphs) {
+		D.bug("entering updateView");
 		Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
 
 		for (GraphView view : graphs) {
@@ -243,31 +219,26 @@ public class YFilesDrawingService implements IDrawingService {
 			
 			/* Remove the excess edges */
 			for (EdgeView edge : excessEdges) {
+				
+				/* This next bit doesn't work as the nodes are not
+				 * found in the currentNodes collection.
+				 * It doesn't matter in the current implementation
+				 * as edges cannot be removed separately and when
+				 * a node is removed the associated edges will also
+				 * be removed.
+				 */
+				D.bug("From: " + edge.getFrom().toString());
+				D.bug("To: " + edge.getTo().toString());				
 				Node from = this.currentNodes.get(edge.getFrom());
-				Node to = this.currentNodes.get(edge.getTo());
+				Node to = this.currentNodes.get(edge.getTo());				
+				D.bug("From node found: " + (from != null));
+				D.bug("To node found: " + (to != null));
 				
-				/* Find all the edges that go from and to the correct nodes */
-				List<Edge> fromEdges = fromEdgeMap.get(from);
-				List<Edge> toEdges = toEdgeMap.get(to);
-				List<Edge> edgesToRemove = new ArrayList<Edge>();
-				for (Edge fromEdge : fromEdges) {
-					if (toEdges.contains(fromEdge)) {
-						edgesToRemove.add(fromEdge);
-					}						
-				}
-				String message = "FromEdge count: " + fromEdgeMap.get(from).size();
-				System.out.println(message);
-				
-				/* Remove the edges */
-				for (Edge edgeToRemove : edgesToRemove) {
+				if ((from != null) && (to != null)) {
+					/* Never runs - see above */
+					Edge edgeToRemove = from.getEdge(to);
 					this.graph2D.removeEdge(edgeToRemove);
-					fromEdges.remove(edgeToRemove);
-					toEdges.remove(edgeToRemove);
 				}
-				
-				message = "FromEdge count: " + fromEdgeMap.get(from).size();
-				System.out.println(message);
-				
 				/* Remove the edge from the main collection */
 				this.currentEdges.remove(edge);
 			}
@@ -305,49 +276,10 @@ public class YFilesDrawingService implements IDrawingService {
 					realizer.setFillColor(node.getColor());
 					Node temp = graph2D.createNode(realizer);
 					currentNodes.put(node, temp);
-					D.bug("Adding ophaned node");
 				}
 			}
-			D.bug("After: " + currentNodes.size() + " nodes & "
-					+ currentEdges.size() + " edges");
 		}
 		this.refreshView();
-	}
-
-	private void processEdge(Map<Node, List<Node>> nodeMap, EdgeView edge) {
-		NodeRealizer realizer;
-		NodeView from = edge.getFromNode();
-		NodeView to = edge.getToNode();
-
-		Node tempFrom;
-		if (currentNodes.containsKey(from)) {
-			tempFrom = currentNodes.get(from);
-		} else {
-			realizer = graph2D.getDefaultNodeRealizer().createCopy();
-			realizer.setLabelText(from.getLabel());
-			realizer.setFillColor(from.getColor());
-			tempFrom = graph2D.createNode(realizer);
-			currentNodes.put(from, tempFrom);
-		}
-		Node tempTo;
-		if (currentNodes.containsKey(to)) {
-			tempTo = currentNodes.get(to);
-		} else {
-			realizer = graph2D.getDefaultNodeRealizer().createCopy();
-			realizer.setLabelText(to.getLabel());
-			realizer.setFillColor(to.getColor());
-			tempTo = graph2D.createNode(realizer);
-			currentNodes.put(to, tempTo);
-		}
-
-		if (nodeMap.containsKey(tempFrom)) {
-			nodeMap.get(tempFrom).add(tempTo);
-		} else {
-			ArrayList<Node> toNodes = new ArrayList<Node>();
-			toNodes.add(tempTo);
-			nodeMap.put(tempFrom, toNodes);
-		}
-		currentEdges.add(edge);
 	}
 
 	@Override
@@ -363,45 +295,23 @@ public class YFilesDrawingService implements IDrawingService {
 
 	@Override
 	public void refreshView() {
+		/* Don't ask me why this has to be in the order it is - it just does :) */
+		layouter.setLayoutMode(IncrementalHierarchicLayouter.LAYOUT_MODE_FROM_SCRATCH);
+		final Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
+		layoutExecutor.getLayoutMorpher().setSmoothViewTransform(true);
+		this.graphView.fitContent();
+		updateNodeSize();
+		layoutExecutor.doLayout(this.graphView, layouter);
+	}
 
-		// Find the maximum width of all used Labels.
-		// Alternative: Skip the first run and set the current labelwidth for
-		// all node = different nodeswidths
-		double maxlen = 0;
-		for (NodeCursor nc = graph2D.nodes(); nc.ok(); nc.next()) {
-			Node n = nc.node();
-			ShapeNodeRealizer nr = (ShapeNodeRealizer) graph2D.getRealizer(n);
-			nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
-
-			double len = nr.getLabel().getContentWidth();
-
-			if (len > maxlen) {
-				maxlen = len;
-			}
-		}
-
-		for (NodeCursor nc = graph2D.nodes(); nc.ok(); nc.next()) {
-			Node n = nc.node();
-
-			ShapeNodeRealizer nr = (ShapeNodeRealizer) graph2D.getRealizer(n);
-			nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
-
-			nr.setSize(Math.max(maxlen / 2, 30), 20);
-			nr.getLabel().setFontSize(5);
-
-			configureNodeLabel(nr.getLabel(),
-					SmartNodeLabelModel.POSITION_CENTER);
-
-			nr.repaint();
-		}
-
+	@Override
+	public void doLayout() {
 		layouter.setLayoutMode(IncrementalHierarchicLayouter.LAYOUT_MODE_FROM_SCRATCH);
 		final Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
 		layoutExecutor.getLayoutMorpher().setSmoothViewTransform(true);
 		layoutExecutor.doLayout(this.graphView, layouter);
-		this.graphView.fitContent();
 	}
-
+	
 	@Override
 	/**
 	 * Fill the Graph with explicit information contained within the graphML string.
@@ -425,6 +335,7 @@ public class YFilesDrawingService implements IDrawingService {
 		this.refreshView();
 	}
 
+	@Override
 	public void loadGraphML(URL resource) {
 		if (resource == null) {
 			String message = "Resource \"" + resource
@@ -519,7 +430,7 @@ public class YFilesDrawingService implements IDrawingService {
 		ArrayList<Node> l = new ArrayList<Node>();
 
 		for (int i = 0; i < n.size(); ++i) {
-			NodeCursor neigh = n.node().successors();
+			NodeCursor neigh = n.node().predecessors();
 			for (int j = 0; j < neigh.size(); ++j) {
 				l.add(neigh.node());
 				neigh.next();
@@ -539,7 +450,7 @@ public class YFilesDrawingService implements IDrawingService {
 		ArrayList<Node> l = new ArrayList<Node>();
 
 		for (int i = 0; i < n.size(); ++i) {
-			NodeCursor neigh = n.node().predecessors();
+			NodeCursor neigh = n.node().successors();
 			for (int j = 0; j < neigh.size(); ++j) {
 				l.add(neigh.node());
 				neigh.next();
@@ -596,8 +507,8 @@ public class YFilesDrawingService implements IDrawingService {
 			}
 			System.out.println(view.getLabel() + " " + s + " "
 					+ view.toString());
+			
 			if (view.getLabel().equals(s)) {
-				System.out.println("JEP");
 				this.graphView.getGraph2D().setSelected(n, true);
 			}
 			this.graphView.repaint();
@@ -659,6 +570,89 @@ public class YFilesDrawingService implements IDrawingService {
 	public URL getCurrentFile() {
 		return this.graph2D.getURL();
 	}
+	
+
+
+	
+	
+	
+	
+	
+	
+
+
+	private void updateNodeSize() {
+		// Find the maximum width of all used Labels.
+		// Alternative: Skip the first run and set the current labelwidth for
+		// all node = different nodeswidths
+		double maxlen = 0;
+		for (NodeCursor nc = graph2D.nodes(); nc.ok(); nc.next()) {
+			Node n = nc.node();
+			ShapeNodeRealizer nr = (ShapeNodeRealizer) graph2D.getRealizer(n);
+			nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
+			nr.getLabel().setFontSize(5);
+			configureNodeLabel(nr.getLabel(),
+					SmartNodeLabelModel.POSITION_CENTER);
+
+			double len = nr.getLabel().getContentWidth();
+
+			if (len > maxlen) {
+				maxlen = len;
+			}
+		}
+		System.out.println("Max Width: " + maxlen);
+
+		for (NodeCursor nc = graph2D.nodes(); nc.ok(); nc.next()) {
+			Node n = nc.node();
+
+			ShapeNodeRealizer nr = (ShapeNodeRealizer) graph2D.getRealizer(n);
+			nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
+
+			nr.setSize(Math.max(maxlen / 2, 30), 20);
+
+			nr.repaint();
+		}
+	}
+
+	private void processEdge(Map<Node, List<Node>> nodeMap, EdgeView edge) {
+		NodeView from = edge.getFromNode();
+		NodeView to = edge.getToNode();
+
+		Node tempFrom;
+		if (currentNodes.containsKey(from)) {
+			tempFrom = currentNodes.get(from);
+		} else {
+			tempFrom = createNode(from);
+		}
+		Node tempTo;
+		if (currentNodes.containsKey(to)) {
+			tempTo = currentNodes.get(to);
+		} else {
+			tempTo = createNode(to);
+		}
+
+		if (nodeMap.containsKey(tempFrom)) {
+			nodeMap.get(tempFrom).add(tempTo);
+		} else {
+			ArrayList<Node> toNodes = new ArrayList<Node>();
+			toNodes.add(tempTo);
+			nodeMap.put(tempFrom, toNodes);
+		}
+		currentEdges.add(edge);
+	}
+	
+	private Node createNode(NodeView nodeView) {
+
+		/* Create a new node */
+		NodeRealizer realizer = graph2D.getDefaultNodeRealizer().createCopy();
+		realizer.setLabelText(nodeView.getLabel());
+		realizer.setFillColor(nodeView.getColor());
+		Node node = graph2D.createNode(realizer);
+		
+		/* Keep the collections up to date */
+		currentNodes.put(nodeView, node);
+		return node;
+	}
 
 	private static void applyRealizerDefaults(Graph2D graph,
 			boolean applyDefaultSize, boolean applyFillColor) {
@@ -684,7 +678,7 @@ public class YFilesDrawingService implements IDrawingService {
 		}
 	}
 
-	public static void registerDefaultNodeConfiguration(boolean drawShadows) {
+	private static void registerDefaultNodeConfiguration(boolean drawShadows) {
 		Factory factory = GenericNodeRealizer.getFactory();
 		Map configurationMap = factory.createDefaultConfigurationMap();
 
@@ -699,7 +693,7 @@ public class YFilesDrawingService implements IDrawingService {
 		factory.addConfiguration(NODE_CONFIGURATION, configurationMap);
 	}
 
-	public void addGlassPaneComponents() {
+	private void addGlassPaneComponents() {
 		// get the glass pane
 		JPanel glassPane = this.graphView.getGlassPane();
 		// set an according layout manager
@@ -788,7 +782,7 @@ public class YFilesDrawingService implements IDrawingService {
 		return navigation;
 	}
 
-	protected void registerViewModes() {
+	private void registerViewModes() {
 
 		EditMode editMode = createEditMode();
 		editMode.allowNodeCreation(false);
@@ -835,7 +829,7 @@ public class YFilesDrawingService implements IDrawingService {
 		return ov;
 	}
 
-	protected EditMode createEditMode() {
+	private EditMode createEditMode() {
 		EditMode editMode = new EditMode();
 		// show the highlighting which is turned off by default
 		if (editMode.getCreateEdgeMode() instanceof CreateEdgeMode) {
@@ -852,8 +846,7 @@ public class YFilesDrawingService implements IDrawingService {
 		editMode.allowLabelSelection(true);
 
 		// add hierarchy actions to the views popup menu
-		editMode.setPopupMode(new HierarchicPopupMode(this.parent, this,
-				this.graph2D));
+		editMode.setPopupMode(new HierarchicPopupMode(this.parent, this));
 
 		editMode.getMouseInputMode().setNodeSearchingEnabled(true);
 		editMode.getMouseInputMode().setEdgeSearchingEnabled(true);
@@ -868,7 +861,7 @@ public class YFilesDrawingService implements IDrawingService {
 		return editMode;
 	}
 
-	protected void configureDefaultRealizers() {
+	private void configureDefaultRealizers() {
 
 		NodeRealizer nodeRealizer = this.graph2D.getDefaultNodeRealizer();
 		nodeRealizer.setSize(200, 100);
@@ -913,14 +906,14 @@ public class YFilesDrawingService implements IDrawingService {
 		label.setModelParameter(model.createDiscreteModelParameter(position));
 	}
 
-	protected TooltipMode createTooltipMode() {
+	private TooltipMode createTooltipMode() {
 		TooltipMode tooltipMode = new TooltipMode();
 		tooltipMode.setEdgeTipEnabled(true);
 
 		return tooltipMode;
 	}
 
-	public void layoutIncrementally() {
+	private void layoutIncrementally() {
 		Graph2D graph = this.graphView.getGraph2D();
 
 		layouter.setLayoutMode(IncrementalHierarchicLayouter.LAYOUT_MODE_INCREMENTAL);
@@ -952,56 +945,6 @@ public class YFilesDrawingService implements IDrawingService {
 		}
 	}
 
-	// private void deleteSelected() {
-	// Graph2D g = view.getGraph2D();
-	// NodeCursor n = g.selectedNodes();
-	// ArrayList<Node> l = new ArrayList<Node>();
-	// Collection<GraphClass> gCol = new ArrayList<GraphClass>();
-	// for (int i = 0; i < n.size(); ++i) {
-	// String s = n.current().toString();
-	// if (s.contains("<sub>")) {
-	// if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>")).contains(",")) {
-	// s = s.replace("<sub>", "_{");
-	// s = s.replace("</sub>", "}");
-	// } else {
-	// s = s.replace("<sub>", "_");
-	// s = s.replace("</sub>", "");
-	// }
-	// }
-	// gCol.add(DataProvider.getClass(s));
-	// n.next();
-	// }
-	// this.viewManager.del(App.DataProvider.getNodes(gCol, false, false));
-	//
-	// view.updateView();
-	// }
-
-	//
-	// public void addSubClasses() {
-	// Graph2D g = this.graphView.getGraph2D();
-	// NodeCursor n = g.selectedNodes();
-	// ArrayList<Node> l = new ArrayList<Node>();
-	// Collection<GraphClass> gCol = new ArrayList<GraphClass>();
-	// for (int i = 0; i < n.size(); ++i) {
-	// Node neigh = n.node();
-	// String s = n.current().toString();
-	// if (s.contains("<sub>")) {
-	// if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>")).contains(",")) {
-	// s = s.replace("<sub>", "_{");
-	// s = s.replace("</sub>", "}");
-	// } else {
-	// s = s.replace("<sub>", "_");
-	// s = s.replace("</sub>", "");
-	// }
-	// }
-	// gCol.add(DataProvider.getClass(s));
-	// n.next();
-	// }
-	// this.viewManager.add(App.DataProvider.getNodes(gCol, false, true));
-	//
-	// this.graphView.updateView();
-	// }
-	//
 	class OpenFoldersAndLayoutAction extends
 			Graph2DViewActions.OpenFoldersAction {
 

@@ -77,6 +77,7 @@ import y.view.TooltipMode;
 import y.view.ViewMode;
 import y.view.YLabel;
 import y.view.GenericNodeRealizer.Factory;
+import y.view.hierarchy.HierarchyManager;
 import yext.export.io.EPSOutputHandler;
 import yext.svg.io.SVGIOHandler;
 
@@ -115,11 +116,6 @@ public class YFilesDrawingService implements IDrawingService {
 		this.graphView.getCanvasComponent().addMouseWheelListener(
 				wheelZoomListener);
 
-		/* This must be created here (before setting up the graph) so it 
-		 * can be used in the tooltip method (createEditMode).
-		 */
-		nodeLabelMap = new HashMap<String, String>();
-
 		this.graph2D = graphView.getGraph2D();
 		applyRealizerDefaults(this.graph2D, true, true);
 
@@ -135,6 +131,7 @@ public class YFilesDrawingService implements IDrawingService {
 		BridgeCalculator bridgeCalculator = new BridgeCalculator();
 		((DefaultGraph2DRenderer) this.graphView.getGraph2DRenderer())
 				.setBridgeCalculator(bridgeCalculator);
+
 	}
 
 	@Override
@@ -147,9 +144,9 @@ public class YFilesDrawingService implements IDrawingService {
 		D.bug("entering initializeView");
 		graph2D.clear();
 
-		nodeLabelMap.clear();
 		currentNodes = new HashMap<NodeView, Node>();
 		currentEdges = new ArrayList<EdgeView>();
+		nodeLabelMap = new HashMap<String, String>();
 		Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
 
 		for (GraphView view : graphs) {
@@ -173,7 +170,7 @@ public class YFilesDrawingService implements IDrawingService {
 							.getDefaultEdgeRealizer().createCopy();
 					edgeRealizer.setTargetArrow(Arrow.STANDARD);
 					
-					graph2D.createEdge(from, to, edgeRealizer);
+					Edge edge = graph2D.createEdge(from, to, edgeRealizer);
 				}
 			}
 			for (NodeView node : nodes) {
@@ -186,9 +183,7 @@ public class YFilesDrawingService implements IDrawingService {
 					realizer.setFillColor(node.getColor());
 					Node temp = graph2D.createNode(realizer);
 
-					if (!this.nodeLabelMap.containsKey(label)) {
-						this.nodeLabelMap.put(label, fullname);
-					}
+					nodeLabelMap.put(label, fullname);
 					currentNodes.put(node, temp);
 					D.bug("Adding ophaned node");
 				}
@@ -278,12 +273,6 @@ public class YFilesDrawingService implements IDrawingService {
 			for (NodeView node : excessNodes) {
 				this.graph2D.removeNode(this.currentNodes.get(node));
 				this.currentNodes.remove(node);
-				
-				/* Not strictly necessary, but we should tidy up */
-				String label = node.getLabel();
-				if (this.nodeLabelMap.containsKey(label)) {
-					this.nodeLabelMap.remove(label);
-				}
 			}
 			
 			/* Add the nodes that have no edges */
@@ -297,9 +286,7 @@ public class YFilesDrawingService implements IDrawingService {
 					realizer.setFillColor(node.getColor());
 					Node temp = graph2D.createNode(realizer);
 
-					if (!this.nodeLabelMap.containsKey(label)) {
-						this.nodeLabelMap.put(label, fullname);
-					}
+					nodeLabelMap.put(label, fullname);
 					currentNodes.put(node, temp);
 				}
 			}
@@ -494,8 +481,7 @@ public class YFilesDrawingService implements IDrawingService {
 		NodeCursor n = g.selectedNodes();
 		Collection<GraphClass> graphClasses = new ArrayList<GraphClass>();
 		for (int i = 0; i < n.size(); ++i) {
-			String s = this.getNodeName(n.node());
-			
+			String s = n.current().toString();
 			if (s.contains("<sub>")) {
 				if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>"))
 						.contains(",")) {
@@ -519,7 +505,7 @@ public class YFilesDrawingService implements IDrawingService {
 		for (NodeCursor nc = this.graphView.getGraph2D().nodes(); nc.ok(); nc
 				.next()) {
 			Node n = nc.node();
-			String s = this.getNodeName(n);
+			String s = n.toString();
 
 			if (s.contains("<sub>")) {
 				if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>"))
@@ -534,7 +520,7 @@ public class YFilesDrawingService implements IDrawingService {
 			System.out.println(view.getLabel() + " " + s + " "
 					+ view.toString());
 			
-			if (view.getFullName().equals(s)) {
+			if (view.getLabel().equals(s)) {
 				this.graphView.getGraph2D().setSelected(n, true);
 			}
 			this.graphView.repaint();
@@ -607,15 +593,6 @@ public class YFilesDrawingService implements IDrawingService {
 	
 
 
-
-	String getNodeName(Node node) {
-		String s = node.toString();
-		if (this.nodeLabelMap.containsKey(s)) {
-			s = this.nodeLabelMap.get(s);
-		}
-		return s;
-	}
-	
 	private void updateNodeSize() {
 		// Find the maximum width of all used Labels.
 		// Alternative: Skip the first run and set the current labelwidth for
@@ -685,11 +662,9 @@ public class YFilesDrawingService implements IDrawingService {
 		realizer.setLabelText(label);
 		realizer.setFillColor(nodeView.getColor());
 		Node node = graph2D.createNode(realizer);
+		nodeLabelMap.put(label, fullname);
 		
 		/* Keep the collections up to date */
-		if (!this.nodeLabelMap.containsKey(label)) {
-			this.nodeLabelMap.put(label, fullname);
-		}		
 		currentNodes.put(nodeView, node);
 		return node;
 	}
@@ -835,10 +810,10 @@ public class YFilesDrawingService implements IDrawingService {
 
 		this.graphView.addViewMode(new AutoDragViewMode());
 
-//		TooltipMode tooltipMode = createTooltipMode();
-//		if (tooltipMode != null) {
-//			this.graphView.addViewMode(tooltipMode);
-//		}
+		TooltipMode tooltipMode = createTooltipMode();
+		if (tooltipMode != null) {
+			this.graphView.addViewMode(tooltipMode);
+		}
 
 		// view.addViewMode(new AutoDragViewMode());
 		/*
@@ -870,14 +845,7 @@ public class YFilesDrawingService implements IDrawingService {
 	}
 
 	private EditMode createEditMode() {
-		
-		final YFilesDrawingService drawingService = this;
-		EditMode editMode = new EditMode(){
-		      /* Overwrite getNodeTip with the classes full name */
-		      public String getNodeTip(Node v) {
-		        return drawingService.getNodeName(v);
-		      }
-		    };
+		EditMode editMode = new EditMode();
 		// show the highlighting which is turned off by default
 		if (editMode.getCreateEdgeMode() instanceof CreateEdgeMode) {
 			((CreateEdgeMode) editMode.getCreateEdgeMode())
@@ -887,9 +855,6 @@ public class YFilesDrawingService implements IDrawingService {
 			((MovePortMode) editMode.getMovePortMode())
 					.setIndicatingTargetNode(true);
 		}
-		
-		//enable node tooltips
-	    editMode.showNodeTips(true);
 
 		// allow moving view port with right drag gesture
 		editMode.allowMovingWithPopup(true);
@@ -959,7 +924,6 @@ public class YFilesDrawingService implements IDrawingService {
 	private TooltipMode createTooltipMode() {
 		TooltipMode tooltipMode = new TooltipMode();
 		tooltipMode.setEdgeTipEnabled(true);
-		tooltipMode.setNodeTipEnabled(true);
 
 		return tooltipMode;
 	}

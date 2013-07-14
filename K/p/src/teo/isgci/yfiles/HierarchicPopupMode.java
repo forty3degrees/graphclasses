@@ -63,7 +63,7 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
       }
     
     private void addEdgeActions(JPopupMenu pm, EdgeCursor sec) {
-        pm.add(new EdgeAction("Information", sec, this.parent));
+        pm.add(new EdgeAction("Information", sec, this.parent, this.drawingService));
     }
 
   	protected void populatePopup(JPopupMenu pm, final double x, final double y, Node node, boolean selected, final Node n) {
@@ -137,7 +137,7 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
 
         Object source = event.getSource();
         if (source == infoItem) {
-        	String sub = getGraph2D().selectedNodes().node().toString();
+        	String sub = drawingService.getNodeName(getGraph2D().selectedNodes().node());
         	JDialog d;
         	if (sub.length() >= 0) {
         		//ToDo: Catch unknown Sequences (\cap ... )

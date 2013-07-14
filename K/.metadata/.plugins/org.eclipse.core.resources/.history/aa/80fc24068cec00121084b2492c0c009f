@@ -19,14 +19,12 @@ public class EdgeAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 	
 	private EdgeCursor ec;
-    private ISGCIMainFrame parent;
-    private YFilesDrawingService drawingService;
+    private ISGCIMainFrame m_parent;
 
-    public EdgeAction(String name, EdgeCursor edges, ISGCIMainFrame parent, YFilesDrawingService drawingService) {
+    public EdgeAction(String name, EdgeCursor edges, ISGCIMainFrame parent) {
       super(name);
       this.ec = edges;
-      this.parent = parent;
-      this.drawingService = drawingService;
+      this.m_parent = parent;
     }
 
     public void actionPerformed(ActionEvent a) {
@@ -36,9 +34,9 @@ public class EdgeAction extends AbstractAction {
 	      Edge e = ec.edge();
 		  Node s = e.source();
 		  Node t = e.target();
-
-		  String source = drawingService.getNodeName(s);
-		  String target = drawingService.getNodeName(t);
+		  
+		  String source = s.toString();
+		  String target = t.toString();
 		  
 		  source = source.replace("<html>", "");
 		  source = source.replace("</html>", "");
@@ -65,7 +63,7 @@ public class EdgeAction extends AbstractAction {
 			  }
 		  }
 	        
-		  JDialog d = InclusionResultDialog.newInstance(parent,
+		  JDialog d = InclusionResultDialog.newInstance(m_parent,
 	        		App.DataProvider.getClass(source),
 	        		App.DataProvider.getClass(target));
 		  d.setLocation(50, 50);

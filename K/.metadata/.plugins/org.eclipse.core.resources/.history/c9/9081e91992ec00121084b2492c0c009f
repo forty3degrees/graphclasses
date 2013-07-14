@@ -871,11 +871,16 @@ public class YFilesDrawingService implements IDrawingService {
 
 	private EditMode createEditMode() {
 		
-		final YFilesDrawingService drawingService = this;
+		final Map<String, String> nameMap = this.nodeLabelMap;
 		EditMode editMode = new EditMode(){
 		      /* Overwrite getNodeTip with the classes full name */
 		      public String getNodeTip(Node v) {
-		        return drawingService.getNodeName(v);
+		        String s = v.toString();
+				D.bug("NameMap count: " + nameMap.size());
+		        if (nameMap.containsKey(s)) {
+		        	s = nameMap.get(s);
+		        }
+		        return  s;
 		      }
 		    };
 		// show the highlighting which is turned off by default

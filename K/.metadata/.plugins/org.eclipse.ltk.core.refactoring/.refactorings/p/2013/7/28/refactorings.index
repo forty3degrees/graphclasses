@@ -32,3 +32,4 @@
 1373744082960	Extract method 'doLayout'
 1373744427976	Extract method 'updateNodeSize'
 1373744673890	Extract method 'doLayout'
+1373809648374	Rename field 'm_parent'

@@ -36,9 +36,9 @@ public class EdgeAction extends AbstractAction {
 	      Edge e = ec.edge();
 		  Node s = e.source();
 		  Node t = e.target();
-
-		  String source = drawingService.getNodeName(s);
-		  String target = drawingService.getNodeName(t);
+		  
+		  String source = s.toString();
+		  String target = t.toString();
 		  
 		  source = source.replace("<html>", "");
 		  source = source.replace("</html>", "");
