@@ -174,7 +174,7 @@ public class ISGCIReader extends DefaultHandler{
         
         //---- GraphClass ----
         if (Tags.GRAPHCLASS.equals(qName)) {
-            curClass = new GraphClassWrapper(atts.getValue(Tags.ID),
+            curClass = new GraphClassWrapper(atts.getValue(Tags.ID).replace("$\\cap$", "\u2229"),
                     atts.getValue(Tags.TYPE));
         } else if (Tags.HERED.equals(qName)) {
             curClass.hered = atts.getValue(Tags.TYPE);

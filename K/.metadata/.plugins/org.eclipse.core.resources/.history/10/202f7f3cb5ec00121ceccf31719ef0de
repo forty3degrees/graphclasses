@@ -1,0 +1,301 @@
+package teo.isgci.data;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.Vector;
+
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import teo.isgci.core.IDataProvider;
+import teo.isgci.data.db.AbstractRelation;
+import teo.isgci.data.gc.GraphClass;
+import teo.isgci.data.grapht.BFSWalker;
+import teo.isgci.data.grapht.GraphWalker;
+import teo.isgci.data.grapht.Inclusion;
+import teo.isgci.data.grapht.RevBFSWalker;
+import teo.isgci.data.problem.Complexity;
+import teo.isgci.data.problem.Problem;
+
+public abstract class DataProvider implements IDataProvider {
+
+	protected boolean initialized;
+    
+    protected String date;
+	protected int nodeCount;
+	protected int edgeCount;
+	
+
+    /** The inclusion graph */
+	protected SimpleDirectedGraph<GraphClass,Inclusion> inclGraph;
+    /** Maps classnames to nodes */
+    protected TreeMap<String,GraphClass> names;
+    /** Maps graphclasses to their SCCs */
+    protected Map<GraphClass, Set<GraphClass> > sccs;
+
+    /** Problems */
+    public Vector<Problem> problems;
+
+    /** Relations not in inclGraph */
+    public List<AbstractRelation> relations;
+    
+	/**
+	 * Loads the data from the specified file into memory.
+	 * 
+	 * @param	data	The data required by the derived class to load the 
+	 * 					application data (file path, connection string etc.)
+	 */
+	@Override
+	public abstract void loadData(String data) throws Exception;
+
+	@Override
+	public AbstractRelation findRelation(GraphClass x, GraphClass y) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<AbstractRelation> getRelations() {
+		return Collections.unmodifiableCollection(this.relations);
+	}
+	
+    /**
+     * Returns the nodes of the available graphclasses ordered alphabetically.
+     */
+	@Override
+	public Collection<GraphClass> getGraphClasses() {
+		GraphClass[] c = new GraphClass[](names.values());
+		for (int i = 0; i < names.values().size()) {
+			System.out.println()
+		}
+		return Collections.unmodifiableCollection(this.names.values());
+	}
+
+    /**
+     * Return the node in inclGraph belonging to the given classname.
+     */
+	@Override
+    public GraphClass getClass(String name) {
+        return this.names.get(name);
+    }
+
+    /**
+     * Return the node in inclGraph belonging to the given classname.
+     */
+	@Override
+    public SimpleDirectedGraph<GraphClass,Inclusion> getInclusionGraph() {
+        return this.inclGraph;
+    }
+
+    /**
+     * Return the set of classes equivalent to the given one.
+     */
+	@Override
+    public Set<GraphClass> getEquivalentClasses(GraphClass graph) {
+        return this.sccs.get(graph);
+    }
+    
+	@Override
+	public Problem[] getProblems() {
+		
+		/* Return a copy */
+		Problem[] temp = new Problem[this.problems.size()];
+		return this.problems.toArray(temp);
+	}
+
+	@Override
+	public Problem getProblem(String name) {
+		for (int i = 0; i < problems.size(); i++)
+            if (name.equals( ((Problem) problems.elementAt(i)).getName() )) {
+                return (Problem) problems.elementAt(i);
+            }
+        return null;
+	}
+	
+	@Override
+	public Collection<GraphClass> getSubClasses(GraphClass graph, final Boolean recursive) {
+
+		final HashSet<GraphClass> result = new HashSet<GraphClass>();
+		
+		result.add(graph);
+		new BFSWalker<GraphClass,Inclusion>( this.inclGraph,
+                graph, null, GraphWalker.InitCode.DYNAMIC) {
+            public void visit(GraphClass v) {
+                result.add(v);
+                if (recursive)
+                {
+                	super.visit(v);
+                }
+            }
+        }.run();
+        
+        return result;
+	}
+
+	@Override
+	public Collection<GraphClass> getSuperClasses(GraphClass graph, final Boolean recursive) {
+
+		final HashSet<GraphClass> result = new HashSet<GraphClass>();
+		
+		result.add(graph);
+		new RevBFSWalker<GraphClass,Inclusion>( this.inclGraph,
+                graph, null, GraphWalker.InitCode.DYNAMIC) {
+            public void visit(GraphClass v) {
+                result.add(v);
+                if (recursive)
+                {
+                	super.visit(v);
+                }
+            }
+        }.run();
+        
+        return result;
+	}
+
+	@Override
+	public Map<Problem, Complexity> getComplexityMap(GraphClass graph) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<GraphClass, Complexity> getComplexityMap(Problem problem) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+    public String getDate() {
+        return date;
+    }        
+
+	@Override
+    public int getNodeCount() {
+        return nodeCount;
+    }    
+
+	@Override
+    public int getEdgeCount() {
+        return edgeCount;
+    }    
+    
+    /**
+     * Returns a Collection with the selected classes an there super/sub classes if specified
+     */
+	@Override
+    public Collection<GraphClass> getNodes(Collection<GraphClass> graphs, 
+    		boolean doSuper, boolean doSub) {
+        final HashSet<GraphClass> result = new HashSet<GraphClass>();
+       
+        for (GraphClass graph : graphs) {
+            result.add(graph);
+            if (doSuper) {
+                result.addAll(this.getSuperClasses(graph, true));
+            }
+            if (doSub) {
+                result.addAll(this.getSubClasses(graph, true));
+            }
+        }
+
+        return result;
+    }  
+
+    /**
+     * Returns a vector with the environment of the node with the given name.
+     * The environment depends on the complexity of the given node.
+     */
+	@Override
+    public Collection<GraphClass> getNodes(GraphClass graph, Problem problem) {
+        Complexity c = problem.getComplexity(graph);
+        Collection<GraphClass> result = null;
+        if (c.isUnknown())
+            result = getNodesOpen(graph, problem);
+        else if (c.betterOrEqual(Complexity.P))
+            result = getNodesP(graph, problem);
+        else if (c.likelyNotP())
+            result = getNodesNP(graph, problem);
+        else
+            throw new RuntimeException("Bad node");
+        return result;
+    }
+    
+    /**
+     * Return a collection with the environment of the given node.
+     * The environment is found by walking over open super/subclasses until the
+     * first non-open node is reached.
+     */
+    private Collection<GraphClass> getNodesOpen(GraphClass node,
+            final Problem problem) {
+        /*final ArrayList<GraphClass> result = new ArrayList<GraphClass>();
+        new UBFSWalker<GraphClass,Inclusion>(
+                DataSet.inclGraph, node, null, GraphWalker.InitCode.DYNAMIC) {
+            public void visit(GraphClass v) {
+                result.add(v);
+                Complexity c = problem.getComplexity(v);
+                if (c.isUnknown())
+                    super.visit(v);
+                else
+                    finish(v);
+            }
+        }.run();*/
+
+        ArrayList<GraphClass> result = new ArrayList<GraphClass>();
+        result.addAll(getNodesNP(node, problem));
+        result.addAll(getNodesP(node, problem));
+
+        return result;
+    }
+
+
+    /**
+     * Return a collection with the environment of the given node.
+     * The environment is found by walking over open subclasses until the
+     * first polynomial node is reached.
+     */
+    private Collection<GraphClass> getNodesNP(GraphClass node,
+            final Problem problem) {
+        final ArrayList<GraphClass> result = new ArrayList<GraphClass>();
+        new BFSWalker<GraphClass,Inclusion>(
+                this.inclGraph, node, null, GraphWalker.InitCode.DYNAMIC) {
+            public void visit(GraphClass v) {
+                result.add(v);
+                if (problem.getComplexity(v).betterOrEqual(Complexity.P))
+                    finish(v);
+                else
+                    super.visit(v);
+            }
+        }.run();
+
+        return result;
+    }
+
+
+    /**
+     * Fills in a vector with the environment of the given node.
+     * The environment is found by walking over open superclasses until the
+     * first non-polynomial node is reached.
+     */
+    private Collection<GraphClass> getNodesP(GraphClass node,
+            final Problem problem) {
+        final ArrayList<GraphClass> result = new ArrayList<GraphClass>();
+        new RevBFSWalker<GraphClass,Inclusion>(
+                this.inclGraph, node, null, GraphWalker.InitCode.DYNAMIC) {
+            public void visit(GraphClass v) {
+                result.add(v);
+                Complexity c = problem.getComplexity(v);
+                if (c.likelyNotP())
+                    finish(v);
+                else
+                    super.visit(v);
+            }
+        }.run();
+
+        return result;
+    }
+
+}

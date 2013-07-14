@@ -26,8 +26,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import teo.isgci.data.db.AbstractRelation;
 import teo.isgci.data.db.Disjointness;
 import teo.isgci.data.db.Incomparability;
-import teo.isgci.data.db.Note;
-import teo.isgci.data.db.Ref;
 import teo.isgci.data.gc.BaseClass;
 import teo.isgci.data.gc.CliqueClass;
 import teo.isgci.data.gc.ComplementClass;
@@ -325,7 +323,8 @@ public class ISGCIReader extends DefaultHandler{
             if (!curClass.generate())
                 todo.add(curClass);
         } else if (Tags.NAME.equals(qName)) {
-            curClass.name = new String(chunks.toString());
+        	String fName = new String(chunks.toString());
+            curClass.name = fName.replaceAll("$\\cap$", "A");
         } else if (Tags.SMALLGRAPH.equals(qName) || Tags.GCREF.equals(qName)) {
             if (Tags.INTER.equals(curClass.type) ||
                     Tags.FORBID.equals(curClass.type) ||

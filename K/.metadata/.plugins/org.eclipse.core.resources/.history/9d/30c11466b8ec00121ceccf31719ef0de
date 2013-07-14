@@ -55,7 +55,7 @@ public class UnionClass extends SetClass {
      * its base-classes with " \cup " (TeX-symbol for a union).
      */
     public void setName() {
-        buildName(" \u222A ");
+        buildName(" $\\cup$ ");
     }
 
         

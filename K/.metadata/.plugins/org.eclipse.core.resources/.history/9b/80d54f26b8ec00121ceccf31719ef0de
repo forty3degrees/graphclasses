@@ -1,7 +1,7 @@
 /*
- * A GraphClass defined by union of two or more other GraphClasses.
+ * A GraphClass defined by intersection of two or more other GraphClasses.
  *
- * $Header: /home/ux/CVSROOT/teo/teo/isgci/gc/UnionClass.java,v 1.14 2011/05/29 16:50:54 ux Exp $
+ * $Header: /home/ux/CVSROOT/teo/teo/isgci/gc/IntersectClass.java,v 1.14 2011/05/29 16:50:54 ux Exp $
  *
  * This file is part of the Information System on Graph Classes and their
  * Inclusions (ISGCI) at http://www.graphclasses.org.
@@ -17,15 +17,19 @@ import java.util.Set;
 import java.util.HashSet;
 
 /**
- * A GraphClass defined by union of two or more other GraphClasses.
+ * A GraphClass defined by intersection of two or more other GraphClasses.
  */
-public class UnionClass extends SetClass {
+public class IntersectClass extends SetClass {
 
     /**
      * Creates a new graph class based on the GraphClasses in the
-     * given set (doesn't need to be mathematical set).
+     * given set (doesn't need to be mathematical set).<br>
+     * Note that this constructor may result in a class different to one
+     * that was created with gc1.intersect(gc2). This constructor will
+     * always create an IntersectClass while the result of intersect()
+     * depends on the type of the classes to be intersected.
      */
-    public UnionClass(Collection<GraphClass> set){
+    public IntersectClass(Collection<GraphClass> set) {
         super();
         if (set == null  ||  set.size() < 2)
             throw new IllegalArgumentException("missing GraphClasses" + set);
@@ -37,14 +41,15 @@ public class UnionClass extends SetClass {
             /* avoid classes like (a+b)+c
              * instead make a      a+b+c
              */
-            if (gc instanceof UnionClass) {
-                gcSet.addAll(((UnionClass)gc).getSet());
-            } else {
+            if (gc instanceof IntersectClass)
+                gcSet.addAll(((IntersectClass)gc).getSet());
+            else
                 gcSet.add(gc);
-            }
+            
             if (gc.getHereditariness().compareTo(hered) < 0)
                 hered = gc.getHereditariness();
         }
+
         setSet(gcSet);
         hereditariness = hered;
     }
@@ -52,36 +57,38 @@ public class UnionClass extends SetClass {
     
     /**
      * Constructs the name of this graphclass by connecting the names of
-     * its base-classes with " \cup " (TeX-symbol for a union).
+     * its base-classes with " \cap " (TeX-symbol for a union).
      */
     public void setName() {
-        buildName(" \u222A ");
+        buildName(" $\\cap$ ");
     }
-
         
-    public boolean subClassOf(GraphClass gc){
+
+    public boolean subClassOf(GraphClass gc) {
         if (super.subClassOf(gc))
             return true;
-        if (gc instanceof UnionClass) {
-            // A+B+C -> A+B (includes gc==this)
-            return ((UnionClass)gc).getSet().containsAll(getSet());
+        if (gc instanceof IntersectClass) {
+            // A*B -> A*B*C
+            return getSet().containsAll( ((IntersectClass)gc).getSet() );
+        } else {
+            // A -> A*B
+            return getSet().contains(gc);
         }
-        return false;
     }
-    
-    
-    public GraphClass unite(GraphClass gc) {
+   
+
+    public GraphClass intersect(GraphClass gc) {
         ArrayList<GraphClass> set = new ArrayList<GraphClass>(getSet());
         // result may be equal to this, e.g. if gc already elem in gcSet
-        if (gc instanceof UnionClass) {
-            set.addAll(((UnionClass)gc).getSet());
+        if (gc instanceof IntersectClass) {
+            set.addAll(((IntersectClass)gc).getSet());
         } else {
             set.add(gc);
         }
-        return new UnionClass(set);
+        return new IntersectClass(set);
     }
 
-
+    
     /**
      * Create a complement of this by complementing the member classes.
      */
@@ -89,7 +96,7 @@ public class UnionClass extends SetClass {
         ArrayList<GraphClass> set = new ArrayList<GraphClass>();
         for (GraphClass gc : getSet())
             set.add(gc.complement());
-        return new UnionClass(set);
+        return new IntersectClass(set);
     }
     
 }

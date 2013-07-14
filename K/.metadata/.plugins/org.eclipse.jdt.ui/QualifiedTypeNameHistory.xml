@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="teo.isgci.problem.Complexity"/>
 <fullyQualifiedTypeName name="teo.isgci.grapht.BFSWalker"/>
 <fullyQualifiedTypeName name="teo.isgci.xml.ISGCIReader"/>
 <fullyQualifiedTypeName name="teo.isgci.xml.XMLParser"/>
@@ -60,4 +59,5 @@
 <fullyQualifiedTypeName name="teo.isgci.core.ViewManager"/>
 <fullyQualifiedTypeName name="y.view.hierarchy.HierarchyManager"/>
 <fullyQualifiedTypeName name="teo.isgci.yfiles.YFilesDrawingService"/>
+<fullyQualifiedTypeName name="teo.isgci.data.db.Ref"/>
 </qualifiedTypeNameHistroy>

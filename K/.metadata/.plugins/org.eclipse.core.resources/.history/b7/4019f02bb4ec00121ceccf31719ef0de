@@ -11,37 +11,21 @@
 
 package teo.isgci.data.xml;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 import org.jgrapht.DirectedGraph;
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
-import teo.isgci.data.db.AbstractRelation;
-import teo.isgci.data.db.Disjointness;
-import teo.isgci.data.db.Incomparability;
-import teo.isgci.data.db.Note;
-import teo.isgci.data.db.Ref;
-import teo.isgci.data.gc.BaseClass;
-import teo.isgci.data.gc.CliqueClass;
-import teo.isgci.data.gc.ComplementClass;
-import teo.isgci.data.gc.ConnectedHereditaryClass;
-import teo.isgci.data.gc.ForbiddenClass;
-import teo.isgci.data.gc.GraphClass;
-import teo.isgci.data.gc.InducedHereditaryClass;
-import teo.isgci.data.gc.IntersectClass;
-import teo.isgci.data.gc.IsometricHereditaryClass;
-import teo.isgci.data.gc.ProbeClass;
-import teo.isgci.data.gc.UnionClass;
-import teo.isgci.data.grapht.Inclusion;
-import teo.isgci.data.problem.Complexity;
-import teo.isgci.data.problem.Problem;
+import java.util.*;
+import java.io.StringWriter;
+import java.io.PrintWriter;
+
+import teo.isgci.data.db.*;
+import teo.isgci.data.gc.*;
+import teo.isgci.data.grapht.*;
+import teo.isgci.data.problem.*;
 
 public class ISGCIReader extends DefaultHandler{
     

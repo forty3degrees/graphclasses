@@ -325,7 +325,8 @@ public class ISGCIReader extends DefaultHandler{
             if (!curClass.generate())
                 todo.add(curClass);
         } else if (Tags.NAME.equals(qName)) {
-            curClass.name = new String(chunks.toString());
+        	String fName = new String(chunks.toString());
+            curClass.name = fName.replaceAll("$\\cap$", "A");
         } else if (Tags.SMALLGRAPH.equals(qName) || Tags.GCREF.equals(qName)) {
             if (Tags.INTER.equals(curClass.type) ||
                     Tags.FORBID.equals(curClass.type) ||
