@@ -162,21 +162,20 @@ public class ViewManager {
 					}
 					
 					if (!contained) {
-						done.add(gc);
+						done.addAll(Algo.equNodes(gc));
 						newNodes.add(gc);
-						System.out.println(gc.toString() + " drin.");
-					} else {
-						System.out.println(gc.toString() + " deleted.");
 					}
 				}
 			}
 		}   
 		
 		graphs.clear();
-		//nodes.removeAll(newNodes);
 		
 		if (newNodes.isEmpty()) {
-			//return;
+			for (IDrawingService ds : drawingServices) {
+	            ds.clearView();
+	        }
+			return;
 		}
 		
 	    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
@@ -185,14 +184,12 @@ public class ViewManager {
 	    List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
 	            GAlg.split(graph, DefaultEdge.class);
 	    
+	    System.out.println(list.size());
+	    
 	    try {
 	    	
-	    	for (SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> g : list) {        		
-	    		addGraph(g);
-	        }
+	    	addGraph(graph);
 	    	
-	    	
-	        
 	    } catch (Error e) {
 	
 	        if (e instanceof OutOfMemoryError || e instanceof StackOverflowError) {

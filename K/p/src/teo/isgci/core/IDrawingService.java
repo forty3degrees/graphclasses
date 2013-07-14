@@ -18,6 +18,7 @@ public interface IDrawingService {
 	void updateColors();
 	void refreshView();
 	void doLayout();
+	void clearView();
 
 	void loadGraphML(String gmlString);
 	void loadGraphML(URL resource);

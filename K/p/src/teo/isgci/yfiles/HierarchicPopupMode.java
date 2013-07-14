@@ -90,11 +90,11 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
             infoItem.addActionListener(this);
             
         	namingMenu = new JMenu("Change Name");
-        	GraphClass gClass = App.DataProvider.getClass(n.toString());
+        	GraphClass gClass = App.DataProvider.getClass(drawingService.getNodeName(n));
+        	System.out.println(gClass.toString());
         	Iterator<GraphClass> classes = Algo.equNodes(gClass).iterator();
 
         	while (classes.hasNext()) {
-        		System.out.println("drin2");
         		final GraphClass c = classes.next();
         		System.out.println(c);
         		JMenuItem item = new JMenuItem(c.toString());
