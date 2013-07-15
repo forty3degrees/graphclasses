@@ -309,10 +309,17 @@ public class YFilesDrawingService implements IDrawingService {
 						this.nodeLabelMap.put(label, fullname);
 					}
 					currentNodes.put(node, temp);
+				} else {
+					String label = node.getLabel();
+					String fullname = node.getFullName();
+					realizer = graph2D.getRealizer(currentNodes.get(node));
+					realizer.setLabelText(node.getLabel());
+					realizer.setFillColor(node.getColor());
+					if (!this.nodeLabelMap.containsKey(label)) {
+						this.nodeLabelMap.put(label, fullname);
+					}
 				}
 			}
-			
-			System.out.println(nodeLabelMap.size() + " Mapsize");
 		}
 		this.refreshView();
 	}
@@ -612,16 +619,6 @@ public class YFilesDrawingService implements IDrawingService {
 	public URL getCurrentFile() {
 		return this.graph2D.getURL();
 	}
-	
-
-
-	
-	
-	
-	
-	
-	
-
 
 
 	String getNodeName(Node node) {
@@ -637,16 +634,20 @@ public class YFilesDrawingService implements IDrawingService {
 		// Alternative: Skip the first run and set the current labelwidth for
 		// all node = different nodeswidths
 		double maxlen = 0;
+		boolean bigger = false;
 		for (NodeCursor nc = graph2D.nodes(); nc.ok(); nc.next()) {
 			Node n = nc.node();
 			ShapeNodeRealizer nr = (ShapeNodeRealizer) graph2D.getRealizer(n);
 			nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
+			System.out.println(nr.getLabel().getFontSize());
+			if (nr.getLabel().getFontSize() > 5) {
+				bigger = true;
+			}
 			nr.getLabel().setFontSize(5);
 			configureNodeLabel(nr.getLabel(),
 					SmartNodeLabelModel.POSITION_CENTER);
 
 			double len = nr.getLabel().getContentWidth();
-
 			if (len > maxlen) {
 				maxlen = len;
 			}
@@ -659,7 +660,11 @@ public class YFilesDrawingService implements IDrawingService {
 			ShapeNodeRealizer nr = (ShapeNodeRealizer) graph2D.getRealizer(n);
 			nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
 
-			nr.setSize(Math.max(maxlen / 2, 30), 20);
+			if (bigger) {
+				nr.setSize(Math.max(maxlen *5 / 12, 30), 20);
+			} else {
+				nr.setSize(Math.max(maxlen, 30), 20);
+			}
 
 			nr.repaint();
 		}

@@ -181,8 +181,11 @@ public class YFilesDrawingService implements IDrawingService {
 					String label = node.getLabel();
 					String fullname = node.getFullName();
 					
+					String labelUnicode = label.replace("$\\cap$", "\u2229"+"A"+"\u2080");
+					labelUnicode = labelUnicode.replace("$\\cup$", "\u222A"+"A"+"\2080");
+					
 					realizer = graph2D.getDefaultNodeRealizer().createCopy();
-					realizer.setLabelText(label);
+					realizer.setLabelText(labelUnicode);
 					realizer.setFillColor(node.getColor());
 					Node temp = graph2D.createNode(realizer);
 
@@ -285,19 +288,17 @@ public class YFilesDrawingService implements IDrawingService {
 				/* Not strictly necessary, but we should tidy up */
 				String label = node.getLabel();
 				if (this.nodeLabelMap.containsKey(label)) {
-					this.nodeLabelMap.remove(label);
+					//this.nodeLabelMap.remove(label);
 				}
 			}
 			
 			/* Add the nodes that have no edges */
+			System.out.println(nodes.size() + " NODES");
 			for (NodeView node : nodes) {
 				if (!currentNodes.containsKey(node)) {
 					String label = node.getLabel();
 					String fullname = node.getFullName();
-					
-					if (!label.equals(fullname)) {
-						System.out.println(label + "  " + fullname);
-					}
+					System.out.println(label + "  " + fullname);
 					
 					realizer = graph2D.getDefaultNodeRealizer().createCopy();
 					realizer.setLabelText(node.getLabel());
@@ -310,6 +311,8 @@ public class YFilesDrawingService implements IDrawingService {
 					currentNodes.put(node, temp);
 				}
 			}
+			
+			System.out.println(nodeLabelMap.size() + " Mapsize");
 		}
 		this.refreshView();
 	}
@@ -625,8 +628,6 @@ public class YFilesDrawingService implements IDrawingService {
 		String s = node.toString();
 		if (this.nodeLabelMap.containsKey(s)) {
 			s = this.nodeLabelMap.get(s);
-		} else {
-			System.out.println(s + " nicht drin");
 		}
 		return s;
 	}
@@ -697,6 +698,7 @@ public class YFilesDrawingService implements IDrawingService {
 		String label = nodeView.getLabel();
 		String fullname = nodeView.getFullName();
 		NodeRealizer realizer = graph2D.getDefaultNodeRealizer().createCopy();
+		
 		realizer.setLabelText(label);
 		realizer.setFillColor(nodeView.getColor());
 		Node node = graph2D.createNode(realizer);

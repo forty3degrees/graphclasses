@@ -181,8 +181,11 @@ public class YFilesDrawingService implements IDrawingService {
 					String label = node.getLabel();
 					String fullname = node.getFullName();
 					
+					String labelUnicode = label.replace("$\\cap$", "\u2229"+"A"+"\u2080");
+					labelUnicode = labelUnicode.replace("$\\cup$", "\u222A"+"A"+"\2080");
+					
 					realizer = graph2D.getDefaultNodeRealizer().createCopy();
-					realizer.setLabelText(label);
+					realizer.setLabelText(labelUnicode);
 					realizer.setFillColor(node.getColor());
 					Node temp = graph2D.createNode(realizer);
 
@@ -207,8 +210,8 @@ public class YFilesDrawingService implements IDrawingService {
 		for (GraphView view : graphs) {
 			List<NodeView> nodes = view.getNodes();
 			List<EdgeView> edges = view.getEdges();
-			D.bug("Before: " + nodes.size() + " nodes & " + edges.size()
-					+ " edges");
+			//D.bug("Before: " + nodes.size() + " nodes & " + edges.size()
+			//		+ " edges");
 
 			NodeRealizer realizer = graph2D.getDefaultNodeRealizer().createCopy();
 			
@@ -239,12 +242,12 @@ public class YFilesDrawingService implements IDrawingService {
 				 * a node is removed the associated edges will also
 				 * be removed.
 				 */
-				D.bug("From: " + edge.getFrom().toString());
-				D.bug("To: " + edge.getTo().toString());				
+				//D.bug("From: " + edge.getFrom().toString());
+				//D.bug("To: " + edge.getTo().toString());				
 				Node from = this.currentNodes.get(edge.getFrom());
 				Node to = this.currentNodes.get(edge.getTo());				
-				D.bug("From node found: " + (from != null));
-				D.bug("To node found: " + (to != null));
+				//D.bug("From node found: " + (from != null));
+				//D.bug("To node found: " + (to != null));
 				
 				if ((from != null) && (to != null)) {
 					/* Never runs - see above */
@@ -256,20 +259,16 @@ public class YFilesDrawingService implements IDrawingService {
 			}
 
 			/* Add the new edges */
-			try {
 			for (Node from : nodeMap.keySet()) {
-				D.bug("From " + from);
+				//D.bug("From " + from);
 				List<Node> toNodes = nodeMap.get(from);
 				for (Node to : toNodes) {
-					D.bug("\tTo " + to);
+					//D.bug("\tTo " + to);
 					EdgeRealizer edgeRealizer = graph2D
 							.getDefaultEdgeRealizer().createCopy();
 					edgeRealizer.setTargetArrow(Arrow.STANDARD);
 					graph2D.createEdge(from, to, edgeRealizer);
 				}
-			}
-			} catch (Exception ex) {
-				
 			}
 			
 			/* Remove any excess nodes */
@@ -279,6 +278,9 @@ public class YFilesDrawingService implements IDrawingService {
 					excessNodes.remove(node);
 				}				
 			}
+			
+			System.out.println("excessnodes size " + excessNodes.size());
+			
 			for (NodeView node : excessNodes) {
 				this.graph2D.removeNode(this.currentNodes.get(node));
 				this.currentNodes.remove(node);
@@ -286,15 +288,17 @@ public class YFilesDrawingService implements IDrawingService {
 				/* Not strictly necessary, but we should tidy up */
 				String label = node.getLabel();
 				if (this.nodeLabelMap.containsKey(label)) {
-					this.nodeLabelMap.remove(label);
+					//this.nodeLabelMap.remove(label);
 				}
 			}
 			
 			/* Add the nodes that have no edges */
+			System.out.println(nodes.size() + " NODES");
 			for (NodeView node : nodes) {
 				if (!currentNodes.containsKey(node)) {
 					String label = node.getLabel();
 					String fullname = node.getFullName();
+					System.out.println(label + "  " + fullname);
 					
 					realizer = graph2D.getDefaultNodeRealizer().createCopy();
 					realizer.setLabelText(node.getLabel());
@@ -307,6 +311,8 @@ public class YFilesDrawingService implements IDrawingService {
 					currentNodes.put(node, temp);
 				}
 			}
+			
+			System.out.println(nodeLabelMap.size() + " Mapsize");
 		}
 		this.refreshView();
 	}
@@ -606,16 +612,6 @@ public class YFilesDrawingService implements IDrawingService {
 	public URL getCurrentFile() {
 		return this.graph2D.getURL();
 	}
-	
-
-
-	
-	
-	
-	
-	
-	
-
 
 
 	String getNodeName(Node node) {
@@ -692,6 +688,7 @@ public class YFilesDrawingService implements IDrawingService {
 		String label = nodeView.getLabel();
 		String fullname = nodeView.getFullName();
 		NodeRealizer realizer = graph2D.getDefaultNodeRealizer().createCopy();
+		
 		realizer.setLabelText(label);
 		realizer.setFillColor(nodeView.getColor());
 		Node node = graph2D.createNode(realizer);

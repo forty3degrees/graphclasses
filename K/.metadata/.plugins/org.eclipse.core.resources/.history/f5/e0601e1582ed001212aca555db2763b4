@@ -112,7 +112,6 @@ public class NamingDialog extends JDialog implements ActionListener {
             else if (c == derivedBox.getModel())
                 pref = Algo.NamePref.DERIVED;
             App.getViewManager(parent).setNamingPref(pref);
-            App.getDrawingService(parent).refreshView();
             closeDialog();
         }
     }

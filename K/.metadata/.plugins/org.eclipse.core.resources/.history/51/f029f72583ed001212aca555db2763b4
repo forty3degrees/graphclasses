@@ -181,8 +181,11 @@ public class YFilesDrawingService implements IDrawingService {
 					String label = node.getLabel();
 					String fullname = node.getFullName();
 					
+					String labelUnicode = label.replace("$\\cap$", "\u2229"+"A"+"\u2080");
+					labelUnicode = labelUnicode.replace("$\\cup$", "\u222A"+"A"+"\2080");
+					
 					realizer = graph2D.getDefaultNodeRealizer().createCopy();
-					realizer.setLabelText(label);
+					realizer.setLabelText(labelUnicode);
 					realizer.setFillColor(node.getColor());
 					Node temp = graph2D.createNode(realizer);
 
@@ -275,6 +278,9 @@ public class YFilesDrawingService implements IDrawingService {
 					excessNodes.remove(node);
 				}				
 			}
+			
+			System.out.println("excessnodes size " + excessNodes.size());
+			
 			for (NodeView node : excessNodes) {
 				this.graph2D.removeNode(this.currentNodes.get(node));
 				this.currentNodes.remove(node);
@@ -282,15 +288,17 @@ public class YFilesDrawingService implements IDrawingService {
 				/* Not strictly necessary, but we should tidy up */
 				String label = node.getLabel();
 				if (this.nodeLabelMap.containsKey(label)) {
-					this.nodeLabelMap.remove(label);
+					//this.nodeLabelMap.remove(label);
 				}
 			}
 			
 			/* Add the nodes that have no edges */
+			System.out.println(nodes.size() + " NODES");
 			for (NodeView node : nodes) {
 				if (!currentNodes.containsKey(node)) {
 					String label = node.getLabel();
 					String fullname = node.getFullName();
+					System.out.println(label + "  " + fullname);
 					
 					realizer = graph2D.getDefaultNodeRealizer().createCopy();
 					realizer.setLabelText(node.getLabel());
@@ -303,6 +311,8 @@ public class YFilesDrawingService implements IDrawingService {
 					currentNodes.put(node, temp);
 				}
 			}
+			
+			System.out.println(nodeLabelMap.size() + " Mapsize");
 		}
 		this.refreshView();
 	}
@@ -602,16 +612,6 @@ public class YFilesDrawingService implements IDrawingService {
 	public URL getCurrentFile() {
 		return this.graph2D.getURL();
 	}
-	
-
-
-	
-	
-	
-	
-	
-	
-
 
 
 	String getNodeName(Node node) {
@@ -627,6 +627,7 @@ public class YFilesDrawingService implements IDrawingService {
 		// Alternative: Skip the first run and set the current labelwidth for
 		// all node = different nodeswidths
 		double maxlen = 0;
+		boolean bigger = false;
 		for (NodeCursor nc = graph2D.nodes(); nc.ok(); nc.next()) {
 			Node n = nc.node();
 			ShapeNodeRealizer nr = (ShapeNodeRealizer) graph2D.getRealizer(n);
@@ -636,7 +637,7 @@ public class YFilesDrawingService implements IDrawingService {
 					SmartNodeLabelModel.POSITION_CENTER);
 
 			double len = nr.getLabel().getContentWidth();
-
+			System.out.println(len);
 			if (len > maxlen) {
 				maxlen = len;
 			}
@@ -688,6 +689,7 @@ public class YFilesDrawingService implements IDrawingService {
 		String label = nodeView.getLabel();
 		String fullname = nodeView.getFullName();
 		NodeRealizer realizer = graph2D.getDefaultNodeRealizer().createCopy();
+		
 		realizer.setLabelText(label);
 		realizer.setFillColor(nodeView.getColor());
 		Node node = graph2D.createNode(realizer);

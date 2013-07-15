@@ -181,8 +181,11 @@ public class YFilesDrawingService implements IDrawingService {
 					String label = node.getLabel();
 					String fullname = node.getFullName();
 					
+					String labelUnicode = label.replace("$\\cap$", "\u2229"+"A"+"\u2080");
+					labelUnicode = labelUnicode.replace("$\\cup$", "\u222A"+"A"+"\2080");
+					
 					realizer = graph2D.getDefaultNodeRealizer().createCopy();
-					realizer.setLabelText(label);
+					realizer.setLabelText(labelUnicode);
 					realizer.setFillColor(node.getColor());
 					Node temp = graph2D.createNode(realizer);
 
@@ -626,7 +629,6 @@ public class YFilesDrawingService implements IDrawingService {
 		if (this.nodeLabelMap.containsKey(s)) {
 			s = this.nodeLabelMap.get(s);
 		}
-		s.replace("$\\cap$", "&#8745");
 		return s;
 	}
 	
@@ -696,6 +698,7 @@ public class YFilesDrawingService implements IDrawingService {
 		String label = nodeView.getLabel();
 		String fullname = nodeView.getFullName();
 		NodeRealizer realizer = graph2D.getDefaultNodeRealizer().createCopy();
+		
 		realizer.setLabelText(label);
 		realizer.setFillColor(nodeView.getColor());
 		Node node = graph2D.createNode(realizer);
