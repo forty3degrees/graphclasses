@@ -29,6 +29,7 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
 	    
 	private JMenuItem  addUp;
 	private JMenuItem  addDown;
+	private JMenuItem  delItem;
 	private JMenuItem  infoItem;
 	private JMenuItem  selectItem;
 	private JMenuItem  selectItemUp;
@@ -68,13 +69,13 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
 
   	protected void populatePopup(JPopupMenu pm, final double x, final double y, Node node, boolean selected, final Node n) {
           
-      	parent.add(selectItem = new JMenuItem("Select Neighbors"));
+      	parent.add(selectItem = new JMenuItem("Select Neighbors (H)"));
         selectItem.addActionListener(this);
           
-        parent.add(selectItemUp = new JMenuItem("Select SuperClasses"));
+        parent.add(selectItemUp = new JMenuItem("Select SuperClasses (U)"));
         selectItemUp.addActionListener(this);
           
-        parent.add(selectItemDown = new JMenuItem("Select Subclasses"));
+        parent.add(selectItemDown = new JMenuItem("Select Subclasses (B)"));
         selectItemDown.addActionListener(this);
           
         parent.add(addUp = new JMenuItem("Add Superclasses"));
@@ -82,6 +83,9 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
           
         parent.add(addDown = new JMenuItem("Add Subclasses"));
         addDown.addActionListener(this);
+        
+        parent.add(delItem = new JMenuItem("Delete selected (Del)"));
+        delItem.addActionListener(this);
             
         
         if (n != null) {
@@ -119,6 +123,7 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
           
         pm.add(addUp);
         pm.add(addDown);
+        pm.add(delItem);
          
         pm.addSeparator();
          
@@ -189,6 +194,9 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         	Collection<GraphClass> graphClasses = drawingService.getSelection();
         	graphClasses = App.DataProvider.getNodes(graphClasses, false, true);
         	App.getViewManager(parent).add(graphClasses);
+        } else if (object == delItem) {
+        	Collection<GraphClass> graphClasses = drawingService.getSelection();
+        	App.getViewManager(parent).delete(graphClasses);
         }
     }
 }

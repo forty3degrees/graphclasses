@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workbench progressCount="20" version="2.0">
+<workbench progressCount="17" version="2.0">
 <workbenchAdvisor/>
 <window height="768" maximized="true" width="1326" x="65" y="196">
 <fastViewData fastViewLocation="1024"/>
@@ -54,6 +54,8 @@
 <part id="19"/>
 <part id="20"/>
 <part id="21"/>
+<part id="22"/>
+<part id="23"/>
 </presentation>
 </folder>
 </info>
@@ -64,11 +66,11 @@
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ISGCIMainFrame.java" partName="ISGCIMainFrame.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/view/gui/ISGCIMainFrame.java" title="ISGCIMainFrame.java" tooltip="p/src/teo/isgci/view/gui/ISGCIMainFrame.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/view/gui/ISGCIMainFrame.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6863" selectionTopPixel="3076"/>
+<editorState selectionHorizontalPixel="0" selectionLength="130" selectionOffset="6797" selectionTopPixel="2261"/>
 </editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ISGCIRibbon.java" partName="ISGCIRibbon.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/view/gui/ISGCIRibbon.java" title="ISGCIRibbon.java" tooltip="p/src/teo/isgci/view/gui/ISGCIRibbon.java" workbook="DefaultEditorWorkbook">
+<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ISGCIRibbon.java" partName="ISGCIRibbon.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/view/gui/ISGCIRibbon.java" title="ISGCIRibbon.java" tooltip="p/src/teo/isgci/view/gui/ISGCIRibbon.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/view/gui/ISGCIRibbon.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="7183" selectionTopPixel="2414"/>
+<editorState selectionHorizontalPixel="0" selectionLength="10" selectionOffset="11266" selectionTopPixel="7119"/>
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="DeleteSelection.java" partName="DeleteSelection.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/view/actions/DeleteSelection.java" title="DeleteSelection.java" tooltip="p/src/teo/isgci/view/actions/DeleteSelection.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/view/actions/DeleteSelection.java"/>
@@ -80,11 +82,11 @@
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ViewManager.java" partName="ViewManager.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/core/ViewManager.java" title="ViewManager.java" tooltip="p/src/teo/isgci/core/ViewManager.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/core/ViewManager.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="8378" selectionTopPixel="4607"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3799" selectionTopPixel="1275"/>
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="HierarchicPopupMode.java" partName="HierarchicPopupMode.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/yfiles/HierarchicPopupMode.java" title="HierarchicPopupMode.java" tooltip="p/src/teo/isgci/yfiles/HierarchicPopupMode.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/yfiles/HierarchicPopupMode.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3402" selectionTopPixel="998"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6876" selectionTopPixel="2494"/>
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="UnionClass.java" partName="UnionClass.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/data/gc/UnionClass.java" title="UnionClass.java" tooltip="p/src/teo/isgci/data/gc/UnionClass.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/data/gc/UnionClass.java"/>
@@ -126,9 +128,9 @@
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/core/IDrawingService.java"/>
 <editorState selectionHorizontalPixel="0" selectionLength="10" selectionOffset="365" selectionTopPixel="0"/>
 </editor>
-<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="YFilesDrawingService.java" partName="YFilesDrawingService.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/yfiles/YFilesDrawingService.java" title="YFilesDrawingService.java" tooltip="p/src/teo/isgci/yfiles/YFilesDrawingService.java" workbook="DefaultEditorWorkbook">
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="YFilesDrawingService.java" partName="YFilesDrawingService.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/yfiles/YFilesDrawingService.java" title="YFilesDrawingService.java" tooltip="p/src/teo/isgci/yfiles/YFilesDrawingService.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/yfiles/YFilesDrawingService.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="10389" selectionTopPixel="3570"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="51408" selectionTopPixel="9234"/>
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="NodeView.java" partName="NodeView.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/core/NodeView.java" title="NodeView.java" tooltip="p/src/teo/isgci/core/NodeView.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/core/NodeView.java"/>
@@ -145,6 +147,14 @@
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Algo.java" partName="Algo.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/data/db/Algo.java" title="Algo.java" tooltip="p/src/teo/isgci/data/db/Algo.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/data/db/Algo.java"/>
 <editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="2790"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IDataProvider.java" partName="IDataProvider.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/core/IDataProvider.java" title="IDataProvider.java" tooltip="p/src/teo/isgci/core/IDataProvider.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/core/IDataProvider.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="8" selectionOffset="1235" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="DataProvider.java" partName="DataProvider.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/data/DataProvider.java" title="DataProvider.java" tooltip="p/src/teo/isgci/data/DataProvider.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/data/DataProvider.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="5" selectionOffset="3533" selectionTopPixel="0"/>
 </editor>
 </editors>
 <views>
@@ -188,7 +198,9 @@
 </view>
 <view id="org.eclipse.jdt.ui.PackageExplorer" partName="Package Explorer">
 <viewState group_libraries="1" layout="2" linkWithEditor="0" rootMode="1" workingSetName="Aggregate for window 1367576448189">
-<customFilters userDefinedPatternsEnabled="false">&#x0A;<xmlDefinedFilters>&#x0A;<child filterId="org.eclipse.jdt.ui.PackageExplorer.LibraryFilter" isEnabled="false"/>
+<customFilters userDefinedPatternsEnabled="false">
+<xmlDefinedFilters>
+<child filterId="org.eclipse.jdt.ui.PackageExplorer.LibraryFilter" isEnabled="false"/>
 <child filterId="org.eclipse.jdt.ui.PackageExplorer.LocalTypesFilter" isEnabled="false"/>
 <child filterId="org.eclipse.jdt.ui.PackageExplorer.StaticsFilter" isEnabled="false"/>
 <child filterId="org.eclipse.pde.ui.ExternalPluginLibrariesFilter1" isEnabled="true"/>
@@ -299,7 +311,7 @@
 <layout>
 <mainWindow>
 <info folder="true" part="left">
-<folder activePageID="org.eclipse.jdt.ui.TypeHierarchy" appearance="2" expanded="2">
+<folder activePageID="org.eclipse.jdt.ui.PackageExplorer" appearance="2" expanded="2">
 <page content="org.eclipse.jdt.ui.PackageExplorer" label="Package Explorer"/>
 <page content="org.eclipse.jdt.ui.TypeHierarchy" label="Type Hierarchy"/>
 <page content="org.eclipse.ui.views.ResourceNavigator" label="LabelNotFound"/>
@@ -451,163 +463,166 @@
 <workingSets/>
 <navigationHistory>
 <editors>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/view/gui/ISGCIRibbon.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/view/gui/NamingDialog.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/core/ViewManager.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/data/db/Algo.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/core/IDrawingService.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/yfiles/YFilesDrawingService.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/core/NodeView.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/view/gui/ISGCIRibbon.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/view/gui/ISGCIMainFrame.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/yfiles/HierarchicPopupMode.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/core/IDataProvider.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/data/DataProvider.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/core/ViewManager.java"/>
 </editors>
-<item historyLabel="ViewManager.java" index="2">
-<position info="not_deleted" x="4" y="0"/>
-</item>
-<item historyLabel="ViewManager.java" index="2">
-<position info="not_deleted" x="9985" y="0"/>
-</item>
-<item historyLabel="ViewManager.java" index="2">
-<position info="not_deleted" x="11489" y="13"/>
-</item>
-<item historyLabel="ViewManager.java" index="2">
-<position info="not_deleted" x="11571" y="0"/>
-</item>
-<item historyLabel="ViewManager.java" index="2">
-<position info="not_deleted" x="8394" y="0"/>
-</item>
-<item historyLabel="Algo.java" index="3">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="Algo.java" index="3">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="ISGCIRibbon.java" index="0">
-<position info="not_deleted" x="7182" y="0"/>
-</item>
-<item historyLabel="NamingDialog.java" index="1">
-<position info="not_deleted" x="870" y="12"/>
-</item>
-<item historyLabel="IDrawingService.java" index="4">
-<position info="not_deleted" x="408" y="12"/>
-</item>
-<item historyLabel="IDrawingService.java" index="4">
-<position info="not_deleted" x="431" y="11"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position info="not_deleted" x="10945" y="0"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position info="not_deleted" x="11392" y="0"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position info="not_deleted" x="51022" y="14"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position info="not_deleted" x="6511" y="0"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position info="not_deleted" x="11030" y="11"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position info="not_deleted" x="11395" y="0"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position info="not_deleted" x="51022" y="14"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position info="not_deleted" x="51250" y="0"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position info="not_deleted" x="51552" y="0"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position info="not_deleted" x="52119" y="0"/>
-</item>
-<item historyLabel="ISGCIRibbon.java" index="0">
-<position info="not_deleted" x="7183" y="0"/>
-</item>
-<item historyLabel="NamingDialog.java" index="1">
-<position info="not_deleted" x="4037" y="0"/>
-</item>
-<item historyLabel="ViewManager.java" index="2">
-<position info="not_deleted" x="11489" y="13"/>
-</item>
-<item historyLabel="ViewManager.java" index="2">
-<position info="not_deleted" x="11572" y="0"/>
-</item>
-<item historyLabel="ViewManager.java" index="2">
-<position info="not_deleted" x="8247" y="16"/>
-</item>
-<item historyLabel="ViewManager.java" index="2">
-<position info="not_deleted" x="8453" y="0"/>
-</item>
-<item historyLabel="ViewManager.java" index="2">
-<position info="not_deleted" x="7917" y="7"/>
-</item>
-<item historyLabel="NodeView.java" index="6">
-<position info="not_deleted" x="4" y="0"/>
-</item>
-<item historyLabel="NodeView.java" index="6">
-<position info="not_deleted" x="2540" y="27"/>
-</item>
-<item historyLabel="NodeView.java" index="6">
-<position info="not_deleted" x="2202" y="15"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="5">
-<position info="not_deleted" x="52119" y="0"/>
-</item>
-<item historyLabel="NamingDialog.java" index="1">
-<position info="not_deleted" x="4037" y="0"/>
-</item>
-<item historyLabel="Algo.java" index="3">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="NodeView.java" index="6">
-<position info="not_deleted" x="2202" y="15"/>
-</item>
-<item historyLabel="ViewManager.java" index="2">
-<position info="not_deleted" x="8114" y="0"/>
-</item>
-<item historyLabel="IDrawingService.java" index="4">
+<item historyLabel="IDrawingService.java" index="1">
 <position info="not_deleted" x="365" y="10"/>
 </item>
-<item historyLabel="YFilesDrawingService.java" index="5">
+<item historyLabel="YFilesDrawingService.java" index="2">
 <position info="not_deleted" x="6552" y="11"/>
 </item>
-<item historyLabel="ViewManager.java" index="2">
+<item historyLabel="ViewManager.java" index="0">
 <position info="not_deleted" x="8377" y="0"/>
 </item>
-<item historyLabel="YFilesDrawingService.java" index="5">
+<item historyLabel="YFilesDrawingService.java" index="2">
 <position info="not_deleted" x="6552" y="11"/>
 </item>
-<item historyLabel="YFilesDrawingService.java" index="5">
+<item historyLabel="YFilesDrawingService.java" index="2">
 <position info="not_deleted" x="10647" y="0"/>
 </item>
-<item historyLabel="YFilesDrawingService.java" index="5">
+<item historyLabel="YFilesDrawingService.java" index="2">
 <position info="not_deleted" x="6740" y="0"/>
 </item>
-<item historyLabel="NodeView.java" index="6">
+<item historyLabel="NodeView.java" index="3">
 <position info="not_deleted" x="658" y="8"/>
 </item>
-<item historyLabel="YFilesDrawingService.java" index="5">
+<item historyLabel="YFilesDrawingService.java" index="2">
 <position info="not_deleted" x="6740" y="0"/>
 </item>
-<item historyLabel="NodeView.java" index="6">
+<item historyLabel="NodeView.java" index="3">
 <position info="not_deleted" x="658" y="8"/>
 </item>
-<item historyLabel="ViewManager.java" index="2">
+<item historyLabel="ViewManager.java" index="0">
 <position info="not_deleted" x="8378" y="0"/>
 </item>
-<item historyLabel="NodeView.java" index="6">
+<item historyLabel="NodeView.java" index="3">
 <position info="not_deleted" x="2202" y="15"/>
 </item>
-<item historyLabel="YFilesDrawingService.java" index="5">
+<item historyLabel="YFilesDrawingService.java" index="2">
 <position info="not_deleted" x="6740" y="0"/>
 </item>
-<item active="true" historyLabel="YFilesDrawingService.java" index="5">
+<item historyLabel="YFilesDrawingService.java" index="2">
 <position info="not_deleted" x="10298" y="0"/>
+</item>
+<item historyLabel="ISGCIRibbon.java" index="4">
+<position info="not_deleted" x="4577" y="0"/>
+</item>
+<item historyLabel="YFilesDrawingService.java" index="2">
+<position info="not_deleted" x="9727" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="5">
+<position info="not_deleted" x="4" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="5">
+<position info="not_deleted" x="8575" y="0"/>
+</item>
+<item historyLabel="YFilesDrawingService.java" index="2">
+<position info="not_deleted" x="47326" y="16"/>
+</item>
+<item historyLabel="ISGCIRibbon.java" index="4">
+<position info="not_deleted" x="4577" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="5">
+<position info="not_deleted" x="8575" y="0"/>
+</item>
+<item historyLabel="HierarchicPopupMode.java" index="6">
+<position info="not_deleted" x="6675" y="3"/>
+</item>
+<item historyLabel="YFilesDrawingService.java" index="2">
+<position info="not_deleted" x="47326" y="16"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="5">
+<position info="not_deleted" x="6797" y="130"/>
+</item>
+<item historyLabel="HierarchicPopupMode.java" index="6">
+<position info="not_deleted" x="7110" y="0"/>
+</item>
+<item historyLabel="ISGCIMainFrame.java" index="5">
+<position info="not_deleted" x="6797" y="130"/>
+</item>
+<item historyLabel="HierarchicPopupMode.java" index="6">
+<position info="not_deleted" x="6846" y="0"/>
+</item>
+<item historyLabel="IDataProvider.java" index="7">
+<position info="not_deleted" x="1235" y="8"/>
+</item>
+<item historyLabel="DataProvider.java" index="8">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="IDataProvider.java" index="7">
+<position info="not_deleted" x="1235" y="8"/>
+</item>
+<item historyLabel="DataProvider.java" index="8">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="DataProvider.java" index="8">
+<position info="not_deleted" x="5351" y="0"/>
+</item>
+<item historyLabel="DataProvider.java" index="8">
+<position info="not_deleted" x="3257" y="0"/>
+</item>
+<item historyLabel="HierarchicPopupMode.java" index="6">
+<position info="not_deleted" x="6846" y="0"/>
+</item>
+<item historyLabel="DataProvider.java" index="8">
+<position info="not_deleted" x="5043" y="8"/>
+</item>
+<item historyLabel="HierarchicPopupMode.java" index="6">
+<position info="not_deleted" x="6846" y="0"/>
+</item>
+<item historyLabel="ViewManager.java" index="9">
+<position info="not_deleted" x="4" y="0"/>
+</item>
+<item historyLabel="ViewManager.java" index="9">
+<position info="not_deleted" x="8430" y="0"/>
+</item>
+<item historyLabel="ViewManager.java" index="9">
+<position info="not_deleted" x="2983" y="3"/>
+</item>
+<item historyLabel="HierarchicPopupMode.java" index="6">
+<position info="not_deleted" x="6916" y="0"/>
+</item>
+<item historyLabel="ViewManager.java" index="9">
+<position info="not_deleted" x="2983" y="3"/>
+</item>
+<item historyLabel="HierarchicPopupMode.java" index="6">
+<position info="not_deleted" x="6876" y="0"/>
+</item>
+<item historyLabel="DataProvider.java" index="8">
+<position info="not_deleted" x="5043" y="8"/>
+</item>
+<item historyLabel="DataProvider.java" index="8">
+<position info="not_deleted" x="5461" y="0"/>
+</item>
+<item historyLabel="DataProvider.java" index="8">
+<position info="not_deleted" x="3533" y="5"/>
+</item>
+<item historyLabel="YFilesDrawingService.java" index="2">
+<position info="not_deleted" x="47326" y="16"/>
+</item>
+<item historyLabel="ISGCIRibbon.java" index="4">
+<position info="not_deleted" x="4577" y="0"/>
+</item>
+<item historyLabel="ViewManager.java" index="9">
+<position info="not_deleted" x="2983" y="3"/>
+</item>
+<item historyLabel="ViewManager.java" index="9">
+<position info="not_deleted" x="3799" y="0"/>
+</item>
+<item historyLabel="YFilesDrawingService.java" index="2">
+<position info="not_deleted" x="51408" y="0"/>
+</item>
+<item active="true" historyLabel="ISGCIRibbon.java" index="4">
+<position info="not_deleted" x="4577" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -626,6 +641,12 @@
 </trimLayout>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="DataProvider.java" tooltip="p/src/teo/isgci/data/DataProvider.java">
+<persistable path="/p/src/teo/isgci/data/DataProvider.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IDataProvider.java" tooltip="p/src/teo/isgci/core/IDataProvider.java">
+<persistable path="/p/src/teo/isgci/core/IDataProvider.java"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Algo.java" tooltip="p/src/teo/isgci/data/db/Algo.java">
 <persistable path="/p/src/teo/isgci/data/db/Algo.java"/>
 </file>
@@ -664,12 +685,6 @@
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="InducedHereditaryClass.java" tooltip="p/src/teo/isgci/data/gc/InducedHereditaryClass.java">
 <persistable path="/p/src/teo/isgci/data/gc/InducedHereditaryClass.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IntersectClass.java" tooltip="p/src/teo/isgci/data/gc/IntersectClass.java">
-<persistable path="/p/src/teo/isgci/data/gc/IntersectClass.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="SetClass.java" tooltip="p/src/teo/isgci/data/gc/SetClass.java">
-<persistable path="/p/src/teo/isgci/data/gc/SetClass.java"/>
 </file>
 </mruList>
 </workbench>

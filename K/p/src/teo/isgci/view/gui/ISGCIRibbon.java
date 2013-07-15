@@ -118,7 +118,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		result.setCollapsedStateKeyTip("ZD");
 
 		result.startGroup();
-		JCommandButton dbButton = new JCommandButton("Browse Database", getIcon("images/Database.png"));
+		JCommandButton dbButton = new JCommandButton("Browse Classdatabase", getIcon("images/Database.png"));
 		dbButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -131,7 +131,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		});
 		result.addCommandButton(dbButton, RibbonElementPriority.TOP);
 		
-		JCommandButton relationButton = new JCommandButton("Find Relation", getIcon("images/Relation.jpg"));
+		JCommandButton relationButton = new JCommandButton("Find Classrelation", getIcon("images/Relation.jpg"));
 		relationButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -144,7 +144,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		});
 		result.addCommandButton(relationButton, RibbonElementPriority.TOP);
 		
-		JCommandButton drawButton = new JCommandButton("Draw", getIcon("images/Draw.png"));
+		JCommandButton drawButton = new JCommandButton("Draw Graphclasses", getIcon("images/Draw.png"));
 		drawButton.setMaximumSize(new Dimension(48, 48));
 		drawButton.setMinimumSize(new Dimension(48, 48));
 		drawButton.addActionListener(new ActionListener() {
@@ -277,7 +277,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		colBoxU.setSelectedIndex(14);
 		
 		
-		JRibbonComponent colClasses = new JRibbonComponent(null, "Color for Linear		      	", colBoxL);
+		JRibbonComponent colClasses = new JRibbonComponent(null, "Color for Linear		   		   	", colBoxL);
 		colClasses.setKeyTip("AI");
 		colClasses.setEnabled(true);
 		colClasses.setResizingAware(true);

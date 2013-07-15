@@ -111,6 +111,7 @@ public class ViewManager {
     			}
     		}
     	}   
+    	System.out.println(nodes.size());
     	
     	graphs.clear();
     	//nodes.removeAll(newNodes);
@@ -122,14 +123,14 @@ public class ViewManager {
         SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
             Algo.createHierarchySubgraph(nodes);
 
-        List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
-                GAlg.split(graph, DefaultEdge.class);
+        //List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
+        //        GAlg.split(graph, DefaultEdge.class);
         
         try {
         	
-        	for (SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> g : list) {        		
-        		addGraph(g);
-            }
+        	//for (SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> g : list) {        		
+        		addGraph(graph);
+            //}
         	
         	
             
