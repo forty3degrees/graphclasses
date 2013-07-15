@@ -359,6 +359,17 @@ public class ViewManager {
             }
         }
     }
+    
+    public void updateProblem() {
+        if (problem != null) {
+            /* Update the colors */
+            if (!isLoading) {
+    	        for (IDrawingService ds : drawingServices) {
+    	            ds.updateColors();
+    	        }
+            }
+        }
+    }
 
     public Problem getProblem() {
         return problem;

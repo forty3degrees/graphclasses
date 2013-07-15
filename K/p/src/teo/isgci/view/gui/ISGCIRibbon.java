@@ -44,6 +44,7 @@ import teo.isgci.core.App;
 import teo.isgci.core.GraphView;
 import teo.isgci.core.NodeView;
 import teo.isgci.core.ViewManager;
+import teo.isgci.data.problem.Problem;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -655,12 +656,14 @@ private void colorBoxItemStateChanged(final ItemEvent e){
     int selectedIndexU = colBoxU.getSelectedIndex();
         
     ViewManager viewManager = App.getViewManager(parent);	
-    for (GraphView gv : viewManager.getCurrentViews())
-        for (NodeView v : gv.getNodes())
+    for (GraphView gv : viewManager.getCurrentViews()) {
+        for (NodeView v : gv.getNodes()) {
            v.setColoring(colBoxL.COLORS[selectedIndexL], colBoxP.COLORS[selectedIndexP], colBoxI.COLORS[selectedIndexI], colBoxNpc.COLORS[selectedIndexNpc], colBoxU.COLORS[selectedIndexU]);    
-    
+        }
+    }
     viewManager.setComplexityColors();
-    viewManager.refresh();
+    viewManager.updateProblem();
+    
     
 }
 
@@ -675,7 +678,6 @@ public void actionPerformed(ActionEvent event) {
 	}
 	
 	if (cb.equals(probBox)) {
-		System.out.println(App.DataProvider.getProblem(probBox.getSelectedItem().toString()));		
 		App.getViewManager(parent).setProblem(App.DataProvider.getProblem(probBox.getSelectedItem().toString()));
 	}
 	

@@ -1,11 +1,10 @@
-package teo.isgci.gui;
+package teo.isgci.view.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -41,20 +40,32 @@ import org.pushingpixels.flamingo.api.ribbon.RibbonElementPriority;
 import org.pushingpixels.flamingo.api.ribbon.RibbonTask;
 import org.pushingpixels.flamingo.api.ribbon.resize.CoreRibbonResizePolicies;
 
-import teo.graph.view.GraphView;
-import teo.graph.view.NodeView;
-import y.layout.hierarchic.IncrementalHierarchicLayouter;
+import teo.isgci.core.App;
+import teo.isgci.core.GraphView;
+import teo.isgci.core.NodeView;
+import teo.isgci.core.ViewManager;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class ISGCIRibbon extends JRibbon implements ActionListener{
 	
-	private ISGCIMainFrame m_parent;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private ISGCIMainFrame parent;
+	private JComboBox<String> colPackage;
+	private JCheckBox unprop = new JCheckBox();
+	private JComboBox<String> boBox;
+	private JComboBox<String> probBox;
+	private ColorBox colBoxL, colBoxP, colBoxNpc, colBoxI, colBoxU;
+	
 	
 	public ISGCIRibbon(ISGCIMainFrame par) {
 		super();
-		m_parent = par;
+		parent = par;
 		configureRibbon();
 		this.setVisible(true);
 	}
@@ -82,8 +93,8 @@ protected ResizableIcon getIcon(String ressourceString) {
 		graphMLButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				m_parent.viewManager.export();
-		        JDialog export = new ExportDialog(m_parent);
+				App.getViewManager(parent).export();
+		        JDialog export = new ExportDialog(parent);
 		        export.setLocation(50, 50);
 		        export.pack();
 		        export.setVisible(true);
@@ -101,7 +112,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 	
 	protected JRibbonBand getGraphClassesBand() {
 		JRibbonBand result = new JRibbonBand("Graph Classes",
-				new SimpleResizableIcon(RibbonElementPriority.TOP, 200, 48));
+				new SimpleResizableIcon(RibbonElementPriority.TOP, 152, 48));
 		result.setExpandButtonKeyTip("FY");
 		result.setCollapsedStateKeyTip("ZD");
 
@@ -110,7 +121,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		dbButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JDialog info = new GraphClassInformationDialog(m_parent);
+				JDialog info = new GraphClassInformationDialog(parent);
 	            info.setLocation(50, 50);
 	            info.pack();
 	            info.setSize(800, 600);
@@ -123,7 +134,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		relationButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JDialog check = new CheckInclusionDialog(m_parent);
+				JDialog check = new CheckInclusionDialog(parent);
 	            check.setLocation(50, 50);
 	            check.pack();
 	            check.setSize(700, 400);
@@ -133,12 +144,12 @@ protected ResizableIcon getIcon(String ressourceString) {
 		result.addCommandButton(relationButton, RibbonElementPriority.TOP);
 		
 		JCommandButton drawButton = new JCommandButton("Draw", getIcon("images/Draw.png"));
-		Rectangle r = new Rectangle(48, 48);
-		drawButton.setSize(48, 48);
+		drawButton.setMaximumSize(new Dimension(48, 48));
+		drawButton.setMinimumSize(new Dimension(48, 48));
 		drawButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JDialog select = new GraphClassSelectionDialog(m_parent);
+				JDialog select = new GraphClassSelectionDialog(parent);
 	            select.setLocation(50, 50);
 	            select.pack();
 	            select.setSize(500, 400);
@@ -148,11 +159,11 @@ protected ResizableIcon getIcon(String ressourceString) {
 		result.addCommandButton(drawButton, RibbonElementPriority.TOP);
 
 
-		//result.setResizePolicies(CoreRibbonResizePolicies.getCorePoliciesNone(result));
+		result.setResizePolicies(CoreRibbonResizePolicies.getCorePoliciesNone(result));
 
 		return result;
 	}
-	JCheckBox unprop = new JCheckBox();
+	
 	protected JRibbonBand getMarkUnproperBand() {
 		JRibbonBand result = new JRibbonBand("Mark unproper Inclusions",
 				new SimpleResizableIcon(RibbonElementPriority.TOP, 48, 48));
@@ -165,7 +176,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		unprop.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				m_parent.viewManager.setDrawUnproper(
+				App.getViewManager(parent).setDrawUnproper(
 	                    unprop.isSelected());
 			}
 		});
@@ -175,7 +186,6 @@ protected ResizableIcon getIcon(String ressourceString) {
 
 
 
-		//result.setResizePolicies(CoreRibbonResizePolicies.getCorePoliciesPermissive(result));
 		result.setResizePolicies(CoreRibbonResizePolicies.getCorePoliciesNone(result));
 		return result;
 	}
@@ -193,7 +203,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		naming.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JDialog d = new NamingDialog(m_parent);
+				JDialog d = new NamingDialog(parent);
 		        d.setLocation(50,50);
 		        d.pack();
 		        d.setVisible(true);
@@ -208,7 +218,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		search.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JDialog searchDiag = new SearchDialog(m_parent);
+				JDialog searchDiag = new SearchDialog(parent);
 				searchDiag.setLocation(50,50);
 				searchDiag.setVisible(true);
 			}
@@ -219,12 +229,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		preferencesBand.setResizePolicies(CoreRibbonResizePolicies.getCorePoliciesNone(preferencesBand));
 		return preferencesBand;
 	}
-	
-	private JComboBox boBox;
-	private JComboBox probBox;
-	private ColorBox colBoxL, colBoxP, colBoxNpc, colBoxI, colBoxU;
-	
-	
+		
 	protected JRibbonBand getColoringBand() {
 		
 		JRibbonBand coloringBand = new JRibbonBand("Problems",
@@ -310,14 +315,12 @@ protected ResizableIcon getIcon(String ressourceString) {
 		return coloringBand;
 	}
 
-	JComboBox colPackage;
-
 	protected JRibbonBand getColoringPackageBand() {
 	
 		JRibbonBand coloringBand = new JRibbonBand("Coloring Packages",
 				new SimpleResizableIcon(RibbonElementPriority.TOP, 48, 48));
-		colPackage = new JComboBox(
-				new Object[] { "Standard", 
+		colPackage = new JComboBox<String>(
+				new String[] { "Standard", 
 						"Color blind (monochrome)"});
 		colPackage.addActionListener(this);
 		
@@ -336,8 +339,8 @@ protected ResizableIcon getIcon(String ressourceString) {
 		JRibbonBand problemsBand = new JRibbonBand("Problems",
 				new SimpleResizableIcon(RibbonElementPriority.TOP, 48, 48));
 
-		boBox = new JComboBox(
-				new Object[] { "Recognition", 
+		boBox = new JComboBox<String>(
+				new String[] { "Recognition", 
 						"Treewidth", 
 						"Cliquewidth",
 						"Cliquewidth expression",
@@ -364,8 +367,8 @@ protected ResizableIcon getIcon(String ressourceString) {
 		problemsBand.addRibbonComponent(boClasses);
 		
 		
-		probBox = new JComboBox(
-				new Object[] { "None", 
+		probBox = new JComboBox<String>(
+				new String[] { "None", 
 						"Recognition", 
 						"Treewidth",
 						"Cliquewidth",
@@ -409,7 +412,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		smallGraph.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				m_parent.loader.showDocument("smallgraphs.html");
+				parent.loader.showDocument("smallgraphs.html");
 			}
 		});
 		helpBand.addCommandButton(smallGraph,
@@ -420,7 +423,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		help.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				m_parent.loader.showDocument("help.html");
+				parent.loader.showDocument("help.html");
 			}
 		});
 		helpBand.addCommandButton(help,
@@ -431,7 +434,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		about.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JDialog select = new AboutDialog(m_parent);
+				JDialog select = new AboutDialog(parent);
 	            select.setLocation(50, 50);
 	            select.setVisible(true);
 			}
@@ -449,64 +452,20 @@ protected ResizableIcon getIcon(String ressourceString) {
 				.getCorePoliciesRestrictive(layoutBand));
 
 		layoutBand.startGroup();
-		JCommandButton layGraph = new JCommandButton("Layout", getIcon("images/Layout.png"));
+		JCommandButton layGraph = new JCommandButton("Update Graph Layout", getIcon("images/Layout.png"));
 		layGraph.setActionKeyTip("L");
 		layGraph.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				m_parent.dolayout();
+				App.getDrawingService(parent).doLayout();
 			}
 		});
 		layoutBand.addCommandButton(layGraph,
 				RibbonElementPriority.TOP);
 		
-		
-		
-		
-		JCommandButton optGraph = new JCommandButton("Preferences", getIcon("images/Preferences.png"));
-		optGraph.setActionKeyTip("P");
-		optGraph.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				final ActionListener layoutListener = new ActionListener() {
-		            public void actionPerformed(ActionEvent e) {
-		          	  m_parent.dolayout();
-		            }
-		          };
-		          OptionSupport.showDialog(m_parent.groupLayoutOptions, layoutListener, false, m_parent.view.getFrame());
-		          configureGroupLayout();
-			}
-		});
-		layoutBand.addCommandButton(optGraph,
-				RibbonElementPriority.TOP);
-				
-		
-		
 		layoutBand.setResizePolicies(CoreRibbonResizePolicies.getCorePoliciesNone(layoutBand));
 		return layoutBand;
 	}
-	
-	
-	void configureGroupLayout() {
-        Object gsi = m_parent.groupLayoutOptions.get("Group Layering Strategy");
-        if ("Recursive Layering".equals(gsi)) {
-        	m_parent.layouter.setRecursiveGroupLayeringEnabled(true);
-        } else if ("Global Layering".equals(gsi)) {
-        	m_parent.layouter.setRecursiveGroupLayeringEnabled(false);
-        }
-
-        m_parent.layouter.setGroupCompactionEnabled(m_parent.groupLayoutOptions.getBool("Enable Compact Layering"));
-
-        Object gai = m_parent.groupLayoutOptions.get("Group Alignment");
-        if ("Top".equals(gai)) {
-        	m_parent.layouter.setGroupAlignmentPolicy(IncrementalHierarchicLayouter.POLICY_ALIGN_GROUPS_TOP);
-        } else if ("Center".equals(gai)) {
-        	m_parent.layouter.setGroupAlignmentPolicy(IncrementalHierarchicLayouter.POLICY_ALIGN_GROUPS_CENTER);
-        }
-        if ("Bottom".equals(gai)) {
-        	m_parent.layouter.setGroupAlignmentPolicy(IncrementalHierarchicLayouter.POLICY_ALIGN_GROUPS_BOTTOM);
-        }
-      }
 	
 	public void configureRibbon() {
 
@@ -548,17 +507,17 @@ protected ResizableIcon getIcon(String ressourceString) {
 		//JRibbonBand quickExportPrefBand = this.getQuickExportPrefBand();
 		RibbonTask helpTask = new RibbonTask("Help", helpClasses);//, quickExportBand, quickExportPrefBand);
 
-		m_parent.getRibbon().addTask(gcTask);
-		m_parent.getRibbon().addTask(fileTask);
-		m_parent.getRibbon().addTask(viewTask);
-		m_parent.getRibbon().addTask(probTask);
-		m_parent.getRibbon().addTask(helpTask);
+		parent.getRibbon().addTask(gcTask);
+		parent.getRibbon().addTask(probTask);
+		parent.getRibbon().addTask(viewTask);
+		parent.getRibbon().addTask(fileTask);
+		parent.getRibbon().addTask(helpTask);
 
-		m_parent.getRibbon().configureHelp(new SimpleResizableIcon(RibbonElementPriority.TOP, 10, 10),
+		parent.getRibbon().configureHelp(new SimpleResizableIcon(RibbonElementPriority.TOP, 10, 10),
 				new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						JOptionPane.showMessageDialog(m_parent,
+						JOptionPane.showMessageDialog(parent,
 								"Help button clicked");
 					}
 				});
@@ -571,7 +530,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		controlPanel.setBorder(new EmptyBorder(20, 0, 0, 5));
 		FormLayout lm = new FormLayout("right:pref, 4dlu, fill:pref:grow", "");
 		DefaultFormBuilder builder = new DefaultFormBuilder(lm, controlPanel);
-		m_parent.getRibbon().add(controlPanel, BorderLayout.EAST);
+		parent.getRibbon().add(controlPanel, BorderLayout.EAST);
 	
 	}
 	
@@ -581,7 +540,12 @@ protected void configureApplicationMenu() {
 				getIcon("images/NewWindow.png"), "New Window", new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						new ISGCIMainFrame(m_parent.loader);
+						try {
+							new ISGCIMainFrame(parent.loader);
+						} catch (Exception e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 					}
 				}, CommandButtonKind.ACTION_ONLY);
 		newWindow.setActionKeyTip("N");
@@ -590,7 +554,7 @@ protected void configureApplicationMenu() {
 				getIcon("images/Exit.png"), "Exit", new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						m_parent.closeWindow();
+						parent.closeWindow();
 					}
 				}, CommandButtonKind.ACTION_ONLY);
 		exitWindow.setActionKeyTip("X");
@@ -601,16 +565,13 @@ protected void configureApplicationMenu() {
 		applicationMenu.addMenuEntry(newWindow);
 		applicationMenu.addMenuEntry(exitWindow);		
 
-		m_parent.getRibbon().setApplicationMenu(applicationMenu);
+		parent.getRibbon().setApplicationMenu(applicationMenu);
 
 		RichTooltip appMenuRichTooltip = new RichTooltip();
 		appMenuRichTooltip.setTitle("Tooltip 1");
 		appMenuRichTooltip.addDescriptionSection("Tooltip 2");
 		
 		try {
-			System.out.println("Loading Images");
-			System.out.println(ISGCIMainFrame.class.getClassLoader().getResource("images/appmenubutton-tooltip-main.png"));
-
 			appMenuRichTooltip
 					.setMainImage(ImageIO
 							.read(ISGCIMainFrame.class.getClassLoader().getResource("images/appmenubutton-tooltip-main.png")));
@@ -621,8 +582,8 @@ protected void configureApplicationMenu() {
 			System.out.println(ioe.getMessage());
 		}
 		appMenuRichTooltip.addFooterSection("Foot Tooltip");
-		m_parent.getRibbon().setApplicationMenuRichTooltip(appMenuRichTooltip);
-		m_parent.getRibbon().setApplicationMenuKeyTip("F");
+		parent.getRibbon().setApplicationMenuRichTooltip(appMenuRichTooltip);
+		parent.getRibbon().setApplicationMenuKeyTip("F");
 	}
 
 class ColorBox extends JComboBox{
@@ -693,12 +654,14 @@ private void colorBoxItemStateChanged(final ItemEvent e){
     int selectedIndexNpc = colBoxNpc.getSelectedIndex();
     int selectedIndexU = colBoxU.getSelectedIndex();
         
-    for (GraphView gv : m_parent.viewManager.getCurrentViews())
-        for (NodeView v : gv.getNodes())
+    ViewManager viewManager = App.getViewManager(parent);	
+    for (GraphView gv : viewManager.getCurrentViews())
+        for (NodeView v : gv.getNodes()) {
            v.setColoring(colBoxL.COLORS[selectedIndexL], colBoxP.COLORS[selectedIndexP], colBoxI.COLORS[selectedIndexI], colBoxNpc.COLORS[selectedIndexNpc], colBoxU.COLORS[selectedIndexU]);    
-    
-    m_parent.viewManager.setComplexityColors();
-    m_parent.viewManager.refresh();
+        }
+    App.getViewManager(parent).setProblem(App.DataProvider.getProblem(probBox.getSelectedItem().toString()));
+    //viewManager.setComplexityColors();
+    //viewManager.refresh();
     
 }
 
@@ -706,15 +669,14 @@ public void actionPerformed(ActionEvent event) {
 	JComboBox cb = (JComboBox)event.getSource();
 	
 	if (cb.equals(boBox)) {
-		JDialog open=new OpenProblemDialog(m_parent,				
+		JDialog open=new OpenProblemDialog(parent,				
                 boBox.getSelectedItem().toString());
         open.setLocation(50, 50);
         open.setVisible(true);
 	}
 	
 	if (cb.equals(probBox)) {
-		System.out.println(ISGCIMainFrame.DataProvider.getProblem(probBox.getSelectedItem().toString()));		
-		m_parent.viewManager.setProblem(ISGCIMainFrame.DataProvider.getProblem(probBox.getSelectedItem().toString()));
+		App.getViewManager(parent).setProblem(App.DataProvider.getProblem(probBox.getSelectedItem().toString()));
 	}
 	
 	if (cb.equals(colPackage)) {
