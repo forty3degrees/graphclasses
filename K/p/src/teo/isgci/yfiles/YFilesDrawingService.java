@@ -11,7 +11,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,8 +27,6 @@ import javax.swing.JPanel;
 import javax.swing.JViewport;
 
 import teo.isgci.core.App;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import teo.isgci.core.EdgeView;
 import teo.isgci.core.GraphView;
 import teo.isgci.core.IDrawingService;
@@ -58,6 +58,7 @@ import y.view.EdgeLabel;
 import y.view.EdgeRealizer;
 import y.view.EditMode;
 import y.view.GenericNodeRealizer;
+import y.view.GenericNodeRealizer.Factory;
 import y.view.Graph2D;
 import y.view.Graph2DLayoutExecutor;
 import y.view.Graph2DPrinter;
@@ -76,7 +77,6 @@ import y.view.SmartNodeLabelModel;
 import y.view.TooltipMode;
 import y.view.ViewMode;
 import y.view.YLabel;
-import y.view.GenericNodeRealizer.Factory;
 import yext.export.io.EPSOutputHandler;
 import yext.svg.io.SVGIOHandler;
 
@@ -143,7 +143,7 @@ public class YFilesDrawingService implements IDrawingService {
 	}
 
 	@Override
-	public void initializeView(List<GraphView> graphs) {
+	public void initializeView(List<GraphView> graphs, HashMap<String, String> initialNames) {
 		D.bug("entering initializeView");
 		graph2D.clear();
 
@@ -178,14 +178,18 @@ public class YFilesDrawingService implements IDrawingService {
 			}
 			for (NodeView node : nodes) {
 				if (!currentNodes.containsKey(node)) {
+					
 					String label = node.getLabel();
 					String fullname = node.getFullName();
-					
-					String labelUnicode = label.replace("$\\cap$", "\u2229"+"A"+"\u2080");
-					labelUnicode = labelUnicode.replace("$\\cup$", "\u222A"+"A"+"\2080");
+										
+					if (initialNames.containsKey(fullname)) {
+						node.setNameAndLabel(initialNames.get(fullname));
+						label = node.getLabel();
+						fullname = node.getFullName();
+					}
 					
 					realizer = graph2D.getDefaultNodeRealizer().createCopy();
-					realizer.setLabelText(labelUnicode);
+					realizer.setLabelText(label);
 					realizer.setFillColor(node.getColor());
 					Node temp = graph2D.createNode(realizer);
 
@@ -203,7 +207,7 @@ public class YFilesDrawingService implements IDrawingService {
 	}
 
 	@Override
-	public void updateView(List<GraphView> graphs) {
+	public void updateView(List<GraphView> graphs, HashMap<String, String> initialNames) {
 		D.bug("entering updateView");
 		Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
 
@@ -298,10 +302,15 @@ public class YFilesDrawingService implements IDrawingService {
 				if (!currentNodes.containsKey(node)) {
 					String label = node.getLabel();
 					String fullname = node.getFullName();
-					System.out.println(label + "  " + fullname);
+
+					if (initialNames.containsKey(fullname)) {
+						node.setNameAndLabel(initialNames.get(fullname));
+						label = node.getLabel();
+						fullname = node.getFullName();
+					}
 					
 					realizer = graph2D.getDefaultNodeRealizer().createCopy();
-					realizer.setLabelText(node.getLabel());
+					realizer.setLabelText(label);
 					realizer.setFillColor(node.getColor());
 					Node temp = graph2D.createNode(realizer);
 
@@ -312,8 +321,15 @@ public class YFilesDrawingService implements IDrawingService {
 				} else {
 					String label = node.getLabel();
 					String fullname = node.getFullName();
+					
+					if (initialNames.containsKey(fullname)) {
+						node.setNameAndLabel(initialNames.get(fullname));
+						label = node.getLabel();
+						fullname = node.getFullName();
+					}
+					
 					realizer = graph2D.getRealizer(currentNodes.get(node));
-					realizer.setLabelText(node.getLabel());
+					realizer.setLabelText(label);
 					realizer.setFillColor(node.getColor());
 					if (!this.nodeLabelMap.containsKey(label)) {
 						this.nodeLabelMap.put(label, fullname);
@@ -932,7 +948,7 @@ public class YFilesDrawingService implements IDrawingService {
 		}
 		return editMode;
 	}
-
+	
 	private void configureDefaultRealizers() {
 
 		NodeRealizer nodeRealizer = this.graph2D.getDefaultNodeRealizer();

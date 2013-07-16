@@ -15,7 +15,7 @@ public interface IDrawingService {
 	JComponent getCanvas();
 	
 	void initializeView(List<GraphView> graphs, HashMap<String, String> initialNames);
-	void updateView(List<GraphView> graphs, HashMap<String, String> initialNames);
+	void updateView(List<GraphView> graphs);
 	void updateColors();
 	void refreshView();
 	void doLayout();

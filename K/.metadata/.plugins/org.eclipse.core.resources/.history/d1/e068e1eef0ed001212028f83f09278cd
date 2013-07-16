@@ -8,7 +8,7 @@
  * Email: isgci@graphclasses.org
  */
 
-package teo.graph.view;
+package teo.isgci.core;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,6 +19,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -26,15 +27,12 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.xml.sax.SAXException;
 
-import teo.data.db.Algo;
-import teo.data.xml.GraphMLWriter;
-import teo.graph.drawing.IDrawingService;
-import teo.isgci.gc.GraphClass;
-import teo.isgci.grapht.GAlg;
-import teo.isgci.grapht.Inclusion;
-import teo.isgci.gui.ISGCIMainFrame;
-import teo.isgci.problem.Problem;
-import y.util.D;
+import teo.isgci.data.db.Algo;
+import teo.isgci.data.gc.GraphClass;
+import teo.isgci.data.grapht.GAlg;
+import teo.isgci.data.grapht.Inclusion;
+import teo.isgci.data.problem.Problem;
+import teo.isgci.data.xml.GraphMLWriter;
 
 /**
  * A canvas that can display an inclusion graph.
@@ -43,7 +41,6 @@ public class ViewManager {
 	
 	
     private List<IDrawingService> drawingServices = new ArrayList<IDrawingService>();
-
     public void attachDrawingService(IDrawingService service) {
     	drawingServices.add(service);
     }
@@ -106,9 +103,8 @@ public class ViewManager {
     }
 
     
-public void add(Collection<GraphClass> nodes) {
+    public void add(Collection<GraphClass> nodes) {
     	
-    	Collection<GraphClass> newNodes = new ArrayList<GraphClass>();
     	for (GraphView gv : graphs) {
     		for (Set<GraphClass> l : gv.getGraph().vertexSet()) {
     			for (GraphClass gc : l) {
@@ -116,6 +112,7 @@ public void add(Collection<GraphClass> nodes) {
     			}
     		}
     	}   
+    	System.out.println(nodes.size());
     	
     	graphs.clear();
     	//nodes.removeAll(newNodes);
@@ -127,14 +124,14 @@ public void add(Collection<GraphClass> nodes) {
         SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
             Algo.createHierarchySubgraph(nodes);
 
-        List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
-                GAlg.split(graph, DefaultEdge.class);
+        //List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
+        //        GAlg.split(graph, DefaultEdge.class);
         
         try {
         	
-        	for (SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> g : list) {        		
-        		addGraph(g);
-            }
+        	//for (SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> g : list) {        		
+        		addGraph(graph);
+            //}
         	
         	
             
@@ -145,35 +142,42 @@ public void add(Collection<GraphClass> nodes) {
             } else {
                 throw(e);
             }
-        }
+        }      
 
-        this.export();        
-
-        /* Notify any listeners that the view was initialized */
-        
+        /* Notify any listeners that the view was updated */
+        this.refresh();
     }
 
-	public void del(Collection<GraphClass> nodes) {
+	public void delete(Collection<GraphClass> nodes) {
 	
 		Collection<GraphClass> newNodes = new ArrayList<GraphClass>();
+		Collection<GraphClass> done = new ArrayList<GraphClass>();
 		for (GraphView gv : graphs) {
 			for (Set<GraphClass> l : gv.getGraph().vertexSet()) {
 				for (GraphClass gc : l) {
-					if (!nodes.contains(gc)) {
+					boolean contained = false;
+					for (GraphClass mc : Algo.equNodes(gc)) {
+						if (nodes.contains(mc) || done.contains(mc)) {
+							contained = true;
+							break;
+						}
+					}
+					
+					if (!contained) {
+						done.addAll(Algo.equNodes(gc));
 						newNodes.add(gc);
-						System.out.println(gc.toString() + " drin.");
-					} else {
-						System.out.println(gc.toString() + " deleted.");
 					}
 				}
 			}
 		}   
 		
 		graphs.clear();
-		//nodes.removeAll(newNodes);
 		
 		if (newNodes.isEmpty()) {
-			//return;
+			for (IDrawingService ds : drawingServices) {
+	            ds.clearView();
+	        }
+			return;
 		}
 		
 	    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
@@ -182,14 +186,12 @@ public void add(Collection<GraphClass> nodes) {
 	    List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
 	            GAlg.split(graph, DefaultEdge.class);
 	    
+	    System.out.println(list.size());
+	    
 	    try {
 	    	
-	    	for (SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> g : list) {        		
-	    		addGraph(g);
-	        }
+	    	addGraph(graph);
 	    	
-	    	
-	        
 	    } catch (Error e) {
 	
 	        if (e instanceof OutOfMemoryError || e instanceof StackOverflowError) {
@@ -198,13 +200,11 @@ public void add(Collection<GraphClass> nodes) {
 	            throw(e);
 	        }
 	    }
-	
-	    this.export();        
-	
-	    /* Notify any listeners that the view was initialized */
-	    
+
+        /* Notify any listeners that the view was updated */
+        this.refresh();
 	}
-    
+	
     /**
      * Add the given graph to this canvas.
      */
@@ -219,29 +219,6 @@ public void add(Collection<GraphClass> nodes) {
             nv.setNameAndLabel(Algo.getName(nv.getNode(), namingPref)); 
         }
         
-        this.refresh();
-        return gv;
-    }
-    
-    protected GraphView addToGraph(SimpleDirectedGraph<Set<GraphClass>,DefaultEdge> g) {
-    	GraphView gv = new GraphView(g);
-    	
-        gv.setIncludeUnproper(drawUnproper);
-        for (Set<GraphClass> gc : g.vertexSet()) {
-        	graphs.get(0).graph.addVertex(gc);
-        }
-        
-
-        //graphs.get(0).graph.addEdge(arg0, arg1)
-        
-        //graphs.add(gv);
-        
-        for (NodeView nv : gv.getNodes()) {
-            nv.updateColor(this.problem);
-            nv.setNameAndLabel(Algo.getName(nv.getNode(), namingPref)); 
-        }
-        
-        this.refresh();
         return gv;
     }
     
@@ -287,6 +264,11 @@ public void add(Collection<GraphClass> nodes) {
     public void load(Collection<GraphClass> nodes) {
     	this.isLoading = true;
     	
+    	Iterator<GraphClass> i = nodes.iterator();
+    	while (i.hasNext()) {
+    		System.out.orintln(i.next().toString());
+    	}
+    	
         SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
             Algo.createHierarchySubgraph(nodes);
 
@@ -309,13 +291,16 @@ public void add(Collection<GraphClass> nodes) {
         }
 
         /* Notify any listeners that the view was initialized */
-        D.bug("loading graph. " + drawingServices.size() + " listeners");
-        for (IDrawingService ds : drawingServices) {
-            ds.initializeView(this.graphs);
-        }
+        this.initializeView();
     	this.isLoading = false;
     }
-    
+
+	private void initializeView() {
+		for (IDrawingService ds : drawingServices) {
+            ds.initializeView(this.graphs);
+        }
+	}
+	
     public void refresh() {
         if (!isLoading) {
 	        /* Notify any attached services that the view should be refreshed */
@@ -356,7 +341,7 @@ public void add(Collection<GraphClass> nodes) {
      */
     protected void setProperness(EdgeView view) {
     	SimpleDirectedGraph<GraphClass, Inclusion> inclusionGraph = 
-    					ISGCIMainFrame.DataProvider.getInclusionGraph();
+    			App.DataProvider.getInclusionGraph();
         List<Inclusion> path = GAlg.getPath(inclusionGraph,
                 view.getFrom().iterator().next(),
                 view.getTo().iterator().next());
@@ -372,7 +357,24 @@ public void add(Collection<GraphClass> nodes) {
         if (problem != p) {
             problem = p;
             setComplexityColors();
-            this.refresh();
+
+            /* Update the colors */
+            if (!isLoading) {
+    	        for (IDrawingService ds : drawingServices) {
+    	            ds.updateColors();
+    	        }
+            }
+        }
+    }
+    
+    public void updateProblem() {
+        if (problem != null) {
+            /* Update the colors */
+            if (!isLoading) {
+    	        for (IDrawingService ds : drawingServices) {
+    	            ds.updateColors();
+    	        }
+            }
         }
     }
 

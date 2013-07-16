@@ -46,18 +46,18 @@
 <fullyQualifiedTypeName name="teo.isgci.core.App"/>
 <fullyQualifiedTypeName name="java.util.Map"/>
 <fullyQualifiedTypeName name="java.util.HashMap"/>
-<fullyQualifiedTypeName name="teo.isgci.core.IDrawingService"/>
 <fullyQualifiedTypeName name="java.awt.Frame"/>
 <fullyQualifiedTypeName name="teo.isgci.view.gui.ISGCIMainFrame"/>
 <fullyQualifiedTypeName name="java.awt.Point"/>
 <fullyQualifiedTypeName name="net.sf.saxon.functions.Collection"/>
 <fullyQualifiedTypeName name="java.util.Collection"/>
 <fullyQualifiedTypeName name="y.base.Edge"/>
-<fullyQualifiedTypeName name="java.util.Iterator"/>
 <fullyQualifiedTypeName name="teo.isgci.data.gc.GraphClass"/>
 <fullyQualifiedTypeName name="teo.isgci.data.db.Algo"/>
 <fullyQualifiedTypeName name="teo.isgci.core.ViewManager"/>
 <fullyQualifiedTypeName name="y.view.hierarchy.HierarchyManager"/>
 <fullyQualifiedTypeName name="teo.isgci.yfiles.YFilesDrawingService"/>
 <fullyQualifiedTypeName name="teo.isgci.data.db.Ref"/>
+<fullyQualifiedTypeName name="java.util.Iterator"/>
+<fullyQualifiedTypeName name="teo.isgci.core.IDrawingService"/>
 </qualifiedTypeNameHistroy>

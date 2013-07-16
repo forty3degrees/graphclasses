@@ -106,6 +106,7 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                     	System.out.println(n.toString() + " -> " + c.toString());
+                    	App.getViewManager(parent).putDefaultName(c);
                     	getGraph2D().setLabelText(n, c.toString());
                     	getGraph2D().updateViews();
                     }

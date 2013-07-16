@@ -19,6 +19,8 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -49,6 +51,7 @@ public class ViewManager {
 	private Algo.NamePref namingPref;
 	private List<GraphView> graphs;
 	private boolean drawUnproper;
+	private HashMap<String, String> initialNames;
 
 
     public ViewManager() {
@@ -257,11 +260,34 @@ public class ViewManager {
    
     
 
+	public void putDefaultName(GraphClass node) {
+		Collection<GraphClass> eq = Algo.equNodes(node);
+		Iterator<GraphClass> it = eq.iterator();
+		if (it.hasNext()) {
+			GraphClass m = it.next();
+			System.out.println(m.toString() +" "+ node.toString());
+			initialNames.put(m.toString(), node.toString());
+		}
+	}
+
     /**
      * Create a hierarchy subgraph of the given classes
      */
     public void load(Collection<GraphClass> nodes) {
     	this.isLoading = true;
+    	initialNames = new HashMap<String, String>();
+    	Iterator<GraphClass> i = nodes.iterator();
+    	while (i.hasNext()) {
+    		GraphClass n = i.next();
+    		Collection<GraphClass> eq = Algo.equNodes(n);
+    		Iterator<GraphClass> it = eq.iterator();
+    		if (it.hasNext()) {
+    			GraphClass m = it.next();
+    			System.out.println(m.toString() +" "+ n.toString());
+    			initialNames.put(m.toString(), n.toString());
+    		}
+    		
+    	}
     	
         SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
             Algo.createHierarchySubgraph(nodes);
@@ -291,7 +317,7 @@ public class ViewManager {
 
 	private void initializeView() {
 		for (IDrawingService ds : drawingServices) {
-            ds.initializeView(this.graphs);
+            ds.initializeView(this.graphs, this.initialNames);
         }
 	}
 	
@@ -299,7 +325,7 @@ public class ViewManager {
         if (!isLoading) {
 	        /* Notify any attached services that the view should be refreshed */
 	        for (IDrawingService ds : drawingServices) {
-	            ds.updateView(this.graphs);
+	            ds.updateView(this.graphs, this.initialNames);
 	        }
         }
     }
