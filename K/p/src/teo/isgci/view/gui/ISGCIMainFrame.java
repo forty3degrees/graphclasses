@@ -171,6 +171,9 @@ public class ISGCIMainFrame extends JRibbonFrame
         this.drawingPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
         .put(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0), "selectDown");
         
+        this.drawingPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0), "invert");
+        
         final ISGCIMainFrame frame = this;
         this.drawingPane.getActionMap().put("select", new AbstractAction() {
             @Override
@@ -200,6 +203,13 @@ public class ISGCIMainFrame extends JRibbonFrame
         		System.out.println("Deleting nodes");
             	Collection<GraphClass> nodes = App.getDrawingService(frame).getSelection();
             	App.getViewManager(frame).delete(nodes);
+            }
+        });
+        
+        this.drawingPane.getActionMap().put("invert", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	App.getDrawingService(frame).invertSelection();
             }
         });
 

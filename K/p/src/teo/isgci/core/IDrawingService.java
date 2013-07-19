@@ -20,6 +20,7 @@ public interface IDrawingService {
 	void refreshView();
 	void doLayout();
 	void clearView();
+	void invertSelection();
 
 	void loadGraphML(String gmlString);
 	void loadGraphML(URL resource);

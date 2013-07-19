@@ -528,6 +528,16 @@ public class YFilesDrawingService implements IDrawingService {
 	}
 
 	@Override
+	public void invertSelection() {
+		for (NodeCursor nc = this.graph2D.nodes(); nc.ok(); nc.next()) {
+			Node n = nc.node();
+			NodeRealizer nr = this.graph2D.getRealizer(n);
+			nr.setSelected(!nr.isSelected());
+			nr.repaint();
+		}
+	}
+	
+	@Override
 	public Collection<GraphClass> getSelection() {
 		Graph2D g = this.graphView.getGraph2D();
 		NodeCursor n = g.selectedNodes();

@@ -1,5 +1,4 @@
 /*
- * Displays ISGCI graphs.
  *
  * $Header: /home/ux/CVSROOT/teo/teo/isgci/gui/ISGCIGraphCanvas.java,v 2.1 2012/10/28 16:00:51 ux Exp $
  *
