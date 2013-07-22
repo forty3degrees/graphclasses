@@ -1,9 +1,0 @@
-package teo.isgci.core;
-
-public class App {
-	public static App Current = null;
-	
-	public App() {
-		
-	}
-}

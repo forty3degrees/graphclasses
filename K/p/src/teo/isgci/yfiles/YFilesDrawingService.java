@@ -34,27 +34,20 @@ import teo.isgci.core.NodeView;
 import teo.isgci.data.gc.GraphClass;
 import teo.isgci.view.gui.ISGCIMainFrame;
 import teo.isgci.view.gui.PSGraphics;
-import y.base.DataMap;
 import y.base.Edge;
-import y.base.EdgeCursor;
 import y.base.Node;
 import y.base.NodeCursor;
-import y.base.NodeList;
 import y.geom.OrientedRectangle;
 import y.io.GraphMLIOHandler;
 import y.io.IOHandler;
 import y.layout.hierarchic.IncrementalHierarchicLayouter;
-import y.layout.hierarchic.incremental.IncrementalHintsFactory;
 import y.option.OptionHandler;
 import y.util.D;
-import y.util.Maps;
 import y.view.Arrow;
 import y.view.AutoDragViewMode;
 import y.view.BridgeCalculator;
 import y.view.CreateEdgeMode;
 import y.view.DefaultGraph2DRenderer;
-import y.view.DefaultLabelConfiguration;
-import y.view.EdgeLabel;
 import y.view.EdgeRealizer;
 import y.view.EditMode;
 import y.view.GenericNodeRealizer;
@@ -63,7 +56,6 @@ import y.view.Graph2D;
 import y.view.Graph2DLayoutExecutor;
 import y.view.Graph2DPrinter;
 import y.view.Graph2DView;
-import y.view.Graph2DViewActions;
 import y.view.Graph2DViewMouseWheelZoomListener;
 import y.view.MovePortMode;
 import y.view.NavigationComponent;
@@ -72,34 +64,78 @@ import y.view.NodeRealizer;
 import y.view.Overview;
 import y.view.ShapeNodeRealizer;
 import y.view.ShinyPlateNodePainter;
-import y.view.SmartEdgeLabelModel;
 import y.view.SmartNodeLabelModel;
-import y.view.TooltipMode;
 import y.view.ViewMode;
-import y.view.YLabel;
 import yext.export.io.EPSOutputHandler;
 import yext.svg.io.SVGIOHandler;
 
+/**
+ * Drawing service class for the yfiles library.
+ * 
+ * @author Calum *
+ */
 public class YFilesDrawingService implements IDrawingService {
 
+	/**
+	 * Holds the yfiles Graph2DView element (which contains
+	 * the Graph2D canvas).
+	 */
 	private Graph2DView graphView = null;
-	private IncrementalHierarchicLayouter layouter = null;
-	private Map<NodeView, Node> currentNodes = null;
-	private List<EdgeView> currentEdges = null;
-	private Map<String, String> nodeLabelMap = null;
-	private ISGCIMainFrame parent;
-	private PageFormat pageFormat;
+	/**
+	 * Holds the yfiles Graph2D element.
+	 */
 	private Graph2D graph2D = null;
+	/**
+	 * Holds the layouter object for yfiles graphs.
+	 */
+	private IncrementalHierarchicLayouter layouter = null;
+	/**
+	 * Contains the nodes currently being displayed. Used to 
+	 * allow updates to the graph without redrawing the graph
+	 * completely.
+	 */
+	private Map<NodeView, Node> currentNodes = null;
+	/**
+	 * Contains the edges currently being displayed. Used to 
+	 * allow updates to the graph without redrawing the graph
+	 * completely.
+	 */
+	private List<EdgeView> currentEdges = null;
+	/**
+	 * A map containing the labels of the current nodes and 
+	 * the respective graph classes full name. Enables us to
+	 * find a graph class using the text displayed on the 
+	 * corresponding label.
+	 */
+	private Map<String, String> nodeLabelMap = null;
+	/**
+	 * The parent frame.
+	 */
+	private ISGCIMainFrame parent;
+	/**
+	 * PageFormat object used when printing the current graph. Saved
+	 * as a field to allow settings to be persisted between printing
+	 * runs (as long as the program isn't closed).
+	 */
+	private PageFormat pageFormat;
 
-	private static final Color LABEL_LINE_COLOR = new Color(153, 204, 255, 255);
-	private static final Color LABEL_BACKGROUND_COLOR = Color.WHITE;
-	private static final String AUTO_FLIPPING_CONFIG = "AutoFlipConfig";
+	/**
+	 * Key for setting the node configuration.
+	 */
 	public static final String NODE_CONFIGURATION = "myConf";
 
+	/**
+	 * Static c'tor. Registers the default node configuration when the type is first used.
+	 */
 	static {
 		registerDefaultNodeConfiguration(true);
 	}
 
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param parent The parent frame.
+	 */
 	public YFilesDrawingService(ISGCIMainFrame parent) {
 		/* Store the parent frame */
 		this.parent = parent;
@@ -116,12 +152,12 @@ public class YFilesDrawingService implements IDrawingService {
 				wheelZoomListener);
 
 		/* This must be created here (before setting up the graph) so it 
-		 * can be used in the tooltip method (createEditMode).
+		 * can be used in the tool-tip method (createEditMode).
 		 */
 		nodeLabelMap = new HashMap<String, String>();
 
 		this.graph2D = graphView.getGraph2D();
-		applyRealizerDefaults(this.graph2D, true, true);
+		this.applyRealizerDefaults(true, true);
 
 		/* Create the layouter */
 		layouter = new IncrementalHierarchicLayouter();
@@ -137,16 +173,24 @@ public class YFilesDrawingService implements IDrawingService {
 				.setBridgeCalculator(bridgeCalculator);
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#getCanvas()
+	 */
 	@Override
 	public JComponent getCanvas() {
 		return this.graphView;
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#initializeView(java.util.List, java.util.HashMap)
+	 */
 	@Override
 	public void initializeView(List<GraphView> graphs, HashMap<String, String> initialNames) {
-		D.bug("entering initializeView");
+		// TODO: Comments
+		//D.bug("entering initializeView");
+		
+		/* Clear the current graph and re-initialise the collections. */
 		graph2D.clear();
-
 		nodeLabelMap.clear();
 		currentNodes = new HashMap<NodeView, Node>();
 		currentEdges = new ArrayList<EdgeView>();
@@ -155,20 +199,21 @@ public class YFilesDrawingService implements IDrawingService {
 		for (GraphView view : graphs) {
 			List<NodeView> nodes = view.getNodes();
 			List<EdgeView> edges = view.getEdges();
-			D.bug("Before: " + nodes.size() + " nodes & " + edges.size()
-					+ " edges");
+			//D.bug("Before: " + nodes.size() + " nodes & " + edges.size() + " edges");
 
+			/* Create all the nodes required for each of the edges. */
 			NodeRealizer realizer = graph2D.getDefaultNodeRealizer()
 					.createCopy();
 			for (EdgeView edge : edges) {
 				processEdge(nodeMap, edge);
 			}
 
+			/* Run through the from-to map of nodes creating the edges. */
 			for (Node from : nodeMap.keySet()) {
-				D.bug("From " + from);
+				//D.bug("From " + from);
 				List<Node> toNodes = nodeMap.get(from);
 				for (Node to : toNodes) {
-					D.bug("\tTo " + to);
+					//D.bug("\tTo " + to);
 					EdgeRealizer edgeRealizer = graph2D
 							.getDefaultEdgeRealizer().createCopy();
 					edgeRealizer.setTargetArrow(Arrow.STANDARD);
@@ -176,6 +221,8 @@ public class YFilesDrawingService implements IDrawingService {
 					graph2D.createEdge(from, to, edgeRealizer);
 				}
 			}
+			
+			/* Now check to see if we have any nodes that don't have any edges. */
 			for (NodeView node : nodes) {
 				if (!currentNodes.containsKey(node)) {
 					
@@ -197,17 +244,20 @@ public class YFilesDrawingService implements IDrawingService {
 						this.nodeLabelMap.put(label, fullname);
 					}
 					currentNodes.put(node, temp);
-					D.bug("Adding ophaned node");
+					//D.bug("Adding orphaned node");
 				}
 			}
-			D.bug("After: " + currentNodes.size() + " nodes & "
-					+ currentEdges.size() + " edges");
+			//D.bug("After: " + currentNodes.size() + " nodes & " + currentEdges.size() + " edges");
 		}
 		this.refreshView();
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#updateView(java.util.List, java.util.HashMap)
+	 */
 	@Override
 	public void updateView(List<GraphView> graphs, HashMap<String, String> initialNames) {
+		// TODO: Comments
 		D.bug("entering updateView");
 		Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
 
@@ -340,8 +390,13 @@ public class YFilesDrawingService implements IDrawingService {
 		this.refreshView();
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#updateColors()
+	 */
 	@Override
 	public void updateColors() {
+		/* Run through all the nodes updating the colour with that
+		 * of the corresponding node view. */
         for (NodeView nodeView : this.currentNodes.keySet())
         {
         	Node n = this.currentNodes.get(nodeView);
@@ -351,9 +406,15 @@ public class YFilesDrawingService implements IDrawingService {
         }
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#refreshView()
+	 */
 	@Override
 	public void refreshView() {
-		/* Don't ask me why this has to be in the order it is - it just does :) */
+		/* Don't ask me why this has to be in the order it is - it just does :) 
+		 * We spent a lot of time trying to get this to work properly but it seems
+		 * that yfiles is a little bit sensitive here. Would really need to get into
+		 * the actual mechanics of all this to figure out what is going on. */
 		layouter.setLayoutMode(IncrementalHierarchicLayouter.LAYOUT_MODE_FROM_SCRATCH);
 		final Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
 		layoutExecutor.getLayoutMorpher().setSmoothViewTransform(true);
@@ -362,22 +423,31 @@ public class YFilesDrawingService implements IDrawingService {
 		layoutExecutor.doLayout(this.graphView, layouter);
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#doLayout()
+	 */
 	@Override
 	public void doLayout() {
+		
+		/* Just delegate the work to the yfiles classes. */
 		layouter.setLayoutMode(IncrementalHierarchicLayouter.LAYOUT_MODE_FROM_SCRATCH);
 		final Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
 		layoutExecutor.getLayoutMorpher().setSmoothViewTransform(true);
 		layoutExecutor.doLayout(this.graphView, layouter);
 	}
 	
-	@Override
-	/**
-	 * Fill the Graph with explicit information contained within the graphML string.
-	 * @param gmlString
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#loadGraphML(java.lang.String)
 	 */
+	@Override
 	public void loadGraphML(String gmlString) {
+		
+		/* Convert the string to a byte stream so we can load it
+		 * with the IOHandler below. The override of IOHandler.read
+		 * that takes a string expects a file name and not a string
+		 * containing graphML so we need to use the override that 
+		 * takes a stream. */
 		byte[] bytes = gmlString.getBytes();
-
 		InputStream is = new ByteArrayInputStream(bytes);
 
 		try {
@@ -390,9 +460,15 @@ public class YFilesDrawingService implements IDrawingService {
 			D.bug(message);
 			throw new RuntimeException(message, e);
 		}
+		
+		/* Don't forget to refresh the view so that the graph is laid out
+		 * properly and a fit-to-screen is done. */
 		this.refreshView();
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#loadGraphML(java.net.URL)
+	 */
 	@Override
 	public void loadGraphML(URL resource) {
 		if (resource == null) {
@@ -417,16 +493,22 @@ public class YFilesDrawingService implements IDrawingService {
 			D.bug(message);
 			throw new RuntimeException(message, e);
 		}
+		
+		/* Don't forget to refresh the view so that the graph is laid out
+		 * properly and a fit-to-screen is done. */
 		this.refreshView();
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#exportGraphics(teo.isgci.view.gui.PSGraphics)
+	 */
 	@Override
 	public void exportGraphics(PSGraphics g) {
 		g.drawImage(this.graphView.getImage(), 0, 0, this.graphView);
 	}
 
-	/**
-	 * Export to Postscript.
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#exportPS(java.lang.String)
 	 */
 	@Override
 	public void exportPS(String file) throws IOException {
@@ -437,8 +519,8 @@ public class YFilesDrawingService implements IDrawingService {
 		this.graphView.setPaintDetailThreshold(tmpPDT);
 	}
 
-	/**
-	 * Export to SVG.
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#exportSVG(java.lang.String)
 	 */
 	@Override
 	public void exportSVG(String file) throws IOException {
@@ -449,11 +531,18 @@ public class YFilesDrawingService implements IDrawingService {
 		this.graphView.setPaintDetailThreshold(tmpPDT);
 	}
 
-	/**
-	 * Export to GraphML.
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#exportGML(java.lang.String)
 	 */
 	@Override
 	public void exportGML(String file) throws IOException {
+		/* NOTE:
+		 * Case-sensitivity!! Not sure if this is a
+		 * case-sensitive check in Java but I assume so. It
+		 * isn't critical in this case, maybe just a bit silly
+		 * (e.g. temp.GRAPHML.graphml), so I will leave this 
+		 * as-is for now.
+		 */
 		if (!file.endsWith(".graphml")) {
 			file += ".graphml";
 		}
@@ -461,34 +550,51 @@ public class YFilesDrawingService implements IDrawingService {
 		ioh.write(this.graph2D, file);
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#selectNeighbors()
+	 */
 	@Override
 	public void selectNeighbors() {
+		ArrayList<Node> list = new ArrayList<Node>();
+		
+		/* Get a cursor for the currently selected nodes. */
 		Graph2D g = this.graphView.getGraph2D();
 		NodeCursor n = g.selectedNodes();
-		ArrayList<Node> l = new ArrayList<Node>();
 
+		/* Run through all the neighbouring nodes for each of 
+		 * the selected nodes. */
 		for (int i = 0; i < n.size(); ++i) {
 			NodeCursor neigh = n.node().neighbors();
 			for (int j = 0; j < neigh.size(); ++j) {
-				l.add(neigh.node());
+				list.add(neigh.node());
 				neigh.next();
 			}
 			n.next();
 		}
-		for (Node no : l) {
-			this.graphView.getGraph2D().setSelected(no, true);
+		/* Run through the list and set each node to selected. */
+		for (Node node : list) {
+			this.graphView.getGraph2D().setSelected(node, true);
 		}
+		
+		/* Finally, update the view. */
 		this.graphView.updateView();
 	}
 	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#clearView()
+	 */
 	@Override
 	public void clearView() {
 		this.graph2D.clear();
 		this.graph2D.updateViews();
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#selectSuperClasses()
+	 */
 	@Override
 	public void selectSuperClasses() {
+		// TODO: Comments
 		Graph2D g = this.graphView.getGraph2D();
 		NodeCursor n = g.selectedNodes();
 		ArrayList<Node> l = new ArrayList<Node>();
@@ -507,8 +613,12 @@ public class YFilesDrawingService implements IDrawingService {
 		this.graphView.updateView();
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#selectSubClasses()
+	 */
 	@Override
 	public void selectSubClasses() {
+		// TODO: Comments
 		Graph2D g = this.graphView.getGraph2D();
 		NodeCursor n = g.selectedNodes();
 		ArrayList<Node> l = new ArrayList<Node>();
@@ -527,8 +637,12 @@ public class YFilesDrawingService implements IDrawingService {
 		this.graphView.updateView();
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#invertSelection()
+	 */
 	@Override
 	public void invertSelection() {
+		// TODO: Comments
 		for (NodeCursor nc = this.graph2D.nodes(); nc.ok(); nc.next()) {
 			Node n = nc.node();
 			NodeRealizer nr = this.graph2D.getRealizer(n);
@@ -537,8 +651,12 @@ public class YFilesDrawingService implements IDrawingService {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#getSelection()
+	 */
 	@Override
 	public Collection<GraphClass> getSelection() {
+		// TODO: Comments
 		Graph2D g = this.graphView.getGraph2D();
 		NodeCursor n = g.selectedNodes();
 		Collection<GraphClass> graphClasses = new ArrayList<GraphClass>();
@@ -561,9 +679,13 @@ public class YFilesDrawingService implements IDrawingService {
 		return graphClasses;
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#search(teo.isgci.core.NodeView)
+	 */
 	@Override
 	public void search(NodeView view) {
-
+		// TODO: Comments
+		// TODO: Fit nodes
 		// parent.graphCanvas.markOnly(view);
 		for (NodeCursor nc = this.graphView.getGraph2D().nodes(); nc.ok(); nc
 				.next()) {
@@ -590,6 +712,9 @@ public class YFilesDrawingService implements IDrawingService {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#print()
+	 */
 	@Override
 	public void print() {
 		/* Setup option handler */
@@ -641,12 +766,20 @@ public class YFilesDrawingService implements IDrawingService {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#getCurrentFile()
+	 */
 	@Override
 	public URL getCurrentFile() {
 		return this.graph2D.getURL();
 	}
 
 
+	/**
+	 * Gets the full name for a node.
+	 * @param node The node.
+	 * @return The full name.
+	 */
 	String getNodeName(Node node) {
 		String s = node.toString();
 		if (this.nodeLabelMap.containsKey(s)) {
@@ -655,6 +788,10 @@ public class YFilesDrawingService implements IDrawingService {
 		return s;
 	}
 	
+	/**
+	 * Updates the width of all nodes using the maximum label size. This
+	 * uses a uniform width accross all nodes.
+	 */
 	private void updateNodeSize() {
 		// Find the maximum width of all used Labels.
 		// Alternative: Skip the first run and set the current labelwidth for
@@ -665,21 +802,31 @@ public class YFilesDrawingService implements IDrawingService {
 			Node n = nc.node();
 			ShapeNodeRealizer nr = (ShapeNodeRealizer) graph2D.getRealizer(n);
 			nr.setShapeType(ShapeNodeRealizer.ROUND_RECT);
-			System.out.println(nr.getLabel().getFontSize());
-			if (nr.getLabel().getFontSize() > 5) {
+
+			NodeLabel label = nr.getLabel();
+			System.out.println(label.getFontSize());
+			
+			/* Set the font size */
+			if (label.getFontSize() > 5) {
 				bigger = true;
 			}
-			nr.getLabel().setFontSize(5);
-			configureNodeLabel(nr.getLabel(),
-					SmartNodeLabelModel.POSITION_CENTER);
+			label.setFontSize(5);
+			
+			/* Set the label model (for centering) */
+			SmartNodeLabelModel model = new SmartNodeLabelModel();
+			label.setLabelModel(model);
+			label.setModelParameter(
+					model.createDiscreteModelParameter(SmartNodeLabelModel.POSITION_CENTER));
 
-			double len = nr.getLabel().getContentWidth();
+			/* Get the content width and adjust the max width if necessary */
+			double len = label.getContentWidth();
 			if (len > maxlen) {
 				maxlen = len;
 			}
 		}
 		System.out.println("Max Width: " + maxlen);
 
+		/* Run through all the nodes updating the size */
 		for (NodeCursor nc = graph2D.nodes(); nc.ok(); nc.next()) {
 			Node n = nc.node();
 
@@ -696,10 +843,20 @@ public class YFilesDrawingService implements IDrawingService {
 		}
 	}
 
+	/**
+	 * Creates any nodes required for the given edge
+	 * @param nodeMap A map of nodes and their connected
+	 * nodes (key = from node, value = to nodes). This is 
+	 * used to create the yfiles Edge objects after all 
+	 * the nodes have been created.
+	 * @param edge The edge to be processed.
+	 */
 	private void processEdge(Map<Node, List<Node>> nodeMap, EdgeView edge) {
+		/* Get the node view objects for the edge */
 		NodeView from = edge.getFromNode();
 		NodeView to = edge.getToNode();
 
+		/* Get or create the yfiles Node objects for the node views. */
 		Node tempFrom;
 		if (currentNodes.containsKey(from)) {
 			tempFrom = currentNodes.get(from);
@@ -713,6 +870,7 @@ public class YFilesDrawingService implements IDrawingService {
 			tempTo = createNode(to);
 		}
 
+		/* Update the node map with the current from-to mapping */
 		if (nodeMap.containsKey(tempFrom)) {
 			nodeMap.get(tempFrom).add(tempTo);
 		} else {
@@ -723,37 +881,46 @@ public class YFilesDrawingService implements IDrawingService {
 		currentEdges.add(edge);
 	}
 	
+	/**
+	 * Creates a yfiles Node for the given NodeView.
+	 * @param nodeView The node view.
+	 * @return The newly created node.
+	 */
 	private Node createNode(NodeView nodeView) {
 
-		/* Create a new node */
-		String label = nodeView.getLabel();
-		String fullname = nodeView.getFullName();
+		/* Get a node realizer and set the label and colour. */
 		NodeRealizer realizer = graph2D.getDefaultNodeRealizer().createCopy();
-		
+		String label = nodeView.getLabel();
 		realizer.setLabelText(label);
 		realizer.setFillColor(nodeView.getColor());
 		Node node = graph2D.createNode(realizer);
 		
-		/* Keep the collections up to date */
+		/* Add the label/fullname mapping to the label map. */
+		String fullname = nodeView.getFullName();
 		if (!this.nodeLabelMap.containsKey(label)) {
 			this.nodeLabelMap.put(label, fullname);
 		}		
+		/* Save and return the node */
 		currentNodes.put(nodeView, node);
 		return node;
 	}
 
-	private static void applyRealizerDefaults(Graph2D graph,
-			boolean applyDefaultSize, boolean applyFillColor) {
-		for (NodeCursor nc = graph.nodes(); nc.ok(); nc.next()) {
+	/**
+	 * Applies the node and edge realizer defaults to the current graph.
+	 * @param applyDefaultSize Whether to apply the default size.
+	 * @param applyFillColor Whether to apply the default fill colour.
+	 */
+	private void applyRealizerDefaults(boolean applyDefaultSize, boolean applyFillColor) {
+		for (NodeCursor nc = this.graph2D.nodes(); nc.ok(); nc.next()) {
 			GenericNodeRealizer gnr = new GenericNodeRealizer(
-					graph.getRealizer(nc.node()));
+					this.graph2D.getRealizer(nc.node()));
 			gnr.setConfiguration(NODE_CONFIGURATION);
 			if (applyFillColor) {
-				gnr.setFillColor(graph.getDefaultNodeRealizer().getFillColor());
+				gnr.setFillColor(this.graph2D.getDefaultNodeRealizer().getFillColor());
 			}
 			gnr.setLineColor(null);
 			if (applyDefaultSize) {
-				gnr.setSize(graph.getDefaultNodeRealizer().getWidth(), graph
+				gnr.setSize(this.graph2D.getDefaultNodeRealizer().getWidth(), this.graph2D
 						.getDefaultNodeRealizer().getHeight());
 			}
 			NodeLabel label = gnr.getLabel();
@@ -762,18 +929,24 @@ public class YFilesDrawingService implements IDrawingService {
 			label.setLabelModel(model);
 			label.setModelParameter(model
 					.createModelParameter(labelBounds, gnr));
-			graph.setRealizer(nc.node(), gnr);
+			this.graph2D.setRealizer(nc.node(), gnr);
 		}
 	}
 
+	/**
+	 * Registers the default node configuration.
+	 * @param drawShadows Whether or not to draw shadows around the nodes.
+	 */
 	private static void registerDefaultNodeConfiguration(boolean drawShadows) {
 		Factory factory = GenericNodeRealizer.getFactory();
-		Map configurationMap = factory.createDefaultConfigurationMap();
+
+		/* Stupid Factory method returns a raw Map type... grrr :) */
+		@SuppressWarnings("unchecked")
+		Map<Object, Object> configurationMap = factory.createDefaultConfigurationMap();
 
 		ShinyPlateNodePainter painter = new ShinyPlateNodePainter();
 		// ShinyPlateNodePainter has an option to draw a drop shadow that is
-		// more efficient
-		// than wrapping it in a ShadowNodePainter.
+		// more efficient than wrapping it in a ShadowNodePainter.
 		painter.setDrawShadow(drawShadows);
 
 		configurationMap.put(GenericNodeRealizer.Painter.class, painter);
@@ -781,6 +954,9 @@ public class YFilesDrawingService implements IDrawingService {
 		factory.addConfiguration(NODE_CONFIGURATION, configurationMap);
 	}
 
+	/**
+	 * Adds the glass panel components (including the navigaiton pane).
+	 */
 	private void addGlassPaneComponents() {
 		// get the glass pane
 		JPanel glassPane = this.graphView.getGlassPane();
@@ -797,12 +973,11 @@ public class YFilesDrawingService implements IDrawingService {
 		gbc.gridx = 0;
 		gbc.anchor = GridBagConstraints.LINE_START;
 		gbc.insets = new Insets(0, 0, 16, 0);
-		JComponent overview = createOverview(this.graphView);
+		JComponent overview = this.createOverview();
 		toolsPanel.add(overview, gbc);
 
 		// create and add the navigation component to the tools panel
-		NavigationComponent navigationComponent = createNavigationComponent(
-				this.graphView, 20, 30);
+		NavigationComponent navigationComponent = createNavigationComponent(20, 30);
 		toolsPanel.add(navigationComponent, gbc);
 
 		// add the toolspanel to the glass pane
@@ -822,10 +997,15 @@ public class YFilesDrawingService implements IDrawingService {
 		glassPane.add(westPanel, BorderLayout.WEST);
 	}
 
-	private NavigationComponent createNavigationComponent(Graph2DView view,
-			double scrollStepSize, int scrollTimerDelay) {
+	/**
+	 * Creates the navigation component for the glass pane.
+	 * @param scrollStepSize The step size for scrolling.
+	 * @param scrollTimerDelay The timer delay for scrolling.
+	 * @return The navigation component.
+	 */
+	private NavigationComponent createNavigationComponent(double scrollStepSize, int scrollTimerDelay) {
 		// create the NavigationComponent itself
-		final NavigationComponent navigation = new NavigationComponent(view);
+		final NavigationComponent navigation = new NavigationComponent(this.graphView);
 		navigation.setScrollStepSize(scrollStepSize);
 		// set the duration between scroll ticks
 		navigation.putClientProperty("NavigationComponent.ScrollTimerDelay",
@@ -870,6 +1050,9 @@ public class YFilesDrawingService implements IDrawingService {
 		return navigation;
 	}
 
+	/**
+	 * Registers the edit and auto-drag view modes.
+	 */
 	private void registerViewModes() {
 
 		EditMode editMode = createEditMode();
@@ -877,27 +1060,16 @@ public class YFilesDrawingService implements IDrawingService {
 		editMode.allowEdgeCreation(false);
 		editMode.allowNodeEditing(false);
 
-		if (editMode != null) {
-			this.graphView.addViewMode(editMode);
-		}
-
+		this.graphView.addViewMode(editMode);
 		this.graphView.addViewMode(new AutoDragViewMode());
-
-//		TooltipMode tooltipMode = createTooltipMode();
-//		if (tooltipMode != null) {
-//			this.graphView.addViewMode(tooltipMode);
-//		}
-
-		// view.addViewMode(new AutoDragViewMode());
-		/*
-		 * editMode.setPopupMode(new PopupMode() { public JPopupMenu
-		 * getEdgePopup(Edge e) { JPopupMenu pm = new JPopupMenu(); pm.add(new
-		 * EditLabel(e, par)); return pm; } });
-		 */
 	}
 
-	private Overview createOverview(Graph2DView view) {
-		Overview ov = new Overview(view);
+	/**
+	 * Creates the overview component for the glass pane (the 'map' of the graph).
+	 * @return The overview component.
+	 */
+	private Overview createOverview() {
+		Overview ov = new Overview(this.graphView);
 		// animates the scrolling
 		ov.putClientProperty("Overview.AnimateScrollTo", Boolean.TRUE);
 		// blurs the part of the graph which can currently not be seen
@@ -917,6 +1089,11 @@ public class YFilesDrawingService implements IDrawingService {
 		return ov;
 	}
 
+	/**
+	 * Creates the edit mode for nodes and edges. This sets the
+	 * tool tip mode, dragging with the right mouse button etc. 
+	 * @return The edit mode.
+	 */
 	private EditMode createEditMode() {
 		
 		final YFilesDrawingService drawingService = this;
@@ -957,144 +1134,6 @@ public class YFilesDrawingService implements IDrawingService {
 			((CreateEdgeMode) createEdgeMode).setIndicatingTargetNode(true);
 		}
 		return editMode;
-	}
-	
-	private void configureDefaultRealizers() {
-
-		NodeRealizer nodeRealizer = this.graph2D.getDefaultNodeRealizer();
-		nodeRealizer.setSize(200, 100);
-		final NodeLabel nodeLabel = nodeRealizer.getLabel();
-		nodeLabel.setText("Smart Node Label");
-		nodeLabel.setLineColor(LABEL_LINE_COLOR);
-		nodeLabel.setBackgroundColor(LABEL_BACKGROUND_COLOR);
-		final SmartNodeLabelModel nodeLabelModel = new SmartNodeLabelModel();
-		nodeLabel.setLabelModel(nodeLabelModel);
-		nodeLabel.setModelParameter(nodeLabelModel.getDefaultParameter());
-
-		final YLabel.Factory factory = EdgeLabel.getFactory();
-		final Map defaultConfigImplementationsMap = factory
-				.createDefaultConfigurationMap();
-		DefaultLabelConfiguration customLabelConfig = new DefaultLabelConfiguration();
-		customLabelConfig.setAutoFlippingEnabled(true);
-		defaultConfigImplementationsMap.put(YLabel.Painter.class,
-				customLabelConfig);
-		defaultConfigImplementationsMap.put(YLabel.Layout.class,
-				customLabelConfig);
-		defaultConfigImplementationsMap.put(YLabel.BoundsProvider.class,
-				customLabelConfig);
-		factory.addConfiguration(AUTO_FLIPPING_CONFIG,
-				defaultConfigImplementationsMap);
-
-		EdgeRealizer edgeRealizer = this.graph2D.getDefaultEdgeRealizer();
-		final EdgeLabel edgeLabel = edgeRealizer.getLabel();
-		edgeLabel.setText("Smart Edge Label");
-		edgeLabel.setLineColor(LABEL_LINE_COLOR);
-		edgeLabel.setBackgroundColor(LABEL_BACKGROUND_COLOR);
-		final SmartEdgeLabelModel edgeLabelModel = new SmartEdgeLabelModel();
-		edgeLabel.setLabelModel(edgeLabelModel);
-		edgeLabel
-				.setModelParameter(edgeLabelModel
-						.createDiscreteModelParameter(SmartEdgeLabelModel.POSITION_CENTER));
-		edgeLabel.setConfiguration(AUTO_FLIPPING_CONFIG);
-	}
-
-	private void configureNodeLabel(NodeLabel label, int position) {
-		SmartNodeLabelModel model = new SmartNodeLabelModel();
-		label.setLabelModel(model);
-		label.setModelParameter(model.createDiscreteModelParameter(position));
-	}
-
-	private TooltipMode createTooltipMode() {
-		TooltipMode tooltipMode = new TooltipMode();
-		tooltipMode.setEdgeTipEnabled(true);
-		tooltipMode.setNodeTipEnabled(true);
-
-		return tooltipMode;
-	}
-
-	private void layoutIncrementally() {
-		Graph2D graph = this.graphView.getGraph2D();
-
-		layouter.setLayoutMode(IncrementalHierarchicLayouter.LAYOUT_MODE_INCREMENTAL);
-
-		// create storage for both nodes and edges
-		DataMap incrementalElements = Maps.createHashedDataMap();
-		// configure the mode
-		final IncrementalHintsFactory ihf = layouter
-				.createIncrementalHintsFactory();
-
-		for (NodeCursor nc = graph.selectedNodes(); nc.ok(); nc.next()) {
-			incrementalElements.set(nc.node(),
-					ihf.createLayerIncrementallyHint(nc.node()));
-		}
-
-		for (EdgeCursor ec = graph.selectedEdges(); ec.ok(); ec.next()) {
-			incrementalElements.set(ec.edge(),
-					ihf.createSequenceIncrementallyHint(ec.edge()));
-		}
-		graph.addDataProvider(
-				IncrementalHierarchicLayouter.INCREMENTAL_HINTS_DPKEY,
-				incrementalElements);
-		try {
-			final Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
-			layoutExecutor.getLayoutMorpher().setSmoothViewTransform(true);
-			layoutExecutor.doLayout(this.graphView, layouter);
-		} finally {
-			graph.removeDataProvider(IncrementalHierarchicLayouter.INCREMENTAL_HINTS_DPKEY);
-		}
-	}
-
-	class OpenFoldersAndLayoutAction extends
-			Graph2DViewActions.OpenFoldersAction {
-
-		OpenFoldersAndLayoutAction() {
-			super(YFilesDrawingService.this.graphView);
-		}
-
-		public void openFolder(Node folderNode, Graph2D graph) {
-			NodeList children = new NodeList(graph.getHierarchyManager()
-					.getInnerGraph(folderNode).nodes());
-			super.openFolder(folderNode, graph);
-			graph.unselectAll();
-			graph.setSelected(folderNode, true);
-			for (NodeCursor nc = children.nodes(); nc.ok(); nc.next()) {
-				graph.setSelected(nc.node(), true);
-			}
-
-			YFilesDrawingService.this.layoutIncrementally();
-
-			graph.unselectAll();
-			graph.setSelected(folderNode, true);
-			graph.updateViews();
-
-		}
-	}
-
-	/**
-	 * Collapse a group node. After collapsing the group node, an incremental
-	 * layout is automatically triggered. For this, the collapsed node is
-	 * treated as an incremental element.
-	 */
-	class CloseGroupsAndLayoutAction extends
-			Graph2DViewActions.CloseGroupsAction {
-
-		CloseGroupsAndLayoutAction() {
-			super(YFilesDrawingService.this.graphView);
-		}
-
-		public void closeGroup(Node groupNode, Graph2D graph) {
-			super.closeGroup(groupNode, graph);
-			graph.unselectAll();
-			graph.setSelected(groupNode, true);
-			for (EdgeCursor ec = groupNode.edges(); ec.ok(); ec.next()) {
-				graph.setSelected(ec.edge(), true);
-			}
-
-			YFilesDrawingService.this.layoutIncrementally();
-			graph.unselectAll();
-
-			graph.updateViews();
-		}
 	}
 
 }

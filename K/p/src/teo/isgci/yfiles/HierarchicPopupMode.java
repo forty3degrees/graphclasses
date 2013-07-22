@@ -22,7 +22,6 @@ import y.base.EdgeList;
 import y.base.Node;
 import y.view.Graph2D;
 import y.view.PopupMode;
-import y.view.ShapeNodeRealizer;
 
 
 public class HierarchicPopupMode extends PopupMode implements ActionListener {
@@ -47,13 +46,13 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
     public JPopupMenu getNodePopup(Node v) {
       Graph2D graph = getGraph2D();
       JPopupMenu pm = new JPopupMenu();
-      populatePopup(pm, graph.getCenterX(v), graph.getCenterY(v), v, true, v);
+      populatePopup(pm, graph.getCenterX(v), graph.getCenterY(v), v, true);
       return pm;
     }
 
     public JPopupMenu getSelectionPopup(double x, double y) {
       JPopupMenu pm = new JPopupMenu();
-      populatePopup(pm, x, y, null, getGraph2D().selectedNodes().ok(), null);
+      populatePopup(pm, x, y, null, getGraph2D().selectedNodes().ok());
       return pm;
     }
     
@@ -67,7 +66,7 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         pm.add(new EdgeAction("Information", sec, this.parent, this.drawingService));
     }
 
-  	protected void populatePopup(JPopupMenu pm, final double x, final double y, Node node, boolean selected, final Node n) {
+	protected void populatePopup(JPopupMenu pm, final double x, final double y, final Node node, boolean selected) {
           
       	parent.add(selectItem = new JMenuItem("Select Neighbors (H)"));
         selectItem.addActionListener(this);
@@ -88,26 +87,29 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         delItem.addActionListener(this);
             
         
-        if (n != null) {
+        if (node != null) {
 
             parent.add(infoItem = new JMenuItem("Information"));
             infoItem.addActionListener(this);
             
         	namingMenu = new JMenu("Change Name");
-        	GraphClass gClass = App.DataProvider.getClass(drawingService.getNodeName(n));
+        	GraphClass gClass = App.DataProvider.getClass(drawingService.getNodeName(node));
         	System.out.println(gClass.toString());
         	Iterator<GraphClass> classes = Algo.equNodes(gClass).iterator();
 
         	while (classes.hasNext()) {
         		final GraphClass c = classes.next();
         		System.out.println(c);
-        		JMenuItem item = new JMenuItem(c.toString());
+        		JMenuItem item = new JMenuItem(c.toString());        		
         		item.addActionListener(new AbstractAction() {
-                    @Override
+                    /** Keep the compiler happy ^^ */
+					private static final long serialVersionUID = 1L;
+
+					@Override
                     public void actionPerformed(ActionEvent e) {
-                    	System.out.println(n.toString() + " -> " + c.toString());
+                    	System.out.println(node.toString() + " -> " + c.toString());
                     	App.getViewManager(parent).putDefaultName(c);
-                    	getGraph2D().setLabelText(n, c.toString());
+                    	getGraph2D().setLabelText(node, c.toString());
                     	getGraph2D().updateViews();
                     }
                 });
@@ -129,7 +131,7 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         pm.addSeparator();
          
         pm.add(infoItem);
-        if (n != null) {
+        if (node != null) {
         	pm.add(namingMenu);
         }
     }

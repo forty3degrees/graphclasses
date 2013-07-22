@@ -285,7 +285,6 @@ public class ViewManager {
     			System.out.println(m.toString() +" "+ n.toString());
     			initialNames.put(m.toString(), n.toString());
     		}
-    		
     	}
     	
         SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
