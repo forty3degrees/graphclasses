@@ -30,7 +30,6 @@ import org.xml.sax.SAXException;
 import teo.isgci.data.db.Algo;
 import teo.isgci.data.gc.GraphClass;
 import teo.isgci.data.grapht.GAlg;
-import teo.isgci.data.grapht.Inclusion;
 import teo.isgci.data.problem.Problem;
 import teo.isgci.data.xml.GraphMLWriter;
 
@@ -242,7 +241,12 @@ public class ViewManager {
         for (GraphView gv : graphs)
             gv.setIncludeUnproper(b);
         
-        this.refresh();
+        if (!isLoading) {
+	        /* Notify any attached services that the view should be refreshed */
+	        for (IDrawingService ds : drawingServices) {
+	            ds.updateImproperInclusions(this.graphs);
+	        }
+        }
     }
 
     public boolean getDrawUnproper() {
@@ -351,22 +355,6 @@ public class ViewManager {
         }
         return null;
     }
-     
-
-    /**
-     * Bit of a hack to get all ISGCI stuff in one place:
-     * Set the appropriate properness of the given edgeview.
-     */
-    protected void setProperness(EdgeView view) {
-    	SimpleDirectedGraph<GraphClass, Inclusion> inclusionGraph = 
-    			App.DataProvider.getInclusionGraph();
-        List<Inclusion> path = GAlg.getPath(inclusionGraph,
-                view.getFrom().iterator().next(),
-                view.getTo().iterator().next());
-        view.setProper(Algo.isPathProper(path)  ||
-                Algo.isPathProper(Algo.makePathProper(path)));
-    }
-
 
     /**
      * Set coloring for p and repaint.

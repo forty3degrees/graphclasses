@@ -34,6 +34,10 @@ public interface IDrawingService {
 	/**
 	 * 
 	 */
+	void updateImproperInclusions(List<GraphView> graphs);
+	/**
+	 * 
+	 */
 	void refreshView();
 	/**
 	 * 

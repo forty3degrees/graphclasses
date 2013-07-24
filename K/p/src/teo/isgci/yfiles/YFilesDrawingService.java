@@ -102,6 +102,14 @@ public class YFilesDrawingService implements IDrawingService {
 	 */
 	private List<EdgeView> currentEdges = null;
 	/**
+	 * Contains the improper edges currently being displayed. 
+	 * Used to allow updates to the graph without redrawing
+	 * completely. A map is used here to continue supporting
+	 * a different setting for each graph view currently being
+	 * shown.
+	 */
+	private Map<GraphView, List<Edge>> currentImproperEdges = null;
+	/**
 	 * A map containing the labels of the current nodes and 
 	 * the respective graph classes full name. Enables us to
 	 * find a graph class using the text displayed on the 
@@ -194,18 +202,20 @@ public class YFilesDrawingService implements IDrawingService {
 		nodeLabelMap.clear();
 		currentNodes = new HashMap<NodeView, Node>();
 		currentEdges = new ArrayList<EdgeView>();
-		Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
+		currentImproperEdges = new HashMap<GraphView, List<Edge>>();
 
 		for (GraphView view : graphs) {
 			List<NodeView> nodes = view.getNodes();
 			List<EdgeView> edges = view.getEdges();
+			Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
+			Map<Node, List<Node>> improperNodeMap = new HashMap<Node, List<Node>>();
 			//D.bug("Before: " + nodes.size() + " nodes & " + edges.size() + " edges");
 
 			/* Create all the nodes required for each of the edges. */
 			NodeRealizer realizer = graph2D.getDefaultNodeRealizer()
 					.createCopy();
 			for (EdgeView edge : edges) {
-				processEdge(nodeMap, edge);
+				processEdge(edge, nodeMap, improperNodeMap);
 			}
 
 			/* Run through the from-to map of nodes creating the edges. */
@@ -219,6 +229,26 @@ public class YFilesDrawingService implements IDrawingService {
 					edgeRealizer.setTargetArrow(Arrow.STANDARD);
 					
 					graph2D.createEdge(from, to, edgeRealizer);
+				}
+			}
+			/* Add any improper inclusions if necessary */
+			currentImproperEdges.put(view, new ArrayList<Edge>());
+			for (Node from : improperNodeMap.keySet()) {
+				//D.bug("From " + from);
+				List<Node> toNodes = improperNodeMap.get(from);
+				for (Node to : toNodes) {
+					//D.bug("\tTo " + to);
+					EdgeRealizer edgeRealizer = graph2D
+							.getDefaultEdgeRealizer().createCopy();
+					edgeRealizer.setTargetArrow(Arrow.STANDARD);
+					
+					/* Only draw the source arrow if necessary */
+					if (view.getIncludeUnproper()) {
+						edgeRealizer.setSourceArrow(Arrow.STANDARD);
+					}
+					
+					Edge edge = graph2D.createEdge(from, to, edgeRealizer);
+					currentImproperEdges.get(view).add(edge);
 				}
 			}
 			
@@ -259,15 +289,17 @@ public class YFilesDrawingService implements IDrawingService {
 	public void updateView(List<GraphView> graphs, HashMap<String, String> initialNames) {
 		// TODO: Comments
 		D.bug("entering updateView");
-		Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
 
 		for (GraphView view : graphs) {
 			List<NodeView> nodes = view.getNodes();
 			List<EdgeView> edges = view.getEdges();
+			Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
+			Map<Node, List<Node>> improperNodeMap = new HashMap<Node, List<Node>>();
+			NodeRealizer realizer = graph2D.getDefaultNodeRealizer().createCopy();
+			
 			//D.bug("Before: " + nodes.size() + " nodes & " + edges.size()
 			//		+ " edges");
 
-			NodeRealizer realizer = graph2D.getDefaultNodeRealizer().createCopy();
 			
 			/* Create a copy of the current edges so we can keep track of which
 			 * ones have been removed and which of the new edges aren't present.
@@ -276,13 +308,12 @@ public class YFilesDrawingService implements IDrawingService {
 			for (EdgeView edge : edges) {
 				if (excessEdges.contains(edge)) {
 					/* Remove the edge from the queue so that we only have
-					 * missing edges left in the collection at the end.
-					 */
+					 * missing edges left in the collection at the end. */
 					excessEdges.remove(edge);
 				}
 				else {
 					/* This is a new edge */
-					processEdge(nodeMap, edge);
+					processEdge(edge, nodeMap, improperNodeMap);
 				}
 			}
 			
@@ -322,6 +353,25 @@ public class YFilesDrawingService implements IDrawingService {
 							.getDefaultEdgeRealizer().createCopy();
 					edgeRealizer.setTargetArrow(Arrow.STANDARD);
 					graph2D.createEdge(from, to, edgeRealizer);
+				}
+			}
+			currentImproperEdges.put(view, new ArrayList<Edge>());
+			for (Node from : improperNodeMap.keySet()) {
+				//D.bug("From " + from);
+				List<Node> toNodes = improperNodeMap.get(from);
+				for (Node to : toNodes) {
+					//D.bug("\tTo " + to);
+					EdgeRealizer edgeRealizer = graph2D
+							.getDefaultEdgeRealizer().createCopy();
+					edgeRealizer.setTargetArrow(Arrow.STANDARD);
+					
+					/* Only draw the source arrow if necessary */
+					if (view.getIncludeUnproper()) {
+						edgeRealizer.setSourceArrow(Arrow.STANDARD);
+					}
+					
+					Edge edge = graph2D.createEdge(from, to, edgeRealizer);
+					currentImproperEdges.get(view).add(edge);
 				}
 			}
 			
@@ -404,6 +454,28 @@ public class YFilesDrawingService implements IDrawingService {
         	nr.setFillColor(nodeView.getColor());
           	nr.repaint();
         }
+	}
+	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#updateColors()
+	 */
+	@Override
+	public void updateImproperInclusions(List<GraphView> graphs) {
+		for (GraphView view : graphs) {
+			if (this.currentImproperEdges.containsKey(view)) {
+				/* Run through all the improper edges for this view */
+				for (Edge edge : this.currentImproperEdges.get(view)) {
+					EdgeRealizer edgeRealizer = this.graph2D.getRealizer(edge);
+					if (view.getIncludeUnproper()) {
+						edgeRealizer.setSourceArrow(Arrow.STANDARD);
+					}
+					else {
+						edgeRealizer.setSourceArrow(Arrow.NONE);
+					}
+					edgeRealizer.repaint();
+				}
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -845,13 +917,15 @@ public class YFilesDrawingService implements IDrawingService {
 
 	/**
 	 * Creates any nodes required for the given edge
+	 * @param edge The edge to be processed.
 	 * @param nodeMap A map of nodes and their connected
 	 * nodes (key = from node, value = to nodes). This is 
 	 * used to create the yfiles Edge objects after all 
 	 * the nodes have been created.
-	 * @param edge The edge to be processed.
+	 * @param improperNodeMap The node map for improper edges.
 	 */
-	private void processEdge(Map<Node, List<Node>> nodeMap, EdgeView edge) {
+	private void processEdge(EdgeView edge,
+			Map<Node, List<Node>> nodeMap, Map<Node, List<Node>> improperNodeMap) {
 		/* Get the node view objects for the edge */
 		NodeView from = edge.getFromNode();
 		NodeView to = edge.getToNode();
@@ -871,12 +945,23 @@ public class YFilesDrawingService implements IDrawingService {
 		}
 
 		/* Update the node map with the current from-to mapping */
-		if (nodeMap.containsKey(tempFrom)) {
-			nodeMap.get(tempFrom).add(tempTo);
-		} else {
-			ArrayList<Node> toNodes = new ArrayList<Node>();
-			toNodes.add(tempTo);
-			nodeMap.put(tempFrom, toNodes);
+		if (edge.getProper()) {			
+			if (nodeMap.containsKey(tempFrom)) {
+				nodeMap.get(tempFrom).add(tempTo);
+			} else {
+				ArrayList<Node> toNodes = new ArrayList<Node>();
+				toNodes.add(tempTo);
+				nodeMap.put(tempFrom, toNodes);
+			}
+		}
+		else {
+			if (improperNodeMap.containsKey(tempFrom)) {
+				improperNodeMap.get(tempFrom).add(tempTo);
+			} else {
+				ArrayList<Node> toNodes = new ArrayList<Node>();
+				toNodes.add(tempTo);
+				improperNodeMap.put(tempFrom, toNodes);
+			}
 		}
 		currentEdges.add(edge);
 	}

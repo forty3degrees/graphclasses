@@ -19,7 +19,10 @@ import org.xml.sax.SAXException;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
+import teo.isgci.data.db.Algo;
 import teo.isgci.data.gc.GraphClass;
+import teo.isgci.data.grapht.GAlg;
+import teo.isgci.data.grapht.Inclusion;
 import teo.isgci.data.xml.GraphMLWriter;
 
 /**
@@ -56,16 +59,23 @@ public class GraphView {
         edges = new ArrayList<EdgeView>();
 
         // Create the EdgeViews
+    	SimpleDirectedGraph<GraphClass, Inclusion> inclusionGraph = 
+    			App.DataProvider.getInclusionGraph();
         for (DefaultEdge e : graph.edgeSet()) {
-            EdgeView v = new EdgeView(this, e);
+            EdgeView view = new EdgeView(this, e);
             
-            setProperness(v);
-            edges.add(v);
+            setProperness(view, inclusionGraph);
+            edges.add(view);
         }
     }
 
-	private void setProperness(EdgeView v) {
-		// TODO Auto-generated method stub
+	private void setProperness(EdgeView view, 
+			SimpleDirectedGraph<GraphClass, Inclusion> inclusionGraph) {
+        List<Inclusion> path = GAlg.getPath(inclusionGraph,
+                view.getFrom().iterator().next(),
+                view.getTo().iterator().next());
+        view.setProper(Algo.isPathProper(path)  ||
+                Algo.isPathProper(Algo.makePathProper(path)));
 		
 	}
 

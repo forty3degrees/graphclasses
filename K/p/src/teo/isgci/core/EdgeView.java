@@ -40,10 +40,14 @@ public class EdgeView {
         isProper = false;
     }
 
+    public boolean getProper() {
+        return isProper;
+    }
+    
     public void setProper(boolean b) {
         isProper = b;
     }
-
+    
     public Set<GraphClass> getFrom() {
         return from;
     }
