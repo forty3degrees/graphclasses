@@ -57,6 +57,7 @@ import y.view.Graph2DLayoutExecutor;
 import y.view.Graph2DPrinter;
 import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
+import y.view.HtmlLabelConfiguration;
 import y.view.MovePortMode;
 import y.view.NavigationComponent;
 import y.view.NodeLabel;
@@ -66,6 +67,7 @@ import y.view.ShapeNodeRealizer;
 import y.view.ShinyPlateNodePainter;
 import y.view.SmartNodeLabelModel;
 import y.view.ViewMode;
+import y.view.YLabel;
 import yext.export.io.EPSOutputHandler;
 import yext.svg.io.SVGIOHandler;
 
@@ -131,6 +133,10 @@ public class YFilesDrawingService implements IDrawingService {
 	 * Key for setting the node configuration.
 	 */
 	public static final String NODE_CONFIGURATION = "myConf";
+	/**
+	 * Key for setting the HTML label configuration.
+	 */
+	public static final String HTML_CONFIGURATION = "HtmlConfig";
 
 	/**
 	 * Static c'tor. Registers the default node configuration when the type is first used.
@@ -212,8 +218,6 @@ public class YFilesDrawingService implements IDrawingService {
 			//D.bug("Before: " + nodes.size() + " nodes & " + edges.size() + " edges");
 
 			/* Create all the nodes required for each of the edges. */
-			NodeRealizer realizer = graph2D.getDefaultNodeRealizer()
-					.createCopy();
 			for (EdgeView edge : edges) {
 				processEdge(edge, nodeMap, improperNodeMap);
 			}
@@ -255,25 +259,7 @@ public class YFilesDrawingService implements IDrawingService {
 			/* Now check to see if we have any nodes that don't have any edges. */
 			for (NodeView node : nodes) {
 				if (!currentNodes.containsKey(node)) {
-					
-					String label = node.getLabel();
-					String fullname = node.getFullName();
-										
-					if (initialNames.containsKey(fullname)) {
-						node.setNameAndLabel(initialNames.get(fullname));
-						label = node.getLabel();
-						fullname = node.getFullName();
-					}
-					
-					realizer = graph2D.getDefaultNodeRealizer().createCopy();
-					realizer.setLabelText(label);
-					realizer.setFillColor(node.getColor());
-					Node temp = graph2D.createNode(realizer);
-
-					if (!this.nodeLabelMap.containsKey(label)) {
-						this.nodeLabelMap.put(label, fullname);
-					}
-					currentNodes.put(node, temp);
+					this.createNode(node);
 					//D.bug("Adding orphaned node");
 				}
 			}
@@ -294,9 +280,7 @@ public class YFilesDrawingService implements IDrawingService {
 			List<NodeView> nodes = view.getNodes();
 			List<EdgeView> edges = view.getEdges();
 			Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
-			Map<Node, List<Node>> improperNodeMap = new HashMap<Node, List<Node>>();
-			NodeRealizer realizer = graph2D.getDefaultNodeRealizer().createCopy();
-			
+			Map<Node, List<Node>> improperNodeMap = new HashMap<Node, List<Node>>();			
 			//D.bug("Before: " + nodes.size() + " nodes & " + edges.size()
 			//		+ " edges");
 
@@ -390,7 +374,7 @@ public class YFilesDrawingService implements IDrawingService {
 				this.currentNodes.remove(node);
 				
 				/* Not strictly necessary, but we should tidy up */
-				String label = node.getLabel();
+				String label = node.getHtmlLabel();
 				if (this.nodeLabelMap.containsKey(label)) {
 					//this.nodeLabelMap.remove(label);
 				}
@@ -400,40 +384,7 @@ public class YFilesDrawingService implements IDrawingService {
 			System.out.println(nodes.size() + " NODES");
 			for (NodeView node : nodes) {
 				if (!currentNodes.containsKey(node)) {
-					String label = node.getLabel();
-					String fullname = node.getFullName();
-
-					if (initialNames.containsKey(fullname)) {
-						node.setNameAndLabel(initialNames.get(fullname));
-						label = node.getLabel();
-						fullname = node.getFullName();
-					}
-					
-					realizer = graph2D.getDefaultNodeRealizer().createCopy();
-					realizer.setLabelText(label);
-					realizer.setFillColor(node.getColor());
-					Node temp = graph2D.createNode(realizer);
-
-					if (!this.nodeLabelMap.containsKey(label)) {
-						this.nodeLabelMap.put(label, fullname);
-					}
-					currentNodes.put(node, temp);
-				} else {
-					String label = node.getLabel();
-					String fullname = node.getFullName();
-					
-					if (initialNames.containsKey(fullname)) {
-						node.setNameAndLabel(initialNames.get(fullname));
-						label = node.getLabel();
-						fullname = node.getFullName();
-					}
-					
-					realizer = graph2D.getRealizer(currentNodes.get(node));
-					realizer.setLabelText(label);
-					realizer.setFillColor(node.getColor());
-					if (!this.nodeLabelMap.containsKey(label)) {
-						this.nodeLabelMap.put(label, fullname);
-					}
+					this.createNode(node);
 				}
 			}
 		}
@@ -774,7 +725,7 @@ public class YFilesDrawingService implements IDrawingService {
 					s = s.replace("</sub>", "");
 				}
 			}
-			System.out.println(view.getLabel() + " " + s + " "
+			System.out.println(view.getHtmlLabel() + " " + s + " "
 					+ view.toString());
 			
 			if (view.getFullName().equals(s)) {
@@ -853,11 +804,10 @@ public class YFilesDrawingService implements IDrawingService {
 	 * @return The full name.
 	 */
 	String getNodeName(Node node) {
-		String s = node.toString();
-		if (this.nodeLabelMap.containsKey(s)) {
-			s = this.nodeLabelMap.get(s);
-		}
-		return s;
+		NodeRealizer realizer = this.graph2D.getRealizer(node);
+		NodeLabel label = realizer.getLabel();
+		NodeView view = (NodeView)label.getUserData();
+		return view.getFullName();
 	}
 	
 	/**
@@ -973,14 +923,23 @@ public class YFilesDrawingService implements IDrawingService {
 	 */
 	private Node createNode(NodeView nodeView) {
 
-		/* Get a node realizer and set the label and colour. */
+		/* Get a node realizer and create a node. */
 		NodeRealizer realizer = graph2D.getDefaultNodeRealizer().createCopy();
-		String label = nodeView.getLabel();
-		realizer.setLabelText(label);
 		realizer.setFillColor(nodeView.getColor());
 		Node node = graph2D.createNode(realizer);
-		
+
+//		if (initialNames.containsKey(fullname)) {
+//			node.setNameAndLabel(initialNames.get(fullname));
+//			label = node.getHtmlLabel();
+//			fullname = node.getFullName();
+//		}
+
+		/* Set the node label. */
+		NodeLabel nodeLabel = getNodeLabel(nodeView, realizer);
+		realizer.setLabel(nodeLabel);
+
 		/* Add the label/fullname mapping to the label map. */
+		String label = nodeView.getHtmlLabel();
 		String fullname = nodeView.getFullName();
 		if (!this.nodeLabelMap.containsKey(label)) {
 			this.nodeLabelMap.put(label, fullname);
@@ -988,6 +947,31 @@ public class YFilesDrawingService implements IDrawingService {
 		/* Save and return the node */
 		currentNodes.put(nodeView, node);
 		return node;
+	}
+
+	/**
+	 * Gets a node label for the given node.
+	 * @param nodeView The node.
+	 * @return The node label.
+	 */
+	private NodeLabel getNodeLabel(NodeView nodeView, NodeRealizer nodeRealizer) {
+		/* Create a new label and set the HTML configuration */
+		NodeLabel nodeLabel = nodeRealizer.createNodeLabel();
+		nodeLabel.setConfiguration(HTML_CONFIGURATION); 
+		
+		/* Set the label text */
+		D.bug("Node label: " + nodeView.getHtmlLabel());
+		nodeLabel.setText("<html>" + nodeView.getHtmlLabel() + "</html>");
+		
+		/* The following line can be use to automatically trim the text
+		 * without using the NodeView label property. This would allow for
+		 * a fixed node width without any text size calculation. */
+		//nodeLabel.setAutoSizePolicy(YLabel.AUTOSIZE_CONTENT);
+		
+		/* Set the tag so we can find the class associated with this node */
+		nodeLabel.setUserData(nodeView);
+
+		return nodeLabel;
 	}
 
 	/**
@@ -1033,10 +1017,26 @@ public class YFilesDrawingService implements IDrawingService {
 		// ShinyPlateNodePainter has an option to draw a drop shadow that is
 		// more efficient than wrapping it in a ShadowNodePainter.
 		painter.setDrawShadow(drawShadows);
-
+		
 		configurationMap.put(GenericNodeRealizer.Painter.class, painter);
 		configurationMap.put(GenericNodeRealizer.ContainsTest.class, painter);
+
 		factory.addConfiguration(NODE_CONFIGURATION, configurationMap);
+
+		/* Instantiate HtmlLabelConfiguration. */  
+		YLabel.Factory labelFactory = NodeLabel.getFactory();  
+		HtmlLabelConfiguration htmlConfig = new HtmlLabelConfiguration();  
+		  
+		/* Stupid factory methods with their raw types :( */
+		@SuppressWarnings("unchecked")
+		Map<Object, Object> htmlConfigMap = labelFactory.createDefaultConfigurationMap();  
+		htmlConfigMap.put(YLabel.Painter.class, htmlConfig);  
+		htmlConfigMap.put(YLabel.Layout.class, htmlConfig);  
+		htmlConfigMap.put(YLabel.BoundsProvider.class, htmlConfig);
+		  
+		/* Add the HTML configuration to the factory. */
+		labelFactory.addConfiguration(HTML_CONFIGURATION, htmlConfigMap);
+		  
 	}
 
 	/**

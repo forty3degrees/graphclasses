@@ -10,6 +10,7 @@
 
 package teo.isgci.core;
 
+import teo.isgci.core.util.Latex2Html;
 import teo.isgci.data.gc.GraphClass;
 import teo.isgci.data.problem.Complexity;
 import teo.isgci.data.problem.Problem;
@@ -39,6 +40,10 @@ public class NodeView {
     public static Color COLOR_NPC = Color.red;
     public static Color COLOR_INTERMEDIATE = SColor.brighter(Color.red);
     public static Color COLOR_UNKNOWN = Color.white;
+	/**
+	 * Latex to HTML converter for the HTML node labels.
+	 */
+	private static Latex2Html latexConverter = new Latex2Html("images/");
 
     public NodeView(GraphView parent, Set<GraphClass> node) {
         this.parent = parent;
@@ -70,6 +75,13 @@ public class NodeView {
         return label;
     }
 
+    /** Get the depicted label as HTML.
+     *  The conversion from latex is done on-demand so 
+     *  the returned value should be cached. */
+    public String getHtmlLabel() {
+        return latexConverter.html(label);
+    }
+    
     /** Set the depicted label */
     protected void setLabel(String s) {
         label = teo.isgci.core.util.Utility.getShortName(s);

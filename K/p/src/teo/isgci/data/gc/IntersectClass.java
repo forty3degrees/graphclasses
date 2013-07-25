@@ -60,7 +60,7 @@ public class IntersectClass extends SetClass {
      * its base-classes with " \cap " (TeX-symbol for a union).
      */
     public void setName() {
-        buildName(" \u2229 ");
+        buildName(" \\cap ");
     }
         
 
