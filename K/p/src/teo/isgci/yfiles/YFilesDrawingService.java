@@ -838,6 +838,8 @@ public class YFilesDrawingService implements IDrawingService {
         	/* Now we need to update the node size (for all nodes) */
         	this.updateNodeSize();
         }
+        /* Update the graph view to remove artifacts outside the nodes bounds */
+		this.graphView.updateView();
 	}
 	
 	/**
