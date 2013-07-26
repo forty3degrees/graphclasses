@@ -12,6 +12,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import teo.isgci.core.App;
+import teo.isgci.core.util.Latex;
+import teo.isgci.core.util.Latex2Html;
 import teo.isgci.data.db.Algo;
 import teo.isgci.data.gc.GraphClass;
 import teo.isgci.view.gui.GraphClassInformationDialog;
@@ -99,18 +101,17 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
 
         	while (classes.hasNext()) {
         		final GraphClass c = classes.next();
-        		System.out.println(c);
-        		JMenuItem item = new JMenuItem(c.toString());        		
+        		JMenuItem item = new JMenuItem("<html>" + new Latex2Html("").html(c.toString()) +"</html>");        		
         		item.addActionListener(new AbstractAction() {
                     /** Keep the compiler happy ^^ */
 					private static final long serialVersionUID = 1L;
 
 					@Override
                     public void actionPerformed(ActionEvent e) {
-                    	System.out.println(node.toString() + " -> " + c.toString());
                     	App.getViewManager(parent).putDefaultName(c);
-                    	getGraph2D().setLabelText(node, c.toString());
+                    	getGraph2D().setLabelText(node, "<html>" + new Latex2Html("").html(c.toString()) +"</html>");
                     	getGraph2D().updateViews();
+                    	App.getDrawingService(parent).refreshView();
                     }
                 });
             	namingMenu.add(item);

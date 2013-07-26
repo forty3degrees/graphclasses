@@ -18,8 +18,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -31,6 +33,7 @@ import teo.isgci.core.EdgeView;
 import teo.isgci.core.GraphView;
 import teo.isgci.core.IDrawingService;
 import teo.isgci.core.NodeView;
+import teo.isgci.data.db.Algo;
 import teo.isgci.data.gc.GraphClass;
 import teo.isgci.view.gui.ISGCIMainFrame;
 import teo.isgci.view.gui.PSGraphics;
@@ -137,6 +140,8 @@ public class YFilesDrawingService implements IDrawingService {
 	 * Key for setting the HTML label configuration.
 	 */
 	public static final String HTML_CONFIGURATION = "HtmlConfig";
+	
+	private HashMap<String, String> initialNames;
 
 	/**
 	 * Static c'tor. Registers the default node configuration when the type is first used.
@@ -199,11 +204,14 @@ public class YFilesDrawingService implements IDrawingService {
 	 * @see teo.isgci.core.IDrawingService#initializeView(java.util.List, java.util.HashMap)
 	 */
 	@Override
-	public void initializeView(List<GraphView> graphs, HashMap<String, String> initialNames) {
+	public void initializeView(List<GraphView> graphs, HashMap<String, String> initialN) {
 		// TODO: Comments
 		//D.bug("entering initializeView");
 		
 		/* Clear the current graph and re-initialise the collections. */
+		
+		initialNames = initialN;
+		
 		graph2D.clear();
 		nodeLabelMap.clear();
 		currentNodes = new HashMap<NodeView, Node>();
@@ -427,6 +435,7 @@ public class YFilesDrawingService implements IDrawingService {
 				}
 			}
 		}
+		this.graph2D.updateViews();
 	}
 
 	/* (non-Javadoc)
@@ -928,15 +937,26 @@ public class YFilesDrawingService implements IDrawingService {
 		realizer.setFillColor(nodeView.getColor());
 		Node node = graph2D.createNode(realizer);
 
-//		if (initialNames.containsKey(fullname)) {
-//			node.setNameAndLabel(initialNames.get(fullname));
-//			label = node.getHtmlLabel();
-//			fullname = node.getFullName();
-//		}
-
-		/* Set the node label. */
+				/* Set the node label. */
 		NodeLabel nodeLabel = getNodeLabel(nodeView, realizer);
+		
+		Set<GraphClass> sgc = nodeView.getNode();
+		Iterator<GraphClass> it = sgc.iterator();
+		if (it.hasNext()) 
+		{
+			GraphClass mc = sgc.iterator().next();
+			GraphClass equiOne = Algo.equNodes(mc).get(0);
+			if (initialNames.containsKey(equiOne.toString())) {
+				nodeView.setNameAndLabel(initialNames.get(equiOne.toString()));
+				nodeLabel = getNodeLabel(nodeView, realizer);
+			}
+		}		
+		
+		
+		
 		realizer.setLabel(nodeLabel);
+		
+		
 
 		/* Add the label/fullname mapping to the label map. */
 		String label = nodeView.getHtmlLabel();
@@ -961,6 +981,7 @@ public class YFilesDrawingService implements IDrawingService {
 		
 		/* Set the label text */
 		D.bug("Node label: " + nodeView.getHtmlLabel());
+
 		nodeLabel.setText("<html>" + nodeView.getHtmlLabel() + "</html>");
 		
 		/* The following line can be use to automatically trim the text

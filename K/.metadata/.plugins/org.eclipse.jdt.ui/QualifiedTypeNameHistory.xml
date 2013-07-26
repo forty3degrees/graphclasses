@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="org.jgrapht.DirectedGraph"/>
-<fullyQualifiedTypeName name="teo.data.services.XmlDataProvider"/>
 <fullyQualifiedTypeName name="org.jgrapht.graph.SimpleDirectedGraph"/>
 <fullyQualifiedTypeName name="teo.data.services.IDataProvider"/>
 <fullyQualifiedTypeName name="java.util.Set"/>
@@ -47,12 +45,10 @@
 <fullyQualifiedTypeName name="java.util.Collection"/>
 <fullyQualifiedTypeName name="y.base.Edge"/>
 <fullyQualifiedTypeName name="teo.isgci.data.gc.GraphClass"/>
-<fullyQualifiedTypeName name="teo.isgci.data.db.Algo"/>
 <fullyQualifiedTypeName name="teo.isgci.core.ViewManager"/>
 <fullyQualifiedTypeName name="y.view.hierarchy.HierarchyManager"/>
 <fullyQualifiedTypeName name="teo.isgci.yfiles.YFilesDrawingService"/>
 <fullyQualifiedTypeName name="teo.isgci.data.db.Ref"/>
-<fullyQualifiedTypeName name="java.util.Iterator"/>
 <fullyQualifiedTypeName name="teo.isgci.core.IDrawingService"/>
 <fullyQualifiedTypeName name="java.lang.Integer"/>
 <fullyQualifiedTypeName name="y.view.HtmlLabelConfiguration"/>
@@ -60,4 +56,8 @@
 <fullyQualifiedTypeName name="y.view.YLabel.BoundsProvider"/>
 <fullyQualifiedTypeName name="y.view.YLabel"/>
 <fullyQualifiedTypeName name="y.view.MovePortMode"/>
+<fullyQualifiedTypeName name="teo.isgci.core.util.Latex"/>
+<fullyQualifiedTypeName name="teo.isgci.core.util.Latex2Html"/>
+<fullyQualifiedTypeName name="teo.isgci.data.db.Algo"/>
+<fullyQualifiedTypeName name="java.util.Iterator"/>
 </qualifiedTypeNameHistroy>

@@ -10,12 +10,14 @@
 
 package teo.isgci.view.gui;
 
-import java.util.Vector;
-import java.util.Iterator;
-import java.util.Collection;
 import java.awt.Component;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
+
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.ListCellRenderer;
 
 import teo.isgci.data.gc.GraphClass;
 
@@ -63,10 +65,24 @@ public class NodeList extends JList {
      * Replace all nodes in this list by the given data.
      */
     public void setListData(Iterator data) {
+    	int error = 0;
         Vector v = new Vector();
-        while (data.hasNext())
-            v.add(data.next());
+        while (data.hasNext()) {
+        	GraphClass gc = (GraphClass)data.next(); 
+        	if (gc != null) { 
+        		v.add(gc);
+        	} else {
+        		error++;
+        	}
+        }
         setListData(v);
+        if (error > 0) {
+        	JOptionPane.showMessageDialog(null,  "The search returned "
+        			+ error + " GraphClasses\n"
+        			+ "that are not part of your local copy.\n"
+        			+ "Please update your database."
+        			, "Attention", JOptionPane.OK_CANCEL_OPTION);
+        }
     }
 
 
@@ -94,6 +110,10 @@ public class NodeList extends JList {
         public Component getListCellRendererComponent(
                 JList list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {
+        	if (value == null) {
+        		return latex.newLabel("");
+        	}
+        	System.out.println(((GraphClass) value).toString());
             LatexLabel label =
                     latex.newLabel(((GraphClass) value).toString());
             if (isSelected) {
