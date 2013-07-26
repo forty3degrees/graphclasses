@@ -255,8 +255,10 @@ inP:
         if (source == drawButton) {
             Cursor oldcursor = parent.getCursor();
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            App.getViewManager(parent).load(
-            		App.DataProvider.getNodes(lists.getSelectedNode(), this.problem));
+            
+            Collection<GraphClass> graphClasses = 
+            		App.DataProvider.getGraphClasses(lists.getSelectedNode(), this.problem);
+            App.getViewManager(parent).load(graphClasses, false, false);
             setCursor(oldcursor);
             closeDialog();
         } else if (source == showButton) {

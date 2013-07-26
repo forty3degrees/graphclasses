@@ -36,6 +36,6 @@ public interface IDataProvider {
     int getNodeCount();
     int getEdgeCount();
     
-	Collection<GraphClass> getNodes(Collection<GraphClass> graphs, boolean doSuper, boolean doSub);
-	Collection<GraphClass> getNodes(GraphClass graph, Problem problem);
+	Collection<GraphClass> getGraphClasses(Collection<GraphClass> graphs, boolean doSuper, boolean doSub);
+	Collection<GraphClass> getGraphClasses(GraphClass graph, Problem problem);
 }

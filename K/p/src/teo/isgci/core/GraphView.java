@@ -94,7 +94,7 @@ public class GraphView {
      */
     public NodeView getView(Set<GraphClass> node) {
         for (NodeView v : nodes)
-            if (v.getNode() == node)
+            if (v.getGraphClasses() == node)
                 return v;
         return null;
     }

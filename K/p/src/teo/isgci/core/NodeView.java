@@ -25,14 +25,16 @@ import org.xml.sax.SAXException;
  * Displays a node.
  */
 public class NodeView {
-    protected GraphView parent;
-    protected Set<GraphClass> node;
+    private GraphView parent;
+    private Set<GraphClass> graphClasses;
+    private GraphClass defaultClass;
     /** The label that is displayed in the node, shortened automatically from
-     * the fullname */
-    protected String label;
-    /** The fullname of the node (e.g. for identification) */
-    protected String fullName;
-    protected Color color;
+     * the full name */
+    private String label;
+    /** The full name of the node (e.g. for identification) */
+    private String fullName;
+    private Color color;
+    
     
     /** Colours for different complexities */
     public static Color COLOR_LIN = Color.green;
@@ -45,19 +47,32 @@ public class NodeView {
 	 */
 	private static Latex2Html latexConverter = new Latex2Html("images/");
 
-    public NodeView(GraphView parent, Set<GraphClass> node) {
+    public NodeView(GraphView parent, Set<GraphClass> graphClasses) {
         this.parent = parent;
-        this.node = node;
+        this.graphClasses = graphClasses;
         this.color = Color.white;
-        label = "";
-        fullName = "";
     }
     
     /**
      * Get the node.
      */
-    public Set<GraphClass> getNode() {
-        return node;
+    public Set<GraphClass> getGraphClasses() {
+        return graphClasses;
+    }
+
+    /** Get the default class */
+    public GraphClass getDefaultClass() {
+        return defaultClass;
+    }
+
+    /** Set the default class */
+    public void setDefaultClass(GraphClass g) {
+    	/* Make sure only non-null values are used */
+    	if (g == null) {
+    		throw new NullPointerException("g cannot be null");
+    	}
+    	defaultClass = g;
+        this.setNameAndLabel(defaultClass.toString());
     }
 
     /** Get the full name */
@@ -66,7 +81,7 @@ public class NodeView {
     }
 
     /** Set the full name */
-    protected void setFullName(String s) {
+    private void setFullName(String s) {
         fullName = s;
     }
 
@@ -74,27 +89,23 @@ public class NodeView {
     public String getLabel() {
         return label;
     }
+    
+    /** Set the depicted label */
+    private void setLabel(String s) {
+        label = teo.isgci.core.util.Utility.getShortName(s);
+    }
 
     /** Get the depicted label as HTML.
      *  The conversion from latex is done on-demand so 
      *  the returned value should be cached. */
     public String getHtmlLabel() {
-        return latexConverter.html(label);
+        return "<html>" + latexConverter.html(label) + "</html>";
     }
     
-    /** Set the depicted label */
-    protected void setLabel(String s) {
-        label = teo.isgci.core.util.Utility.getShortName(s);
-    }
-
-    /** Set the fullname to s and the label to the shortened form of s. */
-    public void setNameAndLabel(String s) {
+    /** Set the full name to s and the label to the shortened form of s. */
+    private void setNameAndLabel(String s) {
         setFullName(s);
         setLabel(s);
-    }
-
-    public void setColor(Color c) {
-        color = c;
     }
 
     public Color getColor() {
@@ -105,12 +116,12 @@ public class NodeView {
      * Update the nodes colour considering its complexity for the given
      * problem.
      */
-    public void updateColor(Problem problem) {
+    public void setColor(Problem problem) {
         if (problem == null) {
         	color = COLOR_UNKNOWN;
         }
         else {
-        	Complexity complexity= problem.getComplexity(node.iterator().next());
+        	Complexity complexity= problem.getComplexity(graphClasses.iterator().next());
 	        if (/*complexity == null  ||*/  complexity.isUnknown()) {
 	            color = COLOR_UNKNOWN;
 	        }
@@ -134,7 +145,7 @@ public class NodeView {
     }
     
     
-    public void setColoring(Color lin, Color p, Color i, Color npc, Color u) {
+    public static void setColoring(Color lin, Color p, Color i, Color npc, Color u) {
        	COLOR_LIN = lin;
        	COLOR_P = p;
        	COLOR_INTERMEDIATE = i;

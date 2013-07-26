@@ -655,11 +655,8 @@ private void colorBoxItemStateChanged(final ItemEvent e){
     int selectedIndexU = colBoxU.getSelectedIndex();
         
     ViewManager viewManager = App.getViewManager(parent);	
-    for (GraphView gv : viewManager.getCurrentViews()) {
-        for (NodeView v : gv.getNodes()) {
-           v.setColoring(colBoxL.COLORS[selectedIndexL], colBoxP.COLORS[selectedIndexP], colBoxI.COLORS[selectedIndexI], colBoxNpc.COLORS[selectedIndexNpc], colBoxU.COLORS[selectedIndexU]);    
-        }
-    }
+    NodeView.setColoring(colBoxL.COLORS[selectedIndexL], colBoxP.COLORS[selectedIndexP], colBoxI.COLORS[selectedIndexI], colBoxNpc.COLORS[selectedIndexNpc], colBoxU.COLORS[selectedIndexU]);    
+    
     viewManager.setComplexityColors();
     viewManager.updateProblem();
     

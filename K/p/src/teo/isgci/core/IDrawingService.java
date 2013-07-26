@@ -3,7 +3,6 @@ package teo.isgci.core;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -21,16 +20,20 @@ public interface IDrawingService {
 	 * @param graphs
 	 * @param initialNames
 	 */
-	void initializeView(List<GraphView> graphs, HashMap<String, String> initialNames);
+	void initializeView(List<GraphView> graphs);
 	/**
 	 * @param graphs
 	 * @param initialNames
 	 */
-	void updateView(List<GraphView> graphs, HashMap<String, String> initialNames);
+	void updateView(List<GraphView> graphs);
 	/**
 	 * 
 	 */
 	void updateColors();
+	/**
+	 * 
+	 */
+	void updateLabel(NodeView node);
 	/**
 	 * 
 	 */
@@ -111,5 +114,6 @@ public interface IDrawingService {
 	 * @return
 	 */
 	URL getCurrentFile();
+
     
 }

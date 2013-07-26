@@ -184,7 +184,7 @@ public abstract class DataProvider implements IDataProvider {
      * Returns a Collection with the selected classes an there super/sub classes if specified
      */
 	@Override
-    public Collection<GraphClass> getNodes(Collection<GraphClass> graphs, 
+    public Collection<GraphClass> getGraphClasses(Collection<GraphClass> graphs, 
     		boolean doSuper, boolean doSub) {
         final HashSet<GraphClass> result = new HashSet<GraphClass>();
        
@@ -206,7 +206,7 @@ public abstract class DataProvider implements IDataProvider {
      * The environment depends on the complexity of the given node.
      */
 	@Override
-    public Collection<GraphClass> getNodes(GraphClass graph, Problem problem) {
+    public Collection<GraphClass> getGraphClasses(GraphClass graph, Problem problem) {
         Complexity c = problem.getComplexity(graph);
         Collection<GraphClass> result = null;
         if (c.isUnknown())

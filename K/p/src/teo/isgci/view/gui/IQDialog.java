@@ -158,13 +158,17 @@ public class IQDialog extends JDialog
         } else if (source == newButton) {
             Cursor oldcursor = parent.getCursor();
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            App.getViewManager(parent).load(getNodes());
+            
+            // TODO: Need to fix getNodes and set getSuper and getSub
+            // to the correct values.
+            App.getViewManager(parent).load(getNodes(), false, false);
             
             for (Object o : classesList.getSelectedValuesList()) {
                 GraphClass gc = (GraphClass) o;
                 NodeView v = App.getViewManager(parent).findNode(gc);
-                if (v != null)
-                    v.setNameAndLabel(gc.toString());
+                if (v != null) {
+                    v.setDefaultClass(gc);
+                }
             }
             
             setCursor(oldcursor);

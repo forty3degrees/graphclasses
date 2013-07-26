@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Collection;
 
+import teo.isgci.core.util.Latex2Html;
+
 public abstract class GraphClass {
 
     public enum Hered {
@@ -53,6 +55,10 @@ public abstract class GraphClass {
     protected int hashcode;
     /** Did we calculate the hashcode already? */
     protected boolean havehash;
+	/**
+	 * Latex to HTML converter for the HTML labels.
+	 */
+	private static Latex2Html latexConverter = new Latex2Html("images/");
 
 
     public GraphClass() {
@@ -261,7 +267,21 @@ public abstract class GraphClass {
     }
 
     protected abstract int calcHash();
-   
+
+
+    /**
+     * Returns the name of this GraphClass.
+     */
+    public String getName() {
+        return this.toString();
+    }
+
+    /** Get the depicted name as HTML.
+     *  The conversion from latex is done on-demand so 
+     *  the returned value should be cached. */
+    public String getNameAsHtml() {
+        return "<html>" + latexConverter.html(this.toString()) + "</html>";
+    }
 
     /**
      * Returns a String representation of this GraphClass.

@@ -18,10 +18,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -33,7 +31,6 @@ import teo.isgci.core.EdgeView;
 import teo.isgci.core.GraphView;
 import teo.isgci.core.IDrawingService;
 import teo.isgci.core.NodeView;
-import teo.isgci.data.db.Algo;
 import teo.isgci.data.gc.GraphClass;
 import teo.isgci.view.gui.ISGCIMainFrame;
 import teo.isgci.view.gui.PSGraphics;
@@ -140,8 +137,7 @@ public class YFilesDrawingService implements IDrawingService {
 	 * Key for setting the HTML label configuration.
 	 */
 	public static final String HTML_CONFIGURATION = "HtmlConfig";
-	
-	private HashMap<String, String> initialNames;
+
 
 	/**
 	 * Static c'tor. Registers the default node configuration when the type is first used.
@@ -204,14 +200,11 @@ public class YFilesDrawingService implements IDrawingService {
 	 * @see teo.isgci.core.IDrawingService#initializeView(java.util.List, java.util.HashMap)
 	 */
 	@Override
-	public void initializeView(List<GraphView> graphs, HashMap<String, String> initialN) {
+	public void initializeView(List<GraphView> graphs) {
 		// TODO: Comments
 		//D.bug("entering initializeView");
 		
 		/* Clear the current graph and re-initialise the collections. */
-		
-		initialNames = initialN;
-		
 		graph2D.clear();
 		nodeLabelMap.clear();
 		currentNodes = new HashMap<NodeView, Node>();
@@ -280,7 +273,7 @@ public class YFilesDrawingService implements IDrawingService {
 	 * @see teo.isgci.core.IDrawingService#updateView(java.util.List, java.util.HashMap)
 	 */
 	@Override
-	public void updateView(List<GraphView> graphs, HashMap<String, String> initialNames) {
+	public void updateView(List<GraphView> graphs) {
 		// TODO: Comments
 		D.bug("entering updateView");
 
@@ -380,12 +373,6 @@ public class YFilesDrawingService implements IDrawingService {
 			for (NodeView node : excessNodes) {
 				this.graph2D.removeNode(this.currentNodes.get(node));
 				this.currentNodes.remove(node);
-				
-				/* Not strictly necessary, but we should tidy up */
-				String label = node.getHtmlLabel();
-				if (this.nodeLabelMap.containsKey(label)) {
-					//this.nodeLabelMap.remove(label);
-				}
 			}
 			
 			/* Add the nodes that have no edges */
@@ -412,6 +399,30 @@ public class YFilesDrawingService implements IDrawingService {
         	ShapeNodeRealizer nr = (ShapeNodeRealizer)graph2D.getRealizer(n);          
         	nr.setFillColor(nodeView.getColor());
           	nr.repaint();
+        }
+	}
+
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#updateLabel(teo.isgci.core.NodeView)
+	 */
+	@Override
+	public void updateLabel(NodeView nodeView) {
+        if (this.currentNodes.containsKey(nodeView)) {
+        	/* Get the node and realizer corresponding to 
+        	 * the node view. */
+        	Node node = this.currentNodes.get(nodeView);
+        	NodeRealizer realizer = graph2D.getRealizer(node);
+
+        	/* Set the node label text. */
+        	NodeLabel nodeLabel = realizer.getLabel();
+    		nodeLabel.setText(nodeView.getHtmlLabel());
+    		
+    		/* Repaint before updating the node size. If we
+    		 * don't do this then the calculations are wrong. */
+    		realizer.repaint();
+
+        	/* Now we need to update the node size (for all nodes) */
+        	this.updateNodeSize();
         }
 	}
 	
@@ -734,8 +745,6 @@ public class YFilesDrawingService implements IDrawingService {
 					s = s.replace("</sub>", "");
 				}
 			}
-			System.out.println(view.getHtmlLabel() + " " + s + " "
-					+ view.toString());
 			
 			if (view.getFullName().equals(s)) {
 				this.graphView.getGraph2D().setSelected(n, true);
@@ -850,7 +859,7 @@ public class YFilesDrawingService implements IDrawingService {
 					model.createDiscreteModelParameter(SmartNodeLabelModel.POSITION_CENTER));
 
 			/* Get the content width and adjust the max width if necessary */
-			double len = label.getContentWidth();
+			double len = label.getContentWidth() + 10;
 			if (len > maxlen) {
 				maxlen = len;
 			}
@@ -937,26 +946,8 @@ public class YFilesDrawingService implements IDrawingService {
 		realizer.setFillColor(nodeView.getColor());
 		Node node = graph2D.createNode(realizer);
 
-				/* Set the node label. */
-		NodeLabel nodeLabel = getNodeLabel(nodeView, realizer);
-		
-		Set<GraphClass> sgc = nodeView.getNode();
-		Iterator<GraphClass> it = sgc.iterator();
-		if (it.hasNext()) 
-		{
-			GraphClass mc = sgc.iterator().next();
-			GraphClass equiOne = Algo.equNodes(mc).get(0);
-			if (initialNames.containsKey(equiOne.toString())) {
-				nodeView.setNameAndLabel(initialNames.get(equiOne.toString()));
-				nodeLabel = getNodeLabel(nodeView, realizer);
-			}
-		}		
-		
-		
-		
-		realizer.setLabel(nodeLabel);
-		
-		
+		/* Set the node label. */
+		setNodeLabel(nodeView, realizer);
 
 		/* Add the label/fullname mapping to the label map. */
 		String label = nodeView.getHtmlLabel();
@@ -974,7 +965,7 @@ public class YFilesDrawingService implements IDrawingService {
 	 * @param nodeView The node.
 	 * @return The node label.
 	 */
-	private NodeLabel getNodeLabel(NodeView nodeView, NodeRealizer nodeRealizer) {
+	private NodeLabel setNodeLabel(NodeView nodeView, NodeRealizer nodeRealizer) {
 		/* Create a new label and set the HTML configuration */
 		NodeLabel nodeLabel = nodeRealizer.createNodeLabel();
 		nodeLabel.setConfiguration(HTML_CONFIGURATION); 
@@ -982,7 +973,7 @@ public class YFilesDrawingService implements IDrawingService {
 		/* Set the label text */
 		D.bug("Node label: " + nodeView.getHtmlLabel());
 
-		nodeLabel.setText("<html>" + nodeView.getHtmlLabel() + "</html>");
+		nodeLabel.setText(nodeView.getHtmlLabel());
 		
 		/* The following line can be use to automatically trim the text
 		 * without using the NodeView label property. This would allow for
@@ -991,6 +982,9 @@ public class YFilesDrawingService implements IDrawingService {
 		
 		/* Set the tag so we can find the class associated with this node */
 		nodeLabel.setUserData(nodeView);
+		
+		/* Set the realizers label */
+		nodeRealizer.setLabel(nodeLabel);		
 
 		return nodeLabel;
 	}

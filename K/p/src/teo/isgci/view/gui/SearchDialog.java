@@ -92,7 +92,7 @@ public class SearchDialog extends JDialog implements ActionListener {
     	List<GraphClass> graphs = new ArrayList<GraphClass>();
     	ViewManager viewManager = App.getViewManager(parent);
     	for (NodeView node : viewManager.getCurrentNodes()) {
-    		graphs.addAll(node.getNode());
+    		graphs.addAll(node.getGraphClasses());
     	}
    	
         if (!graphs.isEmpty()) {

@@ -149,7 +149,14 @@ public class GraphClassSelectionDialog extends JDialog
         } else if (source == newButton) {
             Cursor oldcursor = parent.getCursor();
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            App.getViewManager(parent).load(getNodes());
+                 
+            /* Check if we need to load the super or sub classes */
+            boolean doSuper = superCheck.isSelected(),
+                    doSub = subCheck.isSelected();
+            
+            /* Get the selected classes and load the graph */   
+            Collection<GraphClass> selectedClasses = this.getSelectedGraphClasses();
+            App.getViewManager(parent).load(selectedClasses, doSuper, doSub);
             
             setCursor(oldcursor);
             closeDialog();
@@ -159,15 +166,13 @@ public class GraphClassSelectionDialog extends JDialog
 
     }
     
-    
+
     /**
-     * Returns a Collection with the classes (in DataSet.inclGraph) that are
-     * selected by the current settings.
+     * Returns a Collection with the classes that are currently 
+     * selected in the dialog.
      */
-    protected Collection<GraphClass> getNodes() {
+    private Collection<GraphClass> getSelectedGraphClasses() {
         final HashSet<GraphClass> result = new HashSet<GraphClass>();
-        boolean doSuper = superCheck.isSelected(),
-                doSub = subCheck.isSelected();
        
         for (Object o : classesList.getSelectedValuesList()) {
         	System.out.println(o.getClass());
@@ -175,9 +180,9 @@ public class GraphClassSelectionDialog extends JDialog
             result.add(graph);
         }
 
-        System.out.println(result);
-        return App.DataProvider.getNodes(result, doSuper, doSub);
-    }    
+        return result;
+    }  
+      
 }
 
 

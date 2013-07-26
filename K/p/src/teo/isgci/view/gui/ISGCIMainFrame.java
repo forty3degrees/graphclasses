@@ -126,7 +126,7 @@ public class ISGCIMainFrame extends JRibbonFrame
             latex.init(loader);
         }
 
-        // de Ridder
+        // TODO: Don't really know what this does and whether it needs to be updated
 //        boolean createMaps = false;
 //        try {
 //            createMaps = System.getProperty("org.isgci.mappath") != null;
@@ -211,7 +211,7 @@ public class ISGCIMainFrame extends JRibbonFrame
         registerListeners();
         setLocation(20, 20);
         pack();
-        //this.setSize(1200, 800);
+        this.setSize(1200, 800);
         setVisible(true);
                 
     }

@@ -43,18 +43,21 @@ public final class Algo {
      * Return the name to be used for the given set of equivalent classes,
      * according to the naming preference.
      */
-    public static String getName(Set<GraphClass> equivs, NamePref pref) {
+    public static GraphClass getDefaultClass(Set<GraphClass> equivs, NamePref pref) {
         GraphClass namer = null;
 
         for (GraphClass c : equivs) {
-            if (pref == NamePref.FORBIDDEN  &&  c instanceof ForbiddenClass)
-                return c.toString();
+            if (pref == NamePref.FORBIDDEN  &&  c instanceof ForbiddenClass) {
+                return c;
+            }
             if (pref == NamePref.DERIVED) {
-                if (c instanceof UnionClass  ||  c instanceof IntersectClass)
-                    return c.toString();
+                if (c instanceof UnionClass  ||  c instanceof IntersectClass) {
+                    return c;
+                }
                 if (c instanceof HereditaryClass ||
-                        c instanceof ComplementClass)
+                        c instanceof ComplementClass) {
                     namer = c;
+                }
             }
             if (pref == NamePref.BASIC   &&  !(
                     c instanceof ForbiddenClass ||
@@ -62,11 +65,11 @@ public final class Algo {
                     c instanceof IntersectClass ||
                     c instanceof HereditaryClass ||
                     c instanceof ComplementClass))
-                return c.toString();
+                return c;
             if (namer == null  ||  namer instanceof ForbiddenClass)
                 namer = c;
         }
-        return namer.toString();
+        return namer;
     }
 
 

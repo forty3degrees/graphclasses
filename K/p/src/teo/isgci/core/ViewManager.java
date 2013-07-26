@@ -18,8 +18,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -46,16 +44,21 @@ public class ViewManager {
 
 	private boolean isLoading = false;
 	private Problem problem;
-	private Algo.NamePref namingPref;
 	private List<GraphView> graphs;
 	private boolean drawUnproper;
-	private HashMap<String, String> initialNames;
 
+	private Algo.NamePref namingPref = Algo.NamePref.BASIC;
+	
+	/** 
+	 * Holds the root classes initially loaded into the graph. 
+	 * This is used to make sure the default names are set
+	 * properly for these classes.
+	 */
+	private Collection<GraphClass> rootClasses;
 
     public ViewManager() {
         super();
         problem = null;
-        namingPref = Algo.NamePref.BASIC;
         graphs = new ArrayList<GraphView>();
         drawUnproper = true;
     }
@@ -103,38 +106,28 @@ public class ViewManager {
     }
 
     
-    public void add(Collection<GraphClass> nodes) {
+    public void add(Collection<GraphClass> graphClasses) {
     	
     	for (GraphView gv : graphs) {
     		for (Set<GraphClass> l : gv.getGraph().vertexSet()) {
     			for (GraphClass gc : l) {
-    				nodes.add(gc);
+    				graphClasses.add(gc);
     			}
     		}
     	}   
-    	System.out.println(nodes.size());
+    	System.out.println(graphClasses.size());
     	
     	graphs.clear();
-    	//nodes.removeAll(newNodes);
     	
-    	if (nodes.isEmpty()) {
+    	if (graphClasses.isEmpty()) {
     		return;
     	}
     	
-        SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
-            Algo.createHierarchySubgraph(nodes);
+        SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> directedGraph =
+            Algo.createHierarchySubgraph(graphClasses);
 
-        //List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
-        //        GAlg.split(graph, DefaultEdge.class);
-        
         try {
-        	
-        	//for (SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> g : list) {        		
-        		addGraph(graph);
-            //}
-        	
-        	
-            
+        	addGraph(directedGraph);
         } catch (Error e) {
 
             if (e instanceof OutOfMemoryError || e instanceof StackOverflowError) {
@@ -148,7 +141,7 @@ public class ViewManager {
         this.refresh();
     }
 
-	public void delete(Collection<GraphClass> nodes) {
+	public void delete(Collection<GraphClass> graphClasses) {
 	
 		Collection<GraphClass> newNodes = new ArrayList<GraphClass>();
 		Collection<GraphClass> done = new ArrayList<GraphClass>();
@@ -157,7 +150,7 @@ public class ViewManager {
 				for (GraphClass gc : l) {
 					boolean contained = false;
 					for (GraphClass mc : Algo.equNodes(gc)) {
-						if (nodes.contains(mc) || done.contains(mc)) {
+						if (graphClasses.contains(mc) || done.contains(mc)) {
 							contained = true;
 							break;
 						}
@@ -180,17 +173,17 @@ public class ViewManager {
 			return;
 		}
 		
-	    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
+	    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> directedGraph =
 	        Algo.createHierarchySubgraph(newNodes);
 	
 	    List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
-	            GAlg.split(graph, DefaultEdge.class);
+	            GAlg.split(directedGraph, DefaultEdge.class);
 	    
 	    System.out.println(list.size());
 	    
 	    try {
 	    	
-	    	addGraph(graph);
+	    	addGraph(directedGraph);
 	    	
 	    } catch (Error e) {
 	
@@ -204,23 +197,6 @@ public class ViewManager {
         /* Notify any listeners that the view was updated */
         this.refresh();
 	}
-	
-    /**
-     * Add the given graph to this canvas.
-     */
-    protected GraphView addGraph(SimpleDirectedGraph<Set<GraphClass>,DefaultEdge> g) {
-    	GraphView gv = new GraphView(g);
-    	
-        gv.setIncludeUnproper(drawUnproper);
-        graphs.add(gv);
-        
-        for (NodeView nv : gv.getNodes()) {
-            nv.updateColor(this.problem);
-            nv.setNameAndLabel(Algo.getName(nv.getNode(), namingPref)); 
-        }
-        
-        return gv;
-    }
     
     /**
      * Return the NodeView for the given node.
@@ -260,42 +236,19 @@ public class ViewManager {
         for (GraphView gv : graphs)
             gv.write(w);
     }
-   
-    
 
-	public void putDefaultName(GraphClass node) {
-		Collection<GraphClass> eq = Algo.equNodes(node);
-		Iterator<GraphClass> it = eq.iterator();
-		if (it.hasNext()) {
-			GraphClass m = it.next();
-			System.out.println(m.toString() +" "+ node.toString());
-			initialNames.put(m.toString(), node.toString());
-		}
-	}
-
-    /**
-     * Create a hierarchy subgraph of the given classes
-     */
-    public void load(Collection<GraphClass> nodes) {
+    public void load(Collection<GraphClass> graphClasses, boolean doSuper, boolean doSub) {
     	this.isLoading = true;
-    	initialNames = new HashMap<String, String>();
-    	Iterator<GraphClass> i = nodes.iterator();
-    	while (i.hasNext()) {
-    		GraphClass n = i.next();
-    		Collection<GraphClass> eq = Algo.equNodes(n);
-    		Iterator<GraphClass> it = eq.iterator();
-    		if (it.hasNext()) {
-    			GraphClass m = it.next();
-    			System.out.println(m.toString() +" "+ n.toString());
-    			initialNames.put(m.toString(), n.toString());
-    		}
-    	}
+    	this.rootClasses = graphClasses;
     	
-        SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
-            Algo.createHierarchySubgraph(nodes);
+    	/* Load the hierarchy */
+    	graphClasses = App.DataProvider.getGraphClasses(graphClasses, doSuper, doSub);
+    	
+        SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> directedGraph =
+            Algo.createHierarchySubgraph(graphClasses);
 
         List<SimpleDirectedGraph<Set<GraphClass>,DefaultEdge>> list =
-                GAlg.split(graph, DefaultEdge.class);
+                GAlg.split(directedGraph, DefaultEdge.class);
         
         try {
 
@@ -319,7 +272,7 @@ public class ViewManager {
 
 	private void initializeView() {
 		for (IDrawingService ds : drawingServices) {
-            ds.initializeView(this.graphs, this.initialNames);
+            ds.initializeView(this.graphs);
         }
 	}
 	
@@ -327,19 +280,53 @@ public class ViewManager {
         if (!isLoading) {
 	        /* Notify any attached services that the view should be refreshed */
 	        for (IDrawingService ds : drawingServices) {
-	            ds.updateView(this.graphs, this.initialNames);
+	            ds.updateView(this.graphs);
 	        }
         }
+    }
+	
+    /**
+     * Add the given graph to this canvas.
+     */
+    private GraphView addGraph(SimpleDirectedGraph<Set<GraphClass>,DefaultEdge> g) {
+    	GraphView gv = new GraphView(g);
+    	
+        gv.setIncludeUnproper(drawUnproper);
+        graphs.add(gv);
+        
+        for (NodeView nv : gv.getNodes()) {
+        	/* Set the colour */
+            nv.setColor(this.problem); 
+            
+            /* Check if the node contains one of the root classes and
+             * set this to the default if so. Do the for-loop on the
+             * root classes collection as this will usually be smaller. */
+            Set<GraphClass> graphClasses = nv.getGraphClasses();
+            for (GraphClass gc : this.rootClasses) {
+            	if (graphClasses.contains(gc)) {
+            		nv.setDefaultClass(gc);
+            		break;
+            	}
+            }
+            
+            /* Make sure we have set a class */
+            if (nv.getDefaultClass() == null) {
+            	nv.setDefaultClass(graphClasses.iterator().next());
+            }
+        }
+        
+        return gv;
     }
 
     /**
      * Set all nodes to their preferred names.
      */
     public void setPreferedNames() {
-        for (GraphView gv : graphs)
-            for (NodeView v : gv.getNodes())
-               v.setNameAndLabel(Algo.getName(v.getNode(), namingPref)); 
-        
+        for (GraphView gv : graphs) {
+            for (NodeView v : gv.getNodes()) {
+            	v.setDefaultClass(Algo.getDefaultClass(v.getGraphClasses(), namingPref)); 
+            }
+        }
         this.refresh();
     }
 
@@ -350,21 +337,21 @@ public class ViewManager {
     public NodeView findNode(GraphClass gc) {
         for (GraphView gv : graphs) {
             for (NodeView v : gv.getNodes())
-                if (v.getNode().contains(gc))
+                if (v.getGraphClasses().contains(gc))
                     return v;
         }
         return null;
     }
 
     /**
-     * Set coloring for p and repaint.
+     * Set colouring for p and repaint.
      */
     public void setProblem(Problem p) {
         if (problem != p) {
             problem = p;
             setComplexityColors();
 
-            /* Update the colors */
+            /* Update the colours */
             if (!isLoading) {
     	        for (IDrawingService ds : drawingServices) {
     	            ds.updateColors();
@@ -375,7 +362,7 @@ public class ViewManager {
     
     public void updateProblem() {
         if (problem != null) {
-            /* Update the colors */
+            /* Update the colours */
             if (!isLoading) {
     	        for (IDrawingService ds : drawingServices) {
     	            ds.updateColors();
@@ -434,16 +421,6 @@ public class ViewManager {
 	}
 
 
-    /**
-     * Set all nodes to the proper complexity color.
-     */
-    public void setComplexityColors() {
-        for (GraphView gv : graphs)
-            for (NodeView v : gv.getNodes())
-               v.updateColor(this.problem);
-    }
-
-
     public void setNamingPref(Algo.NamePref pref) {
         namingPref = pref;
         setPreferedNames();
@@ -453,6 +430,14 @@ public class ViewManager {
         return namingPref;
     }
 
+    /**
+     * Set all nodes to the proper complexity color.
+     */
+    public void setComplexityColors() {
+        for (GraphView gv : graphs)
+            for (NodeView v : gv.getNodes())
+               v.setColor(this.problem);
+    }
 
 }
 

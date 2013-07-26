@@ -563,15 +563,15 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             
             ViewManager viewManager = App.getViewManager(parent);
-            viewManager.load(Algo.nodesBetween(upper, lower));
+            viewManager.load(Algo.nodesBetween(upper, lower), false, false);
 
-            NodeView node1 = viewManager.findNode(
-            		App.DataProvider.getClass(nodeName1));
-            NodeView node2 = viewManager.findNode(
-            		App.DataProvider.getClass(nodeName2));
+            GraphClass class1 = App.DataProvider.getClass(nodeName1);
+            NodeView node1 = viewManager.findNode(class1);
+            GraphClass class2 = App.DataProvider.getClass(nodeName2);
+            NodeView node2 = viewManager.findNode(class2);
             if (node1 != null  && node2 != null) {
-                node1.setNameAndLabel(nodeName1);
-                node2.setNameAndLabel(nodeName2);
+                node1.setDefaultClass(class1);
+                node2.setDefaultClass(class2);
             }
             
             setCursor(oldcursor);

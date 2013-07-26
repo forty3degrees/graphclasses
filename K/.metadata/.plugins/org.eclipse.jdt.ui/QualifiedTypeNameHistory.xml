@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="org.jgrapht.graph.SimpleDirectedGraph"/>
-<fullyQualifiedTypeName name="teo.data.services.IDataProvider"/>
-<fullyQualifiedTypeName name="java.util.Set"/>
 <fullyQualifiedTypeName name="teo.isgci.gc.GraphClass"/>
 <fullyQualifiedTypeName name="org.jgrapht.graph.DefaultEdge"/>
 <fullyQualifiedTypeName name="java.util.Collections"/>
@@ -60,4 +57,7 @@
 <fullyQualifiedTypeName name="teo.isgci.core.util.Latex2Html"/>
 <fullyQualifiedTypeName name="teo.isgci.data.db.Algo"/>
 <fullyQualifiedTypeName name="java.util.Iterator"/>
+<fullyQualifiedTypeName name="java.security.InvalidParameterException"/>
+<fullyQualifiedTypeName name="java.lang.NullPointerException"/>
+<fullyQualifiedTypeName name="teo.isgci.core.NodeView"/>
 </qualifiedTypeNameHistroy>

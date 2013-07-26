@@ -1,2 +1,13 @@
 1374502328095	Infer generic type arguments
 1374785682132	Extract method 'getNodeLabel'
+1374834662935	Rename local variable 'nodes'
+1374834690784	Rename local variable 'nodes'
+1374834711933	Rename local variable 'graph'
+1374834759347	Rename local variable 'nodes'
+1374834774585	Rename local variable 'graph'
+1374834809654	Rename local variable 'n'
+1374835086167	Rename field 'node'
+1374835497140	Rename method 'updateColor'
+1374835616234	Rename method 'getNode'
+1374838620289	Rename method 'getNodes'
+1374838648589	Rename method 'getNodes'

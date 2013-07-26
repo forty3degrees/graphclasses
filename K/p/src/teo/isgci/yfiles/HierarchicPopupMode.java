@@ -12,8 +12,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import teo.isgci.core.App;
-import teo.isgci.core.util.Latex;
-import teo.isgci.core.util.Latex2Html;
+import teo.isgci.core.NodeView;
 import teo.isgci.data.db.Algo;
 import teo.isgci.data.gc.GraphClass;
 import teo.isgci.view.gui.GraphClassInformationDialog;
@@ -101,17 +100,16 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
 
         	while (classes.hasNext()) {
         		final GraphClass c = classes.next();
-        		JMenuItem item = new JMenuItem("<html>" + new Latex2Html("").html(c.toString()) +"</html>");        		
+        		JMenuItem item = new JMenuItem(c.getNameAsHtml());        		
         		item.addActionListener(new AbstractAction() {
                     /** Keep the compiler happy ^^ */
 					private static final long serialVersionUID = 1L;
 
 					@Override
                     public void actionPerformed(ActionEvent e) {
-                    	App.getViewManager(parent).putDefaultName(c);
-                    	getGraph2D().setLabelText(node, "<html>" + new Latex2Html("").html(c.toString()) +"</html>");
-                    	getGraph2D().updateViews();
-                    	App.getDrawingService(parent).refreshView();
+                    	NodeView node = App.getViewManager(parent).findNode(c);
+                    	node.setDefaultClass(c);
+                    	App.getDrawingService(parent).updateLabel(node);
                     }
                 });
             	namingMenu.add(item);
@@ -192,11 +190,11 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         	drawingService.selectSubClasses();
         } else if (object == addUp) {
         	Collection<GraphClass> graphClasses = drawingService.getSelection();
-        	graphClasses = App.DataProvider.getNodes(graphClasses, true, false);
+        	graphClasses = App.DataProvider.getGraphClasses(graphClasses, true, false);
         	App.getViewManager(parent).add(graphClasses);
         } else if (object == addDown) {
         	Collection<GraphClass> graphClasses = drawingService.getSelection();
-        	graphClasses = App.DataProvider.getNodes(graphClasses, false, true);
+        	graphClasses = App.DataProvider.getGraphClasses(graphClasses, false, true);
         	App.getViewManager(parent).add(graphClasses);
         } else if (object == delItem) {
         	Collection<GraphClass> graphClasses = drawingService.getSelection();
