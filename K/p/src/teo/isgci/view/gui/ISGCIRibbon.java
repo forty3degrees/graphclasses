@@ -413,7 +413,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		smallGraph.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				parent.loader.showDocument("smallgraphs.html");
+				parent.loader.showDocument("http://www.graphclasses.org/smallgraphs.html");
 			}
 		});
 		helpBand.addCommandButton(smallGraph,
@@ -424,7 +424,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		help.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				parent.loader.showDocument("help.html");
+				parent.loader.showDocument("http://www.graphclasses.org/help.html");
 			}
 		});
 		helpBand.addCommandButton(help,
@@ -518,8 +518,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 				new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						JOptionPane.showMessageDialog(parent,
-								"Help button clicked");
+						parent.loader.showDocument("http://www.graphclasses.org/help.html");
 					}
 				});
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workbench progressCount="21" version="2.0">
+<workbench progressCount="15" version="2.0">
 <workbenchAdvisor/>
 <window height="768" maximized="true" width="1326" x="65" y="196">
 <fastViewData fastViewLocation="1024"/>
@@ -44,6 +44,8 @@
 <part id="9"/>
 <part id="10"/>
 <part id="11"/>
+<part id="12"/>
+<part id="13"/>
 </presentation>
 </folder>
 </info>
@@ -60,9 +62,9 @@
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/core/ViewManager.java"/>
 <editorState selectionHorizontalPixel="0" selectionLength="533" selectionOffset="7506" selectionTopPixel="4689"/>
 </editor>
-<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="YFilesDrawingService.java" partName="YFilesDrawingService.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/yfiles/YFilesDrawingService.java" title="YFilesDrawingService.java" tooltip="p/src/teo/isgci/yfiles/YFilesDrawingService.java" workbook="DefaultEditorWorkbook">
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="YFilesDrawingService.java" partName="YFilesDrawingService.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/yfiles/YFilesDrawingService.java" title="YFilesDrawingService.java" tooltip="p/src/teo/isgci/yfiles/YFilesDrawingService.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/yfiles/YFilesDrawingService.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="503" selectionOffset="60914" selectionTopPixel="15759"/>
+<editorState selectionHorizontalPixel="0" selectionLength="624" selectionOffset="62692" selectionTopPixel="15609"/>
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="UnionClass.java" partName="UnionClass.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/data/gc/UnionClass.java" title="UnionClass.java" tooltip="p/src/teo/isgci/data/gc/UnionClass.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/data/gc/UnionClass.java"/>
@@ -82,7 +84,7 @@
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ISGCIRibbon.java" partName="ISGCIRibbon.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/view/gui/ISGCIRibbon.java" title="ISGCIRibbon.java" tooltip="p/src/teo/isgci/view/gui/ISGCIRibbon.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/view/gui/ISGCIRibbon.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6302" selectionTopPixel="1883"/>
+<editorState selectionHorizontalPixel="0" selectionLength="4" selectionOffset="18406" selectionTopPixel="7854"/>
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="HierarchicPopupMode.java" partName="HierarchicPopupMode.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/yfiles/HierarchicPopupMode.java" title="HierarchicPopupMode.java" tooltip="p/src/teo/isgci/yfiles/HierarchicPopupMode.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/yfiles/HierarchicPopupMode.java"/>
@@ -96,10 +98,18 @@
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/core/NodeView.java"/>
 <editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2367" selectionTopPixel="777"/>
 </editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="GraphClassInformationDialog.java" partName="GraphClassInformationDialog.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/view/gui/GraphClassInformationDialog.java" title="GraphClassInformationDialog.java" tooltip="p/src/teo/isgci/view/gui/GraphClassInformationDialog.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/view/gui/GraphClassInformationDialog.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="10328" selectionTopPixel="5083"/>
+</editor>
+<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="NodeList.java" partName="NodeList.java" path="C:/Users/TK/Documents/GitHub/graphclasses/K/p/src/teo/isgci/view/gui/NodeList.java" title="NodeList.java" tooltip="p/src/teo/isgci/view/gui/NodeList.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/p/src/teo/isgci/view/gui/NodeList.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2820" selectionTopPixel="1290"/>
+</editor>
 </editors>
 <views>
 <view id="org.eclipse.jdt.ui.TypeHierarchy" partName="Type Hierarchy">
-<viewState hidefields="false" hidelocaltypes="false" hidenonpublic="false" hidestatic="false" input="=p/src&lt;teo.isgci.yfiles{YFilesDrawingService.java[YFilesDrawingService" link_editors="0" mv_vertical_scroll="12" orientation="3" qualified_names="0" ratio="350" selection="=p/src&lt;teo.isgci.yfiles{YFilesDrawingService.java[YFilesDrawingService" showinherited="false" sortbydefiningtype="false" vertical_scroll="0" view="2" workingSetName="Aggregate for window 1367576448189"/>
+<viewState hidefields="false" hidelocaltypes="false" hidenonpublic="false" hidestatic="false" input="=p/src&lt;teo.isgci.yfiles{YFilesDrawingService.java[YFilesDrawingService" link_editors="0" mv_vertical_scroll="0" orientation="3" qualified_names="0" ratio="350" selection="=p/src&lt;teo.isgci.yfiles{YFilesDrawingService.java[YFilesDrawingService" showinherited="false" sortbydefiningtype="false" vertical_scroll="0" view="2" workingSetName="Aggregate for window 1367576448189"/>
 </view>
 <view id="org.eclipse.search.ui.views.SearchView" partName="Search">
 <viewState isPinned="false">
@@ -126,9 +136,7 @@
 <view id="org.eclipse.ui.views.ProblemView" partName="Problems">
 <viewState PRIMARY_SORT_FIELD="org.eclipse.ui.ide.severityAndDescriptionField" categoryGroup="org.eclipse.ui.ide.severity" markerContentGenerator="org.eclipse.ui.ide.problemsGenerator" partName="Problems">
 <expanded>
-<category IMemento.internal.id="Warnings (100 of 481 items)"/>
-<category IMemento.internal.id="Errors"/>
-<category IMemento.internal.id="Warnings"/>
+<category IMemento.internal.id="Warnings (100 of 480 items)"/>
 </expanded>
 <columnWidths org.eclipse.ui.ide.locationField="90" org.eclipse.ui.ide.markerType="90" org.eclipse.ui.ide.pathField="120" org.eclipse.ui.ide.resourceField="90" org.eclipse.ui.ide.severityAndDescriptionField="741"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.severityAndDescriptionField"/>
@@ -253,7 +261,7 @@
 <layout>
 <mainWindow>
 <info folder="true" part="left">
-<folder activePageID="org.eclipse.jdt.ui.TypeHierarchy" appearance="2" expanded="2">
+<folder activePageID="org.eclipse.jdt.ui.PackageExplorer" appearance="2" expanded="2">
 <page content="org.eclipse.jdt.ui.PackageExplorer" label="Package Explorer"/>
 <page content="org.eclipse.jdt.ui.TypeHierarchy" label="Type Hierarchy"/>
 <page content="org.eclipse.ui.views.ResourceNavigator" label="LabelNotFound"/>
@@ -415,28 +423,11 @@
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/core/util/Latex2Html.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/core/util/Latex.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/core/NodeView.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/view/gui/GraphClassInformationDialog.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/view/gui/ISGCIRibbon.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/p/src/teo/isgci/view/gui/NodeList.java"/>
+<editor factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" org.eclipse.jdt.ui.ClassFileIdentifier="=p/D:\/KN\/eclipse_knime_2.7.2\/jre\/lib\/rt.jar&lt;javax.swing(JList.class"/>
 </editors>
-<item historyLabel="HierarchicPopupMode.java" index="4">
-<position info="not_deleted" x="3641" y="0"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="3">
-<position info="not_deleted" x="14056" y="0"/>
-</item>
-<item historyLabel="NodeList.java" index="0">
-<position info="not_deleted" x="2868" y="5"/>
-</item>
-<item historyLabel="HierarchicPopupMode.java" index="4">
-<position info="not_deleted" x="3641" y="0"/>
-</item>
-<item historyLabel="YFilesDrawingService.java" index="3">
-<position info="not_deleted" x="14056" y="0"/>
-</item>
-<item historyLabel="NodeList.java" index="0">
-<position info="not_deleted" x="2790" y="0"/>
-</item>
-<item historyLabel="HierarchicPopupMode.java" index="4">
-<position info="not_deleted" x="3663" y="0"/>
-</item>
 <item historyLabel="NodeList.java" index="0">
 <position info="not_deleted" x="2868" y="5"/>
 </item>
@@ -563,8 +554,29 @@
 <item historyLabel="YFilesDrawingService.java" index="3">
 <position info="not_deleted" x="61235" y="0"/>
 </item>
-<item active="true" historyLabel="YFilesDrawingService.java" index="3">
+<item historyLabel="YFilesDrawingService.java" index="3">
 <position/>
+</item>
+<item historyLabel="GraphClassInformationDialog.java" index="10">
+<position info="not_deleted" x="12347" y="0"/>
+</item>
+<item historyLabel="GraphClassInformationDialog.java" index="10">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="ISGCIRibbon.java" index="11">
+<position info="not_deleted" x="18406" y="4"/>
+</item>
+<item historyLabel="GraphClassInformationDialog.java" index="10">
+<position info="not_deleted" x="10328" y="0"/>
+</item>
+<item historyLabel="NodeList.java" index="12">
+<position info="not_deleted" x="2304" y="0"/>
+</item>
+<item historyLabel="JList.class" index="13">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item active="true" historyLabel="NodeList.java" index="12">
+<position info="not_deleted" x="2304" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -583,6 +595,15 @@
 </trimLayout>
 </window>
 <mruList>
+<file factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" name="JList.class" tooltip="javax.swing.JList">
+<persistable org.eclipse.jdt.ui.ClassFileIdentifier="=p/D:\/KN\/eclipse_knime_2.7.2\/jre\/lib\/rt.jar&lt;javax.swing(JList.class"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="NodeList.java" tooltip="p/src/teo/isgci/view/gui/NodeList.java">
+<persistable path="/p/src/teo/isgci/view/gui/NodeList.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="GraphClassInformationDialog.java" tooltip="p/src/teo/isgci/view/gui/GraphClassInformationDialog.java">
+<persistable path="/p/src/teo/isgci/view/gui/GraphClassInformationDialog.java"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="NodeView.java" tooltip="p/src/teo/isgci/core/NodeView.java">
 <persistable path="/p/src/teo/isgci/core/NodeView.java"/>
 </file>
@@ -618,15 +639,6 @@
 </file>
 <file factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" name="CellRendererPane.class" tooltip="javax.swing.CellRendererPane">
 <persistable org.eclipse.jdt.ui.ClassFileIdentifier="=p/D:\/KN\/eclipse_knime_2.7.2\/jre\/lib\/rt.jar&lt;javax.swing(CellRendererPane.class"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="GraphClass.java" tooltip="p/src/teo/isgci/data/gc/GraphClass.java">
-<persistable path="/p/src/teo/isgci/data/gc/GraphClass.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IntersectClass.java" tooltip="p/src/teo/isgci/data/gc/IntersectClass.java">
-<persistable path="/p/src/teo/isgci/data/gc/IntersectClass.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="UnionClass.java" tooltip="p/src/teo/isgci/data/gc/UnionClass.java">
-<persistable path="/p/src/teo/isgci/data/gc/UnionClass.java"/>
 </file>
 </mruList>
 </workbench>

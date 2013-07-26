@@ -306,7 +306,7 @@ public class GraphClassInformationDialog extends JDialog
         if (source == okButton) {
             closeDialog();
         } else if (source == classButton) {
-            parent.loader.showDocument("classes/"+
+            parent.loader.showDocument("http://www.graphclasses.org/classes/"+
                 classesList.getSelectedNode().getID() +".html");
         } else if (source == inclButton) {
             GraphClass c1 = classesList.getSelectedNode();

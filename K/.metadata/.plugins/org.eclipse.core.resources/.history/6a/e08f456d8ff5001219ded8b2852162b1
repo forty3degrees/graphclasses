@@ -110,6 +110,10 @@ public class NodeList extends JList {
         public Component getListCellRendererComponent(
                 JList list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {
+        	if (value == null) {
+        		return latex.newLabel("");
+        	}
+        	System.out.println(((GraphClass) value).toString());
             LatexLabel label =
                     latex.newLabel(((GraphClass) value).toString());
             if (isSelected) {
