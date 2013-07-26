@@ -22,6 +22,8 @@ import y.base.EdgeCursor;
 import y.base.EdgeList;
 import y.base.Node;
 import y.view.Graph2D;
+import y.view.NodeLabel;
+import y.view.NodeRealizer;
 import y.view.PopupMode;
 
 /**
