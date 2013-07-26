@@ -18,6 +18,7 @@ import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -94,8 +95,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		graphMLButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				App.getViewManager(parent).export();
-		        JDialog export = new ExportDialog(parent);
+				JDialog export = new ExportDialog(parent);
 		        export.setLocation(50, 50);
 		        export.pack();
 		        export.setVisible(true);
@@ -177,7 +177,7 @@ protected ResizableIcon getIcon(String ressourceString) {
 		unprop.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				App.getViewManager(parent).setDrawUnproper(
+				App.getViewManager(parent).setDrawImproper(
 	                    unprop.isSelected());
 			}
 		});
@@ -657,9 +657,7 @@ private void colorBoxItemStateChanged(final ItemEvent e){
     ViewManager viewManager = App.getViewManager(parent);	
     NodeView.setColoring(colBoxL.COLORS[selectedIndexL], colBoxP.COLORS[selectedIndexP], colBoxI.COLORS[selectedIndexI], colBoxNpc.COLORS[selectedIndexNpc], colBoxU.COLORS[selectedIndexU]);    
     
-    viewManager.setComplexityColors();
-    viewManager.updateProblem();
-    
+    viewManager.setComplexityColors();   
     
 }
 

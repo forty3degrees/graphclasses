@@ -26,7 +26,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
 
-import teo.isgci.core.App;
 import teo.isgci.core.EdgeView;
 import teo.isgci.core.GraphView;
 import teo.isgci.core.IDrawingService;
@@ -165,6 +164,11 @@ public class YFilesDrawingService implements IDrawingService {
 		wheelZoomListener.setCenterZooming(false);
 		this.graphView.getCanvasComponent().addMouseWheelListener(
 				wheelZoomListener);
+		
+		/* Initialise the collections */
+		currentNodes = new HashMap<NodeView, Node>();
+		currentEdges = new ArrayList<EdgeView>();
+		currentImproperEdges = new HashMap<GraphView, List<Edge>>();
 
 		/* This must be created here (before setting up the graph) so it 
 		 * can be used in the tool-tip method (createEditMode).
@@ -201,15 +205,14 @@ public class YFilesDrawingService implements IDrawingService {
 	 */
 	@Override
 	public void initializeView(List<GraphView> graphs) {
-		// TODO: Comments
 		//D.bug("entering initializeView");
 		
-		/* Clear the current graph and re-initialise the collections. */
+		/* Clear the current graph and collections. */
 		graph2D.clear();
 		nodeLabelMap.clear();
-		currentNodes = new HashMap<NodeView, Node>();
-		currentEdges = new ArrayList<EdgeView>();
-		currentImproperEdges = new HashMap<GraphView, List<Edge>>();
+		currentNodes.clear();
+		currentEdges.clear();
+		currentImproperEdges.clear();
 
 		for (GraphView view : graphs) {
 			List<NodeView> nodes = view.getNodes();
@@ -236,7 +239,11 @@ public class YFilesDrawingService implements IDrawingService {
 					graph2D.createEdge(from, to, edgeRealizer);
 				}
 			}
-			/* Add any improper inclusions if necessary */
+
+			/* Add any improper inclusions. Start by adding an entry
+			 * to currentImproperEdges - this just makes the code below
+			 * a bit easier to read (no if-block to check if the view
+			 * is in the collection and then adding a new list if not). */
 			currentImproperEdges.put(view, new ArrayList<Edge>());
 			for (Node from : improperNodeMap.keySet()) {
 				//D.bug("From " + from);
@@ -248,7 +255,7 @@ public class YFilesDrawingService implements IDrawingService {
 					edgeRealizer.setTargetArrow(Arrow.STANDARD);
 					
 					/* Only draw the source arrow if necessary */
-					if (view.getIncludeUnproper()) {
+					if (view.getIncludeImproper()) {
 						edgeRealizer.setSourceArrow(Arrow.STANDARD);
 					}
 					
@@ -274,21 +281,18 @@ public class YFilesDrawingService implements IDrawingService {
 	 */
 	@Override
 	public void updateView(List<GraphView> graphs) {
-		// TODO: Comments
-		D.bug("entering updateView");
+		//D.bug("entering updateView");
 
+		/* Run through the graphs updating the nodes and edges */
 		for (GraphView view : graphs) {
 			List<NodeView> nodes = view.getNodes();
 			List<EdgeView> edges = view.getEdges();
 			Map<Node, List<Node>> nodeMap = new HashMap<Node, List<Node>>();
 			Map<Node, List<Node>> improperNodeMap = new HashMap<Node, List<Node>>();			
-			//D.bug("Before: " + nodes.size() + " nodes & " + edges.size()
-			//		+ " edges");
-
+			//D.bug("Before: " + nodes.size() + " nodes & " + edges.size() + " edges");
 			
 			/* Create a copy of the current edges so we can keep track of which
-			 * ones have been removed and which of the new edges aren't present.
-			 */
+			 * ones have been removed and which of the new edges aren't present. */
 			List<EdgeView> excessEdges = new ArrayList<EdgeView>(this.currentEdges);
 			for (EdgeView edge : edges) {
 				if (excessEdges.contains(edge)) {
@@ -310,14 +314,9 @@ public class YFilesDrawingService implements IDrawingService {
 				 * It doesn't matter in the current implementation
 				 * as edges cannot be removed separately and when
 				 * a node is removed the associated edges will also
-				 * be removed.
-				 */
-				//D.bug("From: " + edge.getFrom().toString());
-				//D.bug("To: " + edge.getTo().toString());				
+				 * be removed. */			
 				Node from = this.currentNodes.get(edge.getFrom());
-				Node to = this.currentNodes.get(edge.getTo());				
-				//D.bug("From node found: " + (from != null));
-				//D.bug("To node found: " + (to != null));
+				Node to = this.currentNodes.get(edge.getTo());
 				
 				if ((from != null) && (to != null)) {
 					/* Never runs - see above */
@@ -340,7 +339,14 @@ public class YFilesDrawingService implements IDrawingService {
 					graph2D.createEdge(from, to, edgeRealizer);
 				}
 			}
-			currentImproperEdges.put(view, new ArrayList<Edge>());
+			
+			/* Add any improper inclusions. Start by adding an entry
+			 * to currentImproperEdges - this just makes the code below
+			 * a bit easier to read (no if-block to check if the view
+			 * is in the collection and then adding a new list if not). */
+			if (!currentImproperEdges.containsKey(view)) {
+				currentImproperEdges.put(view, new ArrayList<Edge>());
+			}
 			for (Node from : improperNodeMap.keySet()) {
 				//D.bug("From " + from);
 				List<Node> toNodes = improperNodeMap.get(from);
@@ -351,7 +357,7 @@ public class YFilesDrawingService implements IDrawingService {
 					edgeRealizer.setTargetArrow(Arrow.STANDARD);
 					
 					/* Only draw the source arrow if necessary */
-					if (view.getIncludeUnproper()) {
+					if (view.getIncludeImproper()) {
 						edgeRealizer.setSourceArrow(Arrow.STANDARD);
 					}
 					
@@ -367,16 +373,14 @@ public class YFilesDrawingService implements IDrawingService {
 					excessNodes.remove(node);
 				}				
 			}
-			
-			System.out.println("excessnodes size " + excessNodes.size());
-			
 			for (NodeView node : excessNodes) {
 				this.graph2D.removeNode(this.currentNodes.get(node));
 				this.currentNodes.remove(node);
 			}
+			//D.bug("excessNodes size " + excessNodes.size());
 			
 			/* Add the nodes that have no edges */
-			System.out.println(nodes.size() + " NODES");
+			//D.bug(nodes.size() + " NODES");
 			for (NodeView node : nodes) {
 				if (!currentNodes.containsKey(node)) {
 					this.createNode(node);
@@ -401,30 +405,6 @@ public class YFilesDrawingService implements IDrawingService {
           	nr.repaint();
         }
 	}
-
-	/* (non-Javadoc)
-	 * @see teo.isgci.core.IDrawingService#updateLabel(teo.isgci.core.NodeView)
-	 */
-	@Override
-	public void updateLabel(NodeView nodeView) {
-        if (this.currentNodes.containsKey(nodeView)) {
-        	/* Get the node and realizer corresponding to 
-        	 * the node view. */
-        	Node node = this.currentNodes.get(nodeView);
-        	NodeRealizer realizer = graph2D.getRealizer(node);
-
-        	/* Set the node label text. */
-        	NodeLabel nodeLabel = realizer.getLabel();
-    		nodeLabel.setText(nodeView.getHtmlLabel());
-    		
-    		/* Repaint before updating the node size. If we
-    		 * don't do this then the calculations are wrong. */
-    		realizer.repaint();
-
-        	/* Now we need to update the node size (for all nodes) */
-        	this.updateNodeSize();
-        }
-	}
 	
 	/* (non-Javadoc)
 	 * @see teo.isgci.core.IDrawingService#updateColors()
@@ -436,7 +416,7 @@ public class YFilesDrawingService implements IDrawingService {
 				/* Run through all the improper edges for this view */
 				for (Edge edge : this.currentImproperEdges.get(view)) {
 					EdgeRealizer edgeRealizer = this.graph2D.getRealizer(edge);
-					if (view.getIncludeUnproper()) {
+					if (view.getIncludeImproper()) {
 						edgeRealizer.setSourceArrow(Arrow.STANDARD);
 					}
 					else {
@@ -477,6 +457,15 @@ public class YFilesDrawingService implements IDrawingService {
 		final Graph2DLayoutExecutor layoutExecutor = new Graph2DLayoutExecutor();
 		layoutExecutor.getLayoutMorpher().setSmoothViewTransform(true);
 		layoutExecutor.doLayout(this.graphView, layouter);
+	}
+	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#clearView()
+	 */
+	@Override
+	public void clearView() {
+		this.graph2D.clear();
+		this.graph2D.updateViews();
 	}
 	
 	/* (non-Javadoc)
@@ -622,25 +611,17 @@ public class YFilesDrawingService implements IDrawingService {
 		/* Finally, update the view. */
 		this.graphView.updateView();
 	}
-	
-	/* (non-Javadoc)
-	 * @see teo.isgci.core.IDrawingService#clearView()
-	 */
-	@Override
-	public void clearView() {
-		this.graph2D.clear();
-		this.graph2D.updateViews();
-	}
 
 	/* (non-Javadoc)
 	 * @see teo.isgci.core.IDrawingService#selectSuperClasses()
 	 */
 	@Override
 	public void selectSuperClasses() {
-		// TODO: Comments
-		Graph2D g = this.graphView.getGraph2D();
-		NodeCursor n = g.selectedNodes();
 		ArrayList<Node> l = new ArrayList<Node>();
+		
+		/* Run through the selected nodes and store the 
+		 * predecessors for each node. */
+		NodeCursor n = this.graph2D.selectedNodes();
 
 		for (int i = 0; i < n.size(); ++i) {
 			NodeCursor neigh = n.node().predecessors();
@@ -650,8 +631,12 @@ public class YFilesDrawingService implements IDrawingService {
 			}
 			n.next();
 		}
+		
+		/* Now run through the nodes found and select them. Do this
+		 * after the above loop so we don't alter the collection being
+		 * iterated over. */
 		for (Node no : l) {
-			this.graphView.getGraph2D().setSelected(no, true);
+			this.graph2D.setSelected(no, true);
 		}
 		this.graphView.updateView();
 	}
@@ -661,11 +646,11 @@ public class YFilesDrawingService implements IDrawingService {
 	 */
 	@Override
 	public void selectSubClasses() {
-		// TODO: Comments
-		Graph2D g = this.graphView.getGraph2D();
-		NodeCursor n = g.selectedNodes();
 		ArrayList<Node> l = new ArrayList<Node>();
-
+		
+		/* Run through the selected nodes and store the 
+		 * successors for each node. */
+		NodeCursor n = this.graph2D.selectedNodes();
 		for (int i = 0; i < n.size(); ++i) {
 			NodeCursor neigh = n.node().successors();
 			for (int j = 0; j < neigh.size(); ++j) {
@@ -674,24 +659,14 @@ public class YFilesDrawingService implements IDrawingService {
 			}
 			n.next();
 		}
+		
+		/* Now run through the nodes found and select them. Do this
+		 * after the above loop so we don't alter the collection being
+		 * iterated over. */
 		for (Node no : l) {
-			this.graphView.getGraph2D().setSelected(no, true);
+			this.graph2D.setSelected(no, true);
 		}
 		this.graphView.updateView();
-	}
-
-	/* (non-Javadoc)
-	 * @see teo.isgci.core.IDrawingService#invertSelection()
-	 */
-	@Override
-	public void invertSelection() {
-		// TODO: Comments
-		for (NodeCursor nc = this.graph2D.nodes(); nc.ok(); nc.next()) {
-			Node n = nc.node();
-			NodeRealizer nr = this.graph2D.getRealizer(n);
-			nr.setSelected(!nr.isSelected());
-			nr.repaint();
-		}
 	}
 	
 	/* (non-Javadoc)
@@ -699,27 +674,33 @@ public class YFilesDrawingService implements IDrawingService {
 	 */
 	@Override
 	public Collection<GraphClass> getSelection() {
-		// TODO: Comments
 		Graph2D g = this.graphView.getGraph2D();
 		NodeCursor n = g.selectedNodes();
 		Collection<GraphClass> graphClasses = new ArrayList<GraphClass>();
 		for (int i = 0; i < n.size(); ++i) {
-			String s = this.getNodeName(n.node());
+
+			/* Get the user data attached to the label. */
+			NodeView nodeView = getNodeView(n.node());
 			
-			if (s.contains("<sub>")) {
-				if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>"))
-						.contains(",")) {
-					s = s.replace("<sub>", "_{");
-					s = s.replace("</sub>", "}");
-				} else {
-					s = s.replace("<sub>", "_");
-					s = s.replace("</sub>", "");
-				}
-			}
-			graphClasses.add(App.DataProvider.getClass(s));
+			/* Add the default class to the selection */
+			graphClasses.add(nodeView.getDefaultClass());
 			n.next();
 		}
 		return graphClasses;
+	}
+
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDrawingService#invertSelection()
+	 */
+	@Override
+	public void invertSelection() {
+		/* Run through all the nodes toggling the selection */
+		for (NodeCursor nc = this.graph2D.nodes(); nc.ok(); nc.next()) {
+			Node n = nc.node();
+			NodeRealizer nr = this.graph2D.getRealizer(n);
+			nr.setSelected(!nr.isSelected());
+			nr.repaint();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -727,30 +708,29 @@ public class YFilesDrawingService implements IDrawingService {
 	 */
 	@Override
 	public void search(NodeView view) {
-		// TODO: Comments
-		// TODO: Fit nodes
-		// parent.graphCanvas.markOnly(view);
+		// TODO SWP: Fit nodes to the current window. At the moment the nodes
+		// are just selected. Sometimes the view is such that it is hard to 
+		// see where the nodes are. To do this we need to update the method 
+		// to accept an array of node views so that we can process all the
+		// nodes being searched for at once.
+		
+		/* Run through all the nodes looking for the Node associated with the
+		 * NodeView passed.	 */
 		for (NodeCursor nc = this.graphView.getGraph2D().nodes(); nc.ok(); nc
 				.next()) {
-			Node n = nc.node();
-			String s = this.getNodeName(n);
-
-			if (s.contains("<sub>")) {
-				if (s.substring(s.indexOf("<sub>"), s.indexOf("</sub>"))
-						.contains(",")) {
-					s = s.replace("<sub>", "_{");
-					s = s.replace("</sub>", "}");
-				} else {
-					s = s.replace("<sub>", "_");
-					s = s.replace("</sub>", "");
-				}
-			}
 			
-			if (view.getFullName().equals(s)) {
-				this.graphView.getGraph2D().setSelected(n, true);
+			/* Get the associated NodeView. This way we can search for 
+			 * equivalent classes without relying on the node views name. */
+			Node node = nc.node();
+			NodeView current = getNodeView(node);
+
+			if (current.equals(view)) {
+				/* Select the node and then break */
+				this.graphView.getGraph2D().setSelected(node, true);
+				break;
 			}
-			this.graphView.repaint();
 		}
+		this.graphView.repaint();
 	}
 
 	/* (non-Javadoc)
@@ -822,10 +802,42 @@ public class YFilesDrawingService implements IDrawingService {
 	 * @return The full name.
 	 */
 	String getNodeName(Node node) {
+		return getNodeView(node).getFullName();
+	}
+
+	/**
+	 * Gets the NodeView for a node.
+	 * @param node The node.
+	 * @return The NodeView.
+	 */
+	NodeView getNodeView(Node node) {
 		NodeRealizer realizer = this.graph2D.getRealizer(node);
 		NodeLabel label = realizer.getLabel();
-		NodeView view = (NodeView)label.getUserData();
-		return view.getFullName();
+		return (NodeView)label.getUserData();
+	}
+
+	/**
+	 * Updates a node label with the new default class for a node view.
+	 * @param nodeView	The node view with a new default class.
+	 */
+	void updateLabel(NodeView nodeView) {
+        if (this.currentNodes.containsKey(nodeView)) {
+        	/* Get the node and realizer corresponding to 
+        	 * the node view. */
+        	Node node = this.currentNodes.get(nodeView);
+        	NodeRealizer realizer = graph2D.getRealizer(node);
+
+        	/* Set the node label text. */
+        	NodeLabel nodeLabel = realizer.getLabel();
+    		nodeLabel.setText(nodeView.getHtmlLabel());
+    		
+    		/* Repaint before updating the node size. If we
+    		 * don't do this then the calculations are wrong. */
+    		realizer.repaint();
+
+        	/* Now we need to update the node size (for all nodes) */
+        	this.updateNodeSize();
+        }
 	}
 	
 	/**

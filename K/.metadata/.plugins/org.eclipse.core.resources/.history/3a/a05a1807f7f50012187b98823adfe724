@@ -1,0 +1,150 @@
+package teo.isgci.core;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import teo.isgci.data.db.AbstractRelation;
+import teo.isgci.data.gc.GraphClass;
+import teo.isgci.data.grapht.Inclusion;
+import teo.isgci.data.problem.Complexity;
+import teo.isgci.data.problem.Problem;
+
+public interface IDataProvider {
+	/**
+	 * loads the data from the specified file into memory. 
+	 * @param data				The data required by the derived class to load the 
+	 * 							application data (file path, connection string etc.)
+	 * @throws Exception
+	 */
+	void loadData(String data) throws Exception;
+	
+	/**
+	 * Tries to find a relation between the GraphClass x and the GraphClass y
+	 * @param x 				First GraphClass
+	 * @param y					Second GraphClass
+	 * @return					The relation which has been found.
+	 */
+	AbstractRelation findRelation(GraphClass x, GraphClass y);
+	
+	/**
+	 * returns a relation from the Collection which holds all possible relations.
+	 * @return					returns a relation.
+	 */	
+	Collection<AbstractRelation> getRelations();
+	
+	/**
+	 * returns all GraphClass from the Collection which holds all GraphClasses.
+	 * @return					returns all GraphClass
+	 */
+	Collection<GraphClass> getGraphClasses();
+	
+	/**
+	 * Returns a Collection with the selected classes and their super/sub classes if specified.
+	 * @param graphs			The original collection.
+	 * @param doSuper			Adds the super classes of this GraphClass to the result.
+	 * @param doSub				Adds the sub classes of this GraphClass to the result.
+	 * @return					The collection of graph classes.
+	 */
+	Collection<GraphClass> getGraphClasses(Collection<GraphClass> graphs, boolean doSuper, boolean doSub);
+	
+	/**
+	 * Returns all graph classes which are in the same complexity class as the given graph class for the selected problem.
+	 * @param graph				The graph.
+	 * @param problem			The problem.
+	 * @return					All graph classes that are in the same complexity class for the problem.
+	 */
+	Collection<GraphClass> getGraphClasses(GraphClass graph, Problem problem);
+	
+	/**
+	 * returns a specific GraphClass depending on the name which is typed in
+	 * @param name				name of the GraphClass
+	 * @return					returns a GraphClass
+	 */
+	GraphClass getClass(String name);
+	
+	/**
+	 * returns a Graph which represents the Inclusion of a GraphClass
+	 * @return					returns a Graph of an Inclusion
+	 */
+	SimpleDirectedGraph<GraphClass, Inclusion> getInclusionGraph();
+	
+	/**
+	 * returns a set of GraphClasses with the equivalent names of the selected GraphClass in the graph
+	 * @param graph				name of a graph
+	 * @return					returns a set of GraphClasses
+	 */
+	Set<GraphClass> getEquivalentClasses(GraphClass graph);
+	
+	/**
+	 * returns all Problems which are listed in the database
+	 * @return					returns the problems
+	 */
+	Problem[] getProblems();
+	
+	/**
+	 * returns a specific problem depending on which name was typed in
+	 * @param name				name of the wanted problem
+	 * @return					returns a problem
+	 */
+	Problem getProblem(String name);
+	
+	/**
+	 * returns all SubClasses of the GraphClass and also all SubClasses of the SubClasses till there is no
+	 * SubClass of a SubClass anymore
+	 * @param graph				name of the GraphClass from which the SubClasses are wanted
+	 * @param recursive			checks if there is a SubClass and if there is a Subclass of a SubClass
+	 * @return					returns all SubClasses of the wanted GraphClass and all SubClasses 
+	 * 							of the SubClasses 
+	 */
+	Collection<GraphClass> getSubClasses(GraphClass graph, final Boolean recursive);
+	
+	/**
+	 * returns all SuperClasses of the GraphClass and also all SuperClasses of the SubClasses till there 
+	 * is no SuperClass of a SuperClass anymore
+	 * @param graph				name of the GraphClass from which the SuperClasses are wanted
+	 * @param recursive			checks if there is a SuperClass and if there is a Superclass of a SuperClass
+	 * @return					returns all SuperClasses of the wanted GraphClass and all SuperClasses 
+	 * 							of the SuperClasses
+	 */
+	Collection<GraphClass> getSuperClasses(GraphClass graph, final Boolean recursive);
+	
+	/**
+	 * returns a Map between the Problem and the Complexity in which time the selected GraphClass can solve the 
+	 * problem
+	 * @param graph				name of the GraphClass from which the Problems shall be mapped with the right 
+	 * 							complexity
+	 * @return					returns a Map of the problem with the right complexity
+	 */
+	Map<Problem, Complexity> getComplexityMap(GraphClass graph);
+	
+	/**
+	 * returns a Map between the GraphClass and the Complexity in which time the selected problem can be solved
+	 *  by the GraphClass 
+	 * @param problem			name of the problem from which the GraphClasses shall be mapped with the right
+	 * 							complexity
+	 * @return					returns a Map of the GraphClasses and the right complexity
+	 */
+	Map<GraphClass, Complexity> getComplexityMap(Problem problem);
+	
+	/**
+	 * returns the current date
+	 * @return 					returns a date
+	 */
+	String getDate();    
+    
+	/**
+	 * returns the amount of the total nodes
+	 * @return					returns a count of the nodes
+	 */
+	int getNodeCount();
+    
+	/**
+	 * returns the amount of the total edges
+	 * @return					returns a count of the edges		
+	 */
+	int getEdgeCount();
+    
+}

@@ -24,6 +24,9 @@ import teo.isgci.data.xml.XMLParser;
  */
 public class XmlDataProvider extends DataProvider {
 	
+	/**
+	 * Creates a new instance.
+	 */
 	public XmlDataProvider()
 	{
 	}
@@ -31,16 +34,17 @@ public class XmlDataProvider extends DataProvider {
 	/**
 	 * Loads the data from the specified file into memory.
 	 * 
-	 * @param	data	The path to the XML file containing the application data
-	 * @throws MalformedURLException 
+	 * @param data						The path to the XML file containing the application data.
+	 * @throws MalformedURLException	If the parameter contains an incorrect path.	 
 	 */
 	@Override
-	public void loadData(String data) throws Exception {
+	public void loadData(String data) throws MalformedURLException {
+		/* Don't repeat initialisation */
 		if (initialized) {
             return;
 		}
 		
-		/* Initialize the collections */
+		/* Initialise the collections */
         this.inclGraph = new SimpleDirectedGraph<GraphClass,Inclusion>(Inclusion.class);
         this.problems = new Vector<Problem>(); 
 
@@ -58,14 +62,15 @@ public class XmlDataProvider extends DataProvider {
         this.edgeCount = gcr.getEdgeCount();
         this.relations = gcr.getRelations();
 
-        // Gather the classnames
+        /* Gather the class names */
         names = new TreeMap<String,GraphClass>(new LessLatex());
         for (GraphClass gclass : inclGraph.vertexSet())
             names.put(gclass.toString(), gclass);
 
-        // Gather the SCCs
+        /* Gather the SCCs */
         sccs = GAlg.calcSCCMap(inclGraph);
 
+        /* Make sure we don't do this again */
         initialized = true;
 	}
 

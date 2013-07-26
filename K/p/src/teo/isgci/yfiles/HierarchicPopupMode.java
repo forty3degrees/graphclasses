@@ -22,28 +22,55 @@ import y.base.EdgeCursor;
 import y.base.EdgeList;
 import y.base.Node;
 import y.view.Graph2D;
+import y.view.NodeLabel;
+import y.view.NodeRealizer;
 import y.view.PopupMode;
 
-
+/**
+ * The node pop-up menu.
+ * 
+ * @author Calum *
+ */
 public class HierarchicPopupMode extends PopupMode implements ActionListener {
-	    
+	
+	/** The 'add super-classes' menu item. */
 	private JMenuItem  addUp;
+	/** The 'add sub-classes' menu item. */
 	private JMenuItem  addDown;
+	/** The 'delete' menu item. */
 	private JMenuItem  delItem;
+	/** The 'info' menu item. */
 	private JMenuItem  infoItem;
+	/** The 'select neighbours' menu item. */
 	private JMenuItem  selectItem;
+	/** The 'select super-classes' menu item. */
 	private JMenuItem  selectItemUp;
+	/** The 'select sub-classes' menu item. */
 	private JMenuItem  selectItemDown;
+	
+	/** The menu. */
 	private JMenu  namingMenu;
+	
+	/** The parent frame. */
     private ISGCIMainFrame parent;
+    
+    /** The yfiles drawing service. */
 	private final YFilesDrawingService drawingService;
     
+	/**
+	 * Creates a new instance.
+	 * @param parent			The parent frame.
+	 * @param drawingService	The yfiles drawing service.
+	 */
     public HierarchicPopupMode(ISGCIMainFrame parent, YFilesDrawingService drawingService) {
     	super();
     	this.drawingService = drawingService;
     	this.parent = parent;
     }
     
+    /**
+     * Gets the node pop-up menu.
+     */
     public JPopupMenu getNodePopup(Node v) {
       Graph2D graph = getGraph2D();
       JPopupMenu pm = new JPopupMenu();
@@ -51,24 +78,46 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
       return pm;
     }
 
+    /**
+     * Gets the pop-up menu for when the background is right-clicked but
+     * some nodes are selected.
+     */
     public JPopupMenu getSelectionPopup(double x, double y) {
       JPopupMenu pm = new JPopupMenu();
       populatePopup(pm, x, y, null, getGraph2D().selectedNodes().ok());
       return pm;
     }
-    
+
+    /**
+     * Gets the edge pop-up menu.
+     */
     public JPopupMenu getEdgePopup(final Edge e) {
         JPopupMenu pm = new JPopupMenu();
         addEdgeActions(pm, new EdgeList(e).edges());
         return pm;
       }
-    
+
+    /**
+     * Adds the items to the edge pop-up menu.
+     * 
+     * @param pm	The pop-up menu.
+     * @param sec	The associated edge cursor (selected edges when the pop-up is invoked).
+     */
     private void addEdgeActions(JPopupMenu pm, EdgeCursor sec) {
         pm.add(new EdgeAction("Information", sec, this.parent, this.drawingService));
     }
-
+    
+	/**
+	 * Populates the node pop-up menu.
+	 * @param pm		The menu.
+	 * @param x			The x location of the click.
+	 * @param y			The y location of the click.
+	 * @param node		The associated node (if any).
+	 * @param selected	Whether a node is selected or not.
+	 */
 	protected void populatePopup(JPopupMenu pm, final double x, final double y, final Node node, boolean selected) {
           
+		/* Create the selection menu items */
       	parent.add(selectItem = new JMenuItem("Select Neighbors (H)"));
         selectItem.addActionListener(this);
           
@@ -78,27 +127,35 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         parent.add(selectItemDown = new JMenuItem("Select Subclasses (B)"));
         selectItemDown.addActionListener(this);
           
+        /* Create the hierarchy menu items */
         parent.add(addUp = new JMenuItem("Add Superclasses"));
         addUp.addActionListener(this);
           
         parent.add(addDown = new JMenuItem("Add Subclasses"));
         addDown.addActionListener(this);
         
+        /* Create the delete menu item */
         parent.add(delItem = new JMenuItem("Delete selected (Del)"));
         delItem.addActionListener(this);
             
         
         if (node != null) {
-
+        	/* The node is not null, so we add the information and change name items */
             parent.add(infoItem = new JMenuItem("Information"));
             infoItem.addActionListener(this);
             
+            /* Populate the change name flyout menu */
         	namingMenu = new JMenu("Change Name");
         	GraphClass gClass = App.DataProvider.getClass(drawingService.getNodeName(node));
         	System.out.println(gClass.toString());
         	Iterator<GraphClass> classes = Algo.equNodes(gClass).iterator();
 
         	while (classes.hasNext()) {
+        		
+        		/* Store the service in a temp variable so we can use it in the action handler below */
+        		final YFilesDrawingService tempService = this.drawingService;
+        		
+        		/* Add an action listener for each of the classes associated with the node. */
         		final GraphClass c = classes.next();
         		JMenuItem item = new JMenuItem(c.getNameAsHtml());        		
         		item.addActionListener(new AbstractAction() {
@@ -107,9 +164,10 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
 
 					@Override
                     public void actionPerformed(ActionEvent e) {
+						/* A new name was selected. Set the default class and redraw the label. */
                     	NodeView node = App.getViewManager(parent).findNode(c);
                     	node.setDefaultClass(c);
-                    	App.getDrawingService(parent).updateLabel(node);
+                    	tempService.updateLabel(node);
                     }
                 });
             	namingMenu.add(item);
@@ -117,6 +175,7 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         	
         }
          
+        /* Add the menu items and seperators */
         pm.add(selectItem);
         pm.add(selectItemUp);
         pm.add(selectItemDown);
@@ -137,46 +196,21 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
   	
 
     /**
-     * Eventhandler for menu selections
+     * Event handler for menu selections
      */
     public void actionPerformed(ActionEvent event) {
         Object object = event.getSource();
 
         Object source = event.getSource();
         if (source == infoItem) {
-        	String sub = drawingService.getNodeName(getGraph2D().selectedNodes().node());
-        	JDialog d;
-        	if (sub.length() >= 0) {
-        		//ToDo: Catch unknown Sequences (\cap ... )
-        	/*sub = sub.substring(6, sub.indexOf("</html>"));
-        	if (sub.indexOf('?') >= 0) {
-        		String newSub = sub.substring(0, sub.indexOf(" "));
-        		newSub += "$\\cap$ ";
-        		newSub += sub.substring(sub.indexOf("?") + 1);
-        		sub = newSub;
-        		
-        	}*/
-        		sub = sub.replace("<html>", "");
-        		sub = sub.replace("</html>", "");
-        		
-        		if (sub.contains("<sub>")) {
-	        		if (sub.substring(sub.indexOf("<sub>"), sub.indexOf("</sub>")).contains(",")) {
-	        			sub = sub.replace("<sub>", "_{");
-	            		sub = sub.replace("</sub>", "}");
-	        		} else {
-	        			sub = sub.replace("<sub>", "_");
-	            		sub = sub.replace("</sub>", "");
-	        		}
-        		}
-        		
-        		
-            d = new GraphClassInformationDialog(
-                    this.parent, App.DataProvider.getClass(sub));
-        	} else {
-  		    		d = new GraphClassInformationDialog(
-  		    				this.parent, App.DataProvider.getClass(
-  		    						getGraph2D().selectedNodes().current().toString()));
-        	}
+        	/* Get the NodeView for the currently selected node */
+        	Node node = getGraph2D().selectedNodes().node();
+        	NodeView nodeView = drawingService.getNodeView(node);
+        	
+        	/* Create and show the info dialog */
+            JDialog d = new GraphClassInformationDialog(
+                    this.parent, nodeView.getDefaultClass());
+
 	        d.setLocation(50, 50);
 	        d.pack();
 	        d.setSize(800, 600);
@@ -189,16 +223,22 @@ public class HierarchicPopupMode extends PopupMode implements ActionListener {
         } else if (object == selectItemDown) {
         	drawingService.selectSubClasses();
         } else if (object == addUp) {
+        	
         	Collection<GraphClass> graphClasses = drawingService.getSelection();
         	graphClasses = App.DataProvider.getGraphClasses(graphClasses, true, false);
         	App.getViewManager(parent).add(graphClasses);
+        	
         } else if (object == addDown) {
+        	
         	Collection<GraphClass> graphClasses = drawingService.getSelection();
         	graphClasses = App.DataProvider.getGraphClasses(graphClasses, false, true);
         	App.getViewManager(parent).add(graphClasses);
+        	
         } else if (object == delItem) {
+        	
         	Collection<GraphClass> graphClasses = drawingService.getSelection();
         	App.getViewManager(parent).delete(graphClasses);
+        	
         }
     }
 }

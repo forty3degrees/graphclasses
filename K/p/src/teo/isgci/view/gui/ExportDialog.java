@@ -392,7 +392,7 @@ public class ExportDialog extends JDialog implements ActionListener {
             GraphMLWriter w = new GraphMLWriter(out,
                     gmlYed.isSelected() ?
                         GraphMLWriter.MODE_YED : GraphMLWriter.MODE_PLAIN,
-                    App.getViewManager(parent).getDrawUnproper(),
+                    App.getViewManager(parent).getDrawImproper(),
                     gmlHtml.isSelected());
 
             w.startDocument();

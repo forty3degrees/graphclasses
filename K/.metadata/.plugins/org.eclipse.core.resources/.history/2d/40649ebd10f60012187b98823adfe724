@@ -1,0 +1,432 @@
+/*
+ * The main window of ISGCI. Also the class to start the program.
+ *
+ * $Header: /home/ux/CVSROOT/teo/teo/isgci/gui/ISGCIMainFrame.java,v 2.4 2013/04/07 10:51:04 ux Exp $
+ *
+ * This file is part of the Information System on Graph Classes and their
+ * Inclusions (ISGCI) at http://www.graphclasses.org.
+ * Email: isgci@graphclasses.org
+ */
+
+package teo.isgci.view.gui;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.regex.Pattern;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
+import org.pushingpixels.flamingo.api.ribbon.JRibbonFrame;
+
+import teo.isgci.core.App;
+import teo.isgci.core.IDrawingService;
+import teo.isgci.data.gc.ForbiddenClass;
+import teo.isgci.data.gc.GraphClass;
+import teo.isgci.view.actions.SaveAction;
+
+/*import teo.isgci.gc.GraphClass;
+import java.util.ArrayList;*/
+
+
+/** The main frame of the application.
+ */
+public class ISGCIMainFrame extends JRibbonFrame
+        implements WindowListener, ActionListener, ItemListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private static final Pattern PATH_SEPARATOR_PATTERN = Pattern.compile("/");
+		  
+    public static final String APPLICATIONNAME = "ISGCI";
+
+    public static ISGCIMainFrame tracker; // Needed for MediaTracker (hack)
+    public static LatexGraphics latex;
+    public static Font font;
+
+    protected teo.Loader loader;
+
+    // The menu
+    protected JMenuItem miNew, miExport, miExit;
+    protected JMenuItem miNaming, miSearching, miDrawUnproper;
+    protected JMenuItem miSelectGraphClasses, miCheckInclusion;
+    protected JMenuItem miGraphClassInformation;
+    protected JMenuItem miCut, miCopy, miPaste, miDelete, miSelectAll;
+    protected JMenu miOpenProblem, miColourProblem;
+    protected JMenuItem miSmallgraphs, miHelp, miAbout;
+    
+    // This is where the drawing goes.
+    public JScrollPane drawingPane;
+    public JPanel mainPan;
+
+        
+    /** Creates the frame.
+     * @param locationURL The path/URL to the applet/application.
+     * @param isApplet true iff the program runs as an applet.
+     * @throws Exception 
+     */
+    public ISGCIMainFrame(teo.Loader loader) throws Exception {
+        super(APPLICATIONNAME);
+               
+        UIManager.installLookAndFeel("JGoodies Windows",
+				"com.jgoodies.looks.windows.WindowsLookAndFeel");
+
+			try {
+			UIManager.setLookAndFeel(new MetalLookAndFeel());
+		} catch (Exception exc) {
+		}
+        
+        /* Load the data */
+        try {
+			App.DataProvider.loadData("data/isgci.xml");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw ex;
+		}
+        setTitle("ISGCI");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                
+        loader.register();
+        this.loader = loader;
+        tracker = this;
+
+        ForbiddenClass.initRules(loader, "data/smallgraphs.xml");
+        PSGraphics.init(loader);
+        if (latex == null) {
+            latex = new LatexGraphics();
+            latex.init(loader);
+        }
+
+        // TODO SWP: Don't really know what this does and whether it needs to be updated:
+        
+//        boolean createMaps = false;
+//        try {
+//            createMaps = System.getProperty("org.isgci.mappath") != null;
+//        } catch (Exception e) {}
+//
+//        if (createMaps) {       // Create maps and terminate
+//            createCanvasPanel();
+//            new teo.isgci.util.LandMark(this).createMaps();
+//            closeWindow();
+//        }
+        
+        
+        try {
+
+            URL resource = ISGCIMainFrame.class.getClassLoader().getResource("images/favicon.png");
+            ImageWrapperResizableIcon icon = ImageWrapperResizableIcon.getIcon(resource, new Dimension(32, 32));
+            setApplicationIcon(icon);
+            
+        } catch( Exception ex) {
+        	System.out.println(ex.getMessage());
+        }
+                
+        new ISGCIRibbon(this);
+        
+        getContentPane().add("Center", createMainPanel());
+        getContentPane().add("Center", createCanvasPanel());
+        
+        this.drawingPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0), "select");
+        
+        this.drawingPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "delete");
+        
+        this.drawingPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "selectUp");
+        
+        this.drawingPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0), "selectDown");
+        
+        this.drawingPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0), "invert");
+        
+        final ISGCIMainFrame frame = this;
+        this.drawingPane.getActionMap().put("select", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                App.getDrawingService(frame).selectNeighbors();
+            }
+        });
+        
+        this.drawingPane.getActionMap().put("selectUp", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	App.getDrawingService(frame).selectSuperClasses();
+            }
+        });
+        
+        this.drawingPane.getActionMap().put("selectDown", new AbstractAction() {
+
+			@Override
+            public void actionPerformed(ActionEvent e) {
+				App.getDrawingService(frame).selectSubClasses();
+            }
+        });
+        
+        this.drawingPane.getActionMap().put("delete", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+        		System.out.println("Deleting nodes");
+            	Collection<GraphClass> nodes = App.getDrawingService(frame).getSelection();
+            	App.getViewManager(frame).delete(nodes);
+            }
+        });
+        
+        this.drawingPane.getActionMap().put("invert", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	App.getDrawingService(frame).invertSelection();
+            }
+        });
+
+        registerListeners();
+        setLocation(20, 20);
+        pack();
+        this.setSize(1200, 800);
+        setVisible(true);
+                
+    }
+    
+    /**
+     * Creates and attaches the necessary eventlisteners.
+     */
+    protected void registerListeners() {
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(this);        
+    }
+
+      protected Action createSaveAction() {
+        return new SaveAction(this);
+      }
+
+    protected void createExamplesMenu(JMenuBar menuBar) {
+        final String[] fileNames = getExampleResources();
+        if (fileNames == null) {
+          return;
+        }
+
+        final JMenu menu = new JMenu("Example Graphs");
+        menuBar.add(menu);
+
+        for (int i = 0; i < fileNames.length; i++) {
+          final String filename = fileNames[i];
+          final IDrawingService drawingService = App.getDrawingService(this);
+          final String[] path = PATH_SEPARATOR_PATTERN.split(filename);
+          menu.add(
+        	new AbstractAction(path[path.length - 1]) {
+	            public void actionPerformed(ActionEvent e) {
+					try {
+						URL resource = new URL(filename);
+						drawingService.loadGraphML(resource);
+					} catch (MalformedURLException e1) {
+						// TINO: What to do?
+						e1.printStackTrace();
+					}
+	            }
+        	});
+        }
+      }
+    protected String[] getExampleResources() {
+        return null;
+      }
+    
+    /**
+     * Creates the drawing canvas with scrollbars at the bottom and at the
+     * right.
+     * @return the panel
+     */
+    protected JComponent createCanvasPanel() {
+        mainPan = new JPanel();
+        mainPan.setLayout(new BorderLayout());
+        mainPan.add(App.getDrawingService(this).getCanvas(), BorderLayout.CENTER);
+        
+        return mainPan;
+    }
+       
+    /**
+     * Creates the drawing canvas with scrollbars at the bottom and at the
+     * right.
+     * @return the panel
+     */
+    protected JComponent createMainPanel() {
+        drawingPane = new JScrollPane(
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        
+        drawingPane.getHorizontalScrollBar().setUnitIncrement(100);
+        drawingPane.getVerticalScrollBar().setUnitIncrement(100);
+        
+        return drawingPane;
+    }
+
+
+    /**
+     * Center the canvas on the given point.
+     */
+    public void centerCanvas(Point p) {
+        JViewport viewport = drawingPane.getViewport();
+        Dimension port = viewport.getExtentSize();
+        Dimension view = viewport.getViewSize();
+
+        p.x -= port.width/2;
+        if (p.x + port.width > view.width)
+            p.x = view.width - port.width;
+        if (p.x < 0)
+            p.x = 0;
+        p.y -= port.height/2;
+        if (p.y + port.height > view.height)
+            p.y = view.height - port.height;
+        if (p.y < 0)
+            p.y = 0;
+        viewport.setViewPosition(p);
+    }
+
+    public void printPort() {
+        Rectangle view = getViewport();
+        System.err.println("port: "+view);
+    }
+
+    public Rectangle getViewport() {
+        return drawingPane.getViewport().getViewRect();
+    }
+
+    
+    /** Closes the window and possibly terminates the program. */
+    public void closeWindow() {
+        setVisible(false);
+        dispose();
+        loader.unregister();
+    }
+
+    /**
+     * Eventhandler for window events
+     */
+    public void windowClosing(WindowEvent e) {
+        closeWindow();
+    }
+
+    /**
+     * Required to overload (abstract)
+     */
+    public void windowOpened(WindowEvent e) {}
+    public void windowClosed(WindowEvent e) {}
+    public void windowIconified(WindowEvent e) {}
+    public void windowDeiconified(WindowEvent e) {}
+    public void windowDeactivated(WindowEvent e) {}
+    public void windowActivated(WindowEvent e) {}
+
+    
+    /**
+     * Eventhandler for menu selections
+     */
+    public void actionPerformed(ActionEvent event) {
+        Object object = event.getSource();
+
+        Object source = event.getSource();
+        if (object == miExit) {
+            closeWindow();
+        } else if (object == miNew) {
+            try {
+				new ISGCIMainFrame(loader);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        } else if (object == miExport) {
+			/* Get the destination file */
+			//final JFileChooser chooser = new JFileChooser();
+			//int returnVal = chooser.showSaveDialog(null);
+			//if (returnVal == JFileChooser.APPROVE_OPTION) {
+				//App.getViewManager(this).export(chooser.getSelectedFile().getPath());
+	            JDialog export = new ExportDialog(this);
+	            export.setLocation(50, 50);
+	            export.pack();
+	            export.setVisible(true);
+			//}
+        } else if (object == miNaming) {
+            JDialog d = new NamingDialog(this);
+            d.setLocation(50,50);
+            d.pack();
+            d.setVisible(true);
+        } else if (object == miSearching) {
+            JDialog search = new SearchDialog(this);
+            search.setLocation(50,50);
+            search.setVisible(true);
+        } else if (object == miGraphClassInformation) {
+            JDialog info = new GraphClassInformationDialog(this);
+            info.setLocation(50, 50);
+            info.pack();
+            info.setSize(800, 600);
+            info.setVisible(true);
+        } else if (object == miCheckInclusion) {
+            JDialog check = new CheckInclusionDialog(this);
+            check.setLocation(50, 50);
+            check.pack();
+            check.setSize(700, 400);
+            check.setVisible(true);
+        } else if (object == miSelectGraphClasses) {
+            JDialog select = new GraphClassSelectionDialog(this);
+            select.setLocation(50, 50);
+            select.pack();
+            select.setSize(500, 400);
+            select.setVisible(true);
+        } else if (object == miAbout) {
+            JDialog select = new AboutDialog(this);
+            select.setLocation(50, 50);
+            select.setVisible(true);
+        } else if (object == miHelp) {
+            loader.showDocument("help.html");
+        } else if (object == miSmallgraphs) {
+            loader.showDocument("smallgraphs.html");
+        } else if (event.getActionCommand() == "miOpenProblem") {
+            JDialog open=new OpenProblemDialog(this,
+                    ((JMenuItem) event.getSource()).getText());
+            open.setLocation(50, 50);
+            open.setVisible(true);
+        }
+    }
+
+    public void itemStateChanged(ItemEvent event) {
+        Object object = event.getSource();
+
+        if (object == miDrawUnproper) {
+        	App.getViewManager(this).setDrawImproper(
+                    ((JCheckBoxMenuItem) object).getState());
+        }
+    }
+    	  
+}
+
+
+/* EOF */

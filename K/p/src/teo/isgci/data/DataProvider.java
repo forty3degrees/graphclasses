@@ -22,20 +22,43 @@ import teo.isgci.data.grapht.RevBFSWalker;
 import teo.isgci.data.problem.Complexity;
 import teo.isgci.data.problem.Problem;
 
+/**
+ * Generic data provider class. This class provides the data
+ * access logic that is independent of the location and format
+ * of the backing data.
+ * 
+ * @author Calum
+ *
+ */
 public abstract class DataProvider implements IDataProvider {
 
+	/** Flag to check if the data has been initialised */
 	protected boolean initialized;
     
+	/** 
+	 * Holds the last modification date of the backing data.
+	 * Used in the about dialog.
+	 */
     protected String date;
+	/** 
+	 * Holds the number of nodes.
+	 * Used in the about dialog.
+	 */
 	protected int nodeCount;
+	/** 
+	 * Holds the number of edges.
+	 * Used in the about dialog.
+	 */
 	protected int edgeCount;
 	
 
     /** The inclusion graph */
 	protected SimpleDirectedGraph<GraphClass,Inclusion> inclGraph;
-    /** Maps classnames to nodes */
+	
+    /** Maps class names to nodes */
     protected TreeMap<String,GraphClass> names;
-    /** Maps graphclasses to their SCCs */
+    
+    /** Maps graph classes to their SCCs */
     protected Map<GraphClass, Set<GraphClass> > sccs;
 
     /** Problems */
@@ -44,58 +67,102 @@ public abstract class DataProvider implements IDataProvider {
     /** Relations not in inclGraph */
     public List<AbstractRelation> relations;
     
-	/**
-	 * Loads the data from the specified file into memory.
-	 * 
-	 * @param	data	The data required by the derived class to load the 
-	 * 					application data (file path, connection string etc.)
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#loadData(java.lang.String)
 	 */
 	@Override
 	public abstract void loadData(String data) throws Exception;
 
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#findRelation(teo.isgci.data.gc.GraphClass, teo.isgci.data.gc.GraphClass)
+	 */
 	@Override
 	public AbstractRelation findRelation(GraphClass x, GraphClass y) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Method not implemented");
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getRelations()
+	 */
 	@Override
 	public Collection<AbstractRelation> getRelations() {
 		return Collections.unmodifiableCollection(this.relations);
 	}
 	
-    /**
-     * Returns the nodes of the available graphclasses ordered alphabetically.
-     */
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getGraphClasses()
+	 */
 	@Override
 	public Collection<GraphClass> getGraphClasses() {
 		return Collections.unmodifiableCollection(this.names.values());
-	}
+	}   
+    
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getGraphClasses(java.util.Collection, boolean, boolean)
+	 */
+	@Override
+    public Collection<GraphClass> getGraphClasses(Collection<GraphClass> graphs, 
+    		boolean doSuper, boolean doSub) {
+        final HashSet<GraphClass> result = new HashSet<GraphClass>();
+       
+        for (GraphClass graph : graphs) {
+            result.add(graph);
+            if (doSuper) {
+                result.addAll(this.getSuperClasses(graph, true));
+            }
+            if (doSub) {
+                result.addAll(this.getSubClasses(graph, true));
+            }
+        }
 
-    /**
-     * Return the node in inclGraph belonging to the given classname.
-     */
+        return result;
+    }  
+
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getGraphClasses(teo.isgci.data.gc.GraphClass, teo.isgci.data.problem.Problem)
+	 */
+	@Override
+    public Collection<GraphClass> getGraphClasses(GraphClass graph, Problem problem) {
+        Complexity c = problem.getComplexity(graph);
+        Collection<GraphClass> result = null;
+        if (c.isUnknown())
+            result = getGraphClassesOpen(graph, problem);
+        else if (c.betterOrEqual(Complexity.P))
+            result = getGraphClassesP(graph, problem);
+        else if (c.likelyNotP())
+            result = getGraphClassesNP(graph, problem);
+        else
+            throw new RuntimeException("Bad node");
+        return result;
+    }
+
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getClass(java.lang.String)
+	 */
 	@Override
     public GraphClass getClass(String name) {
         return this.names.get(name);
     }
 
-    /**
-     * Return the node in inclGraph belonging to the given classname.
-     */
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getInclusionGraph()
+	 */
 	@Override
     public SimpleDirectedGraph<GraphClass,Inclusion> getInclusionGraph() {
         return this.inclGraph;
     }
 
-    /**
-     * Return the set of classes equivalent to the given one.
-     */
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getEquivalentClasses(teo.isgci.data.gc.GraphClass)
+	 */
 	@Override
     public Set<GraphClass> getEquivalentClasses(GraphClass graph) {
         return this.sccs.get(graph);
     }
-    
+	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getProblems()
+	 */
 	@Override
 	public Problem[] getProblems() {
 		
@@ -103,7 +170,10 @@ public abstract class DataProvider implements IDataProvider {
 		Problem[] temp = new Problem[this.problems.size()];
 		return this.problems.toArray(temp);
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getProblem(java.lang.String)
+	 */
 	@Override
 	public Problem getProblem(String name) {
 		for (int i = 0; i < problems.size(); i++)
@@ -112,7 +182,10 @@ public abstract class DataProvider implements IDataProvider {
             }
         return null;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getSubClasses(teo.isgci.data.gc.GraphClass, java.lang.Boolean)
+	 */
 	@Override
 	public Collection<GraphClass> getSubClasses(GraphClass graph, final Boolean recursive) {
 
@@ -132,7 +205,10 @@ public abstract class DataProvider implements IDataProvider {
         
         return result;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getSuperClasses(teo.isgci.data.gc.GraphClass, java.lang.Boolean)
+	 */
 	@Override
 	public Collection<GraphClass> getSuperClasses(GraphClass graph, final Boolean recursive) {
 
@@ -152,81 +228,59 @@ public abstract class DataProvider implements IDataProvider {
         
         return result;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getComplexityMap(teo.isgci.data.gc.GraphClass)
+	 */
 	@Override
 	public Map<Problem, Complexity> getComplexityMap(GraphClass graph) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Method not implemented");
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getComplexityMap(teo.isgci.data.problem.Problem)
+	 */
 	@Override
 	public Map<GraphClass, Complexity> getComplexityMap(Problem problem) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Method not implemented");
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getDate()
+	 */
 	@Override
     public String getDate() {
         return date;
     }        
-
+	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getNodeCount()
+	 */
 	@Override
     public int getNodeCount() {
         return nodeCount;
     }    
-
+	
+	/* (non-Javadoc)
+	 * @see teo.isgci.core.IDataProvider#getEdgeCount()
+	 */
 	@Override
     public int getEdgeCount() {
         return edgeCount;
-    }    
-    
-    /**
-     * Returns a Collection with the selected classes an there super/sub classes if specified
-     */
-	@Override
-    public Collection<GraphClass> getGraphClasses(Collection<GraphClass> graphs, 
-    		boolean doSuper, boolean doSub) {
-        final HashSet<GraphClass> result = new HashSet<GraphClass>();
-       
-        for (GraphClass graph : graphs) {
-            result.add(graph);
-            if (doSuper) {
-                result.addAll(this.getSuperClasses(graph, true));
-            }
-            if (doSub) {
-                result.addAll(this.getSubClasses(graph, true));
-            }
-        }
-
-        return result;
-    }  
-
-    /**
-     * Returns a vector with the environment of the node with the given name.
-     * The environment depends on the complexity of the given node.
-     */
-	@Override
-    public Collection<GraphClass> getGraphClasses(GraphClass graph, Problem problem) {
-        Complexity c = problem.getComplexity(graph);
-        Collection<GraphClass> result = null;
-        if (c.isUnknown())
-            result = getNodesOpen(graph, problem);
-        else if (c.betterOrEqual(Complexity.P))
-            result = getNodesP(graph, problem);
-        else if (c.likelyNotP())
-            result = getNodesNP(graph, problem);
-        else
-            throw new RuntimeException("Bad node");
-        return result;
-    }
+    } 
     
     /**
      * Return a collection with the environment of the given node.
      * The environment is found by walking over open super/subclasses until the
      * first non-open node is reached.
+     * @param node					name of a GraphClass
+     * @param problem				name of a problem
+     * @return						returns a Collection of GraphClasses
      */
-    private Collection<GraphClass> getNodesOpen(GraphClass node,
+	private Collection<GraphClass> getGraphClassesOpen(GraphClass node,
             final Problem problem) {
+		
+		// TODO SWP: This was commented out in the original code. Can it be deleted?
         /*final ArrayList<GraphClass> result = new ArrayList<GraphClass>();
         new UBFSWalker<GraphClass,Inclusion>(
                 DataSet.inclGraph, node, null, GraphWalker.InitCode.DYNAMIC) {
@@ -241,8 +295,8 @@ public abstract class DataProvider implements IDataProvider {
         }.run();*/
 
         ArrayList<GraphClass> result = new ArrayList<GraphClass>();
-        result.addAll(getNodesNP(node, problem));
-        result.addAll(getNodesP(node, problem));
+        result.addAll(getGraphClassesNP(node, problem));
+        result.addAll(getGraphClassesP(node, problem));
 
         return result;
     }
@@ -252,8 +306,11 @@ public abstract class DataProvider implements IDataProvider {
      * Return a collection with the environment of the given node.
      * The environment is found by walking over open subclasses until the
      * first polynomial node is reached.
+     * @param node					name of a GraphClass
+     * @param problem				name of a problem
+     * @return 						returns a Collection of GraphClasses
      */
-    private Collection<GraphClass> getNodesNP(GraphClass node,
+    private Collection<GraphClass> getGraphClassesNP(GraphClass node,
             final Problem problem) {
         final ArrayList<GraphClass> result = new ArrayList<GraphClass>();
         new BFSWalker<GraphClass,Inclusion>(
@@ -273,10 +330,13 @@ public abstract class DataProvider implements IDataProvider {
 
     /**
      * Fills in a vector with the environment of the given node.
-     * The environment is found by walking over open superclasses until the
+     * The environment is found by walking over open super classes until the
      * first non-polynomial node is reached.
+     * @param node					name of a GraphClass
+     * @param problem				name of a Problem
+     * @return						returns a Collection of GraphClasses
      */
-    private Collection<GraphClass> getNodesP(GraphClass node,
+    private Collection<GraphClass> getGraphClassesP(GraphClass node,
             final Problem problem) {
         final ArrayList<GraphClass> result = new ArrayList<GraphClass>();
         new RevBFSWalker<GraphClass,Inclusion>(

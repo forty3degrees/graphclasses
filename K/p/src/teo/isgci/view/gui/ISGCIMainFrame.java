@@ -126,7 +126,8 @@ public class ISGCIMainFrame extends JRibbonFrame
             latex.init(loader);
         }
 
-        // TODO: Don't really know what this does and whether it needs to be updated
+        // TODO SWP: Don't really know what this does and whether it needs to be updated:
+        
 //        boolean createMaps = false;
 //        try {
 //            createMaps = System.getProperty("org.isgci.mappath") != null;
@@ -362,9 +363,7 @@ public class ISGCIMainFrame extends JRibbonFrame
 				e.printStackTrace();
 			}
         } else if (object == miExport) {
-        	// NOTE
-        	App.getViewManager(this).export();
-            JDialog export = new ExportDialog(this);
+			JDialog export = new ExportDialog(this);
             export.setLocation(50, 50);
             export.pack();
             export.setVisible(true);
@@ -415,7 +414,7 @@ public class ISGCIMainFrame extends JRibbonFrame
         Object object = event.getSource();
 
         if (object == miDrawUnproper) {
-        	App.getViewManager(this).setDrawUnproper(
+        	App.getViewManager(this).setDrawImproper(
                     ((JCheckBoxMenuItem) object).getState());
         }
     }

@@ -26,39 +26,40 @@ import teo.isgci.data.grapht.Inclusion;
 import teo.isgci.data.xml.GraphMLWriter;
 
 /**
- * Display a graph in a GraphCanvas.
+ * Represents the view [model] for a graph.
  */
 public class GraphView {
 	
+	/** The graph associated with this view. */
     protected SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph;
-    /** Whether to include improper (non-strict) inclusions in the resulting graphML */
-    protected boolean includeUnproper;
     
-    /** NodeViews */
+    /** Whether to include improper (non-strict) inclusions in the view. */
+    protected boolean includeImproper;
+    
+    /** The nodes in this graph. */
     protected List<NodeView> nodes;
     
-    /** 'Extra' views: edges, virtual nodes */
+    /** The edges in this graph. */
     protected List<EdgeView> edges;
 
 
     /**
-     * Create a new GraphView with nodes from DataSet.inclGraph.
-     * @param g The graph
+     * Create a new instance.
+     * @param g The associated graph
      */
     public GraphView(SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> g) {
 
         graph = g;
         
-        // Create the NodeViews; EdgeView are created when laying out.
+        /* Instantiate the collections */
         nodes = new ArrayList<NodeView>();
+        edges = new ArrayList<EdgeView>();
+        
+        /* Add the nodes. */
         for (Set<GraphClass> v: g.vertexSet())
             nodes.add(new NodeView(this, v));
         
-
-        //layouter.layoutGraph();
-        edges = new ArrayList<EdgeView>();
-
-        // Create the EdgeViews
+        /* Add the edges */
     	SimpleDirectedGraph<GraphClass, Inclusion> inclusionGraph = 
     			App.DataProvider.getInclusionGraph();
         for (DefaultEdge e : graph.edgeSet()) {
@@ -69,6 +70,11 @@ public class GraphView {
         }
     }
 
+    /**
+     * Sets the 'properness' of an edge (inclusion).
+     * @param view				The edge.	
+     * @param inclusionGraph	The inclusion graph.
+     */
 	private void setProperness(EdgeView view, 
 			SimpleDirectedGraph<GraphClass, Inclusion> inclusionGraph) {
         List<Inclusion> path = GAlg.getPath(inclusionGraph,
@@ -80,48 +86,58 @@ public class GraphView {
 	}
 
 	/** Sets whether to include improper (non-strict) inclusions in the resulting graphML */
-    public void setIncludeUnproper(boolean b) {
-        includeUnproper = b;
+    public void setIncludeImproper(boolean b) {
+        includeImproper = b;
     }
 
     /** Gets whether to include improper (non-strict) inclusions in the resulting graphML */
-    public boolean getIncludeUnproper() {
-        return includeUnproper;
+    public boolean getIncludeImproper() {
+        return includeImproper;
     }
 
     /**
-     * Return the view for the given node.
+     * Return the view for the given set of graph classes.
      */
-    public NodeView getView(Set<GraphClass> node) {
-        for (NodeView v : nodes)
-            if (v.getGraphClasses() == node)
+    public NodeView getView(Set<GraphClass> graphClasses) {
+        for (NodeView v : nodes) {
+            if (v.getGraphClasses() == graphClasses) {
                 return v;
+            }
+        }
         return null;
     }
 
     /**
-     * Return the graph this view shows.
+     * Return the graph this view represents.
      */
     public SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> getGraph() {
         return graph;
     }
 
     /**
-     * Return all nodeviews belonging to non-virtual nodes.
+     * Gets the nodes.
      */
     public List<NodeView> getNodes() {
         return Collections.unmodifiableList(nodes);
     }
 
+    /**
+     * Gets the edges.
+     */
 	public List<EdgeView> getEdges() {
 		return Collections.unmodifiableList(this.edges);
 	}
 
     /**
-     * Writes this to w.
+     * Writes this view in graphML format to the given writer.
+     * 
+     * @param w				The graphML writer.
+     * @throws SAXException	Thrown if an error occurs when writing the graphML elements.
      */
     public void write(GraphMLWriter w) throws SAXException {
-        
+        /* Run through all the nodes and edges delegating the 
+         * work to the NodeView.write(w) and EdgeView.write(w)
+         * methods. */
         for (NodeView v : nodes)
             v.write(w);
         for (EdgeView e : edges)
